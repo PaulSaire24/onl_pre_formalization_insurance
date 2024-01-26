@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<transaction xmlns="http://www.w3schools.com" transactionName="RBVDT118" application="RBVD" version="01" country="PE" language="ES">
+	<paramsIn/>
+	<paramsOut/>
+	<description>Trx to pre-formalizate a contract</description>
+</transaction>
