@@ -94,6 +94,16 @@
 			<artifactId>elara-utility-interbackend-cics</artifactId>
 			<version>${apx.interbackend.cics.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bbva.rbvd.dto.insrncsale</groupId>
+			<artifactId>RBVDC201</artifactId>
+			<version>0.21.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bbva.rbvd</groupId>
+			<artifactId>RBVDR047</artifactId>
+			<version>0.1.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>
