@@ -3,7 +3,7 @@ package com.bbva.rbvd;
 import com.bbva.elara.domain.transaction.RequestHeaderParamsName;
 import com.bbva.elara.domain.transaction.Severity;
 import com.bbva.elara.domain.transaction.response.HttpResponseCode;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
+import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
 import com.bbva.rbvd.lib.r118.RBVDR118;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +27,9 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
 
         this.loggHeaders();
 
-        PolicyDTO requestBody = this.getPolicyDTO();
+        PreformalizationDTO requestBody = this.getPolicyDTO();
 
-        PolicyDTO responseBody = null;
+        PreformalizationDTO responseBody;
 
         responseBody = rbvdR118.executePreFormalization(requestBody);
 
@@ -42,49 +42,15 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
 
     }
 
-    private void mapResponse(PolicyDTO responseBody) {
+    private void mapResponse(PreformalizationDTO responseBody) {
         Calendar operationDate = Calendar.getInstance();
         operationDate.setTimeZone(TimeZone.getTimeZone("America/Lima"));
         operationDate.setTime(responseBody.getOperationDate());
 
-        this.setId(responseBody.getId());
-        this.setPolicynumber(responseBody.getPolicyNumber());
-        this.setQuotationid(responseBody.getQuotationId());
-        this.setProductid(responseBody.getProductId());
-        this.setProductdescription(responseBody.getProductDescription());
-        this.setProductplan(responseBody.getProductPlan());
-        this.setPaymentmethod(responseBody.getPaymentMethod());
-
-        this.setOperationdate(operationDate);
-        this.setValidityperiod(responseBody.getValidityPeriod());
-        this.setLinks(responseBody.getLinks());
-        this.setTotalamount(responseBody.getTotalAmount());
-        this.setTotalamountwithouttax(responseBody.getTotalAmountWithoutTax());
-        this.setInsuredamount(responseBody.getInsuredAmount());
-        this.setIsdatatreatment(responseBody.getIsDataTreatment());
-        this.setDeliveries(responseBody.getDeliveries());
-        this.setHolder(responseBody.getHolder());
-        this.setRelatedcontracts(responseBody.getRelatedContracts());
-        this.setInstallmentplan(responseBody.getInstallmentPlan());
-        this.setHasacceptedcontract(responseBody.getHasAcceptedContract());
-        this.setInspection(responseBody.getInspection());
-        this.setFirstinstallment(responseBody.getFirstInstallment());
-        this.setParticipants(responseBody.getParticipants());
-        this.setBusinessagent(responseBody.getBusinessAgent());
-        this.setPromoter(responseBody.getPromoter());
-        this.setInsurancecompany(responseBody.getInsuranceCompany());
-        this.setExternalquotationid(responseBody.getExternalQuotationId());
-        this.setExternalpolicynumber(responseBody.getExternalPolicyNumber());
-        this.setStatus(responseBody.getStatus());
-        this.setBank(responseBody.getBank());
-        this.setIdentityverificationcode(responseBody.getIdentityVerificationCode());
-        this.setCouponcode(responseBody.getCouponCode());
-        this.setPolicyduration(responseBody.getPolicyDuration());
-        this.setSalesupplier(responseBody.getSaleSupplier());
     }
 
-    private PolicyDTO getPolicyDTO() {
-        PolicyDTO requestBody = new PolicyDTO();
+    private PreformalizationDTO getPolicyDTO() {
+        PreformalizationDTO requestBody = new PreformalizationDTO();
         String traceId = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.REQUESTID);
         String saleChannelId = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.CHANNELCODE);
         String user = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.USERCODE);
@@ -95,29 +61,25 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         String headerOperationDate = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.OPERATIONDATE);
         String operationTime = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.OPERATIONTIME);
 
-        requestBody.setQuotationId(this.getQuotationid());
-        requestBody.setProductId(this.getProductid());
-        requestBody.setProductPlan(this.getProductplan());
+        requestBody.setQuotationNumber(this.getQuotationnumber());
+        requestBody.setProduct(this.getProduct());
         requestBody.setPaymentMethod(this.getPaymentmethod());
         requestBody.setValidityPeriod(this.getValidityperiod());
-        requestBody.setTotalAmount(this.getTotalamount());
-        requestBody.setInsuredAmount(this.getInsuredamount());
-        requestBody.setIsDataTreatment(this.getIsdatatreatment());
-        requestBody.setDeliveries(this.getDeliveries());
+        requestBody.setTotalAmount(this.getTotalAmount());
+        requestBody.setInsuredAmount(this.getInsuredAmount());
+        requestBody.setDataTreatment(this.getIsDataTreatment());
         requestBody.setHolder(this.getHolder());
-        requestBody.setRelatedContracts(this.getRelatedcontracts());
-        requestBody.setInstallmentPlan(this.getInstallmentplan());
-        requestBody.setHasAcceptedContract(this.getHasacceptedcontract());
+        requestBody.setRelatedContracts(this.getRelatedContracts());
+        requestBody.setInstallmentPlan(this.getInstallmentPlan());
+        requestBody.setHasAcceptedContract(this.getHasAcceptedContract());
         requestBody.setInspection(this.getInspection());
-        requestBody.setFirstInstallment(this.getFirstinstallment());
+        requestBody.setFirstInstallment(this.getFirstInstallment());
         requestBody.setParticipants(this.getParticipants());
-        requestBody.setBusinessAgent(this.getBusinessagent());
+        requestBody.setBusinessAgent(this.getBusinessAgent());
         requestBody.setPromoter(this.getPromoter());
         requestBody.setBank(this.getBank());
-        requestBody.setIdentityVerificationCode(this.getIdentityverificationcode());
-        requestBody.setInsuranceCompany(this.getInsurancecompany());
-        requestBody.setCouponCode(this.getCouponcode());
-        requestBody.setSaleSupplier(this.getSalesupplier());
+        requestBody.setInsuranceCompany(this.getInsuranceCompany());
+        requestBody.setCouponCode(this.getCouponCode());
 
         requestBody.setTraceId(traceId);
         requestBody.setSaleChannelId(saleChannelId);

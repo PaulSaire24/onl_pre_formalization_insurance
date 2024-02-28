@@ -4,12 +4,11 @@
     <paramsIn>
         <parameter order="1" name="alias" mandatory="0" type="String" size="60"/>
         <parameter order="2" name="quotationNumber" mandatory="1" type="String" size="20"/>
-        <dto order="3" name="product" mandatory="1"
-             package="com.bbva.rbvd.dto.insrncsale.policy.FinancialProductDTO" artifactId="RBVDC201">
+        <dto order="3" name="product" mandatory="1" package="com.bbva.rbvd.dto.preformalization.input.Product"
+             artifactId="RBVDC118">
             <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
-            <dto order="2" name="plan" mandatory="1"
-                 package="com.bbva.rbvd.dto.insrncsale.policy.PolicyProductPlan"
-                 artifactId="RBVDC201">
+            <dto order="2" name="plan" mandatory="1" package="com.bbva.rbvd.dto.preformalization.input.ProductPlan"
+                 artifactId="RBVDC118">
                 <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
             </dto>
         </dto>
@@ -44,7 +43,7 @@
             <parameter order="2" name="installmentFrequency" mandatory="1" type="String" size="20"/>
         </dto>
         <dto order="6" name="validityPeriod" mandatory="0"
-             package="com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO" artifactId="RBVDC201">
+             package="com.bbva.rbvd.dto.preformalization.input.ValidityPeriod" artifactId="RBVDC118">
             <parameter order="1" name="startDate" mandatory="1" type="Date (YYYY-MM-DD)" size="0"/>
         </dto>
         <dto order="7" name="totalAmount" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO"
@@ -176,27 +175,27 @@
         <parameter order="4" name="alias" mandatory="0" type="String" size="60"/>
         <parameter order="5" name="productType" mandatory="1" type="String" size="20"/>
         <dto order="6" name="product" mandatory="1"
-             package="com.bbva.rbvd.dto.insrncsale.policy.FinancialProductDTO" artifactId="RBVDC201">
+             package="com.bbva.rbvd.dto.preformalization.input.Product" artifactId="RBVDC118">
             <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
             <parameter order="2" name="name" mandatory="1" type="String" size="60"/>
-            <dto order="3" name="plan" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.policy.PolicyProductPlan"
-                 artifactId="RBVDC201">
+            <dto order="3" name="plan" mandatory="1" package="com.bbva.rbvd.dto.preformalization.input.ProductPlan"
+                 artifactId="RBVDC118">
                 <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
                 <parameter order="2" name="description" mandatory="0" type="String" size="100"/>
                 <dto order="3" name="planType" mandatory="1"
-                     package="com.bbva.rbvd.dto.insrncsale.policy.PolicyProductPlan"
-                     artifactId="RBVDC201">
+                     package="com.bbva.rbvd.dto.preformalization.input.PlanType"
+                     artifactId="RBVDC118">
                     <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
                     <parameter order="2" name="name" mandatory="1" type="String" size="60"/>
                 </dto>
                 <dto order="4" name="coverage" mandatory="1"
-                     package="com.bbva.rbvd.dto.insrncsale.policy.CoverageTypeDTO"
-                     artifactId="RBVDC201">
+                     package="com.bbva.rbvd.dto.preformalization.input.PlanCoverage"
+                     artifactId="RBVDC118">
                     <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
                     <parameter order="2" name="name" mandatory="1" type="String" size="60"/>
                     <dto order="4" name="insuranceBranch" mandatory="1"
-                         package="com.bbva.rbvd.dto.insrncsale.policy.CoverageTypeDTO"
-                         artifactId="RBVDC201">
+                         package="com.bbva.rbvd.dto.preformalization.input.InsuranceBranch"
+                         artifactId="RBVDC118">
                         <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
                         <parameter order="2" name="name" mandatory="1" type="String" size="60"/>
                     </dto>
@@ -267,14 +266,14 @@
             </list>
         </dto>
         <list order="14" name="relatedContracts" mandatory="0">
-            <dto order="1" name="Type" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO"
-                 artifactId="RBVDC201">
+            <dto order="1" name="Type" mandatory="0" package="com.bbva.rbvd.dto.preformalization.input.RelatedContract"
+                 artifactId="RBVDC118">
                 <dto order="1" name="relationType" mandatory="1"
                      package="com.bbva.rbvd.dto.insrncsale.policy.RelationTypeDTO" artifactId="RBVDC201">
                     <parameter order="1" name="id" mandatory="1" type="String" size="50"/>
                 </dto>
                 <dto order="2" name="contractDetails" mandatory="1"
-                     package="com.bbva.rbvd.dto.insrncsale.policy.ContractDetailsDTO" artifactId="RBVDC201">
+                     package="com.bbva.rbvd.dto.preformalization.input.ContractDetails" artifactId="RBVDC118">
                     <parameter order="1" name="contractType" mandatory="1" type="String" size="50"/>
                     <parameter order="2" name="contractId" mandatory="0" type="String" size="20"/>
                     <parameter order="3" name="number" mandatory="0" type="String" size="20"/>
@@ -283,7 +282,7 @@
                         <parameter order="1" name="id" mandatory="1" type="String" size="30"/>
                     </dto>
                     <dto order="5" name="productType" mandatory="0"
-                         package="com.bbva.rbvd.dto.insrncsale.policy.FinancialProductDTO" artifactId="RBVDC201">
+                         package="com.bbva.rbvd.dto.preformalization.input.ProductType" artifactId="RBVDC118">
                         <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
                     </dto>
                 </dto>
@@ -295,7 +294,7 @@
             <parameter order="2" name="currency" mandatory="1" type="String" size="3"/>
         </dto>
         <dto order="16" name="totalAmountWithoutTax" mandatory="0"
-             package="com.bbva.rbvd.dto.insrncsale.commons.TotalAmountDTO" artifactId="RBVDC201">
+             package="com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO" artifactId="RBVDC201">
             <parameter order="1" name="amount" mandatory="1" type="Double" size="16"/>
             <parameter order="2" name="currency" mandatory="1" type="String" size="3"/>
             <dto order="3" name="exchangeRate" mandatory="0"
@@ -335,12 +334,12 @@
             </dto>
         </dto>
         <parameter order="19" name="operationDate" mandatory="0" type="Timestamp" size="0"/>
-        <dto order="20" name="status" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.QuotationStatusDTO"
-             artifactId="RBVDC201">
+        <dto order="20" name="status" mandatory="0" package="com.bbva.rbvd.dto.preformalization.input.InsuranceStatus"
+             artifactId="RBVDC118">
             <parameter order="1" name="id" mandatory="1" type="String" size="3"/>
             <parameter order="2" name="description" mandatory="0" type="String" size="30"/>
-            <dto order="3" name="reason" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO"
-                 artifactId="RBVDC201">
+            <dto order="3" name="reason" mandatory="0" package="com.bbva.rbvd.dto.preformalization.input.Reason"
+                 artifactId="RBVDC118">
                 <parameter order="1" name="id" mandatory="1" type="String" size="3"/>
                 <parameter order="2" name="description" mandatory="0" type="String" size="80"/>
             </dto>
@@ -351,9 +350,9 @@
             <parameter order="2" name="name" mandatory="1" type="String" size="100"/>
         </dto>
         <dto order="22" name="paymentConfiguration" mandatory="0"
-             package="com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO" artifactId="RBVDC201">
+             package="com.bbva.rbvd.dto.preformalization.input.PaymentConfiguration" artifactId="RBVDC118">
             <dto order="1" name="frequency" mandatory="1"
-                 package="com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO" artifactId="RBVDC201">
+                 package="com.bbva.rbvd.dto.preformalization.input.PaymentFrequency" artifactId="RBVDC118">
                 <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
                 <parameter order="2" name="name" mandatory="0" type="String" size="20"/>
             </dto>
@@ -388,38 +387,38 @@
         </dto>
         <parameter order="24" name="cancelationDate" mandatory="0" type="Date (YYYY-MM-DD)" size="0"/>
         <dto order="25" name="validityPeriod" mandatory="0"
-             package="com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO" artifactId="RBVDC201">
+             package="com.bbva.rbvd.dto.preformalization.input.ValidityPeriod" artifactId="RBVDC118">
             <parameter order="1" name="unit" mandatory="1" type="String" size="20"/>
             <parameter order="2" name="description" mandatory="0" type="String" size="80"/>
             <parameter order="3" name="startDate" mandatory="1" type="Date (YYYY-MM-DD)" size="0"/>
             <parameter order="4" name="endDate" mandatory="1" type="Date (YYYY-MM-DD)" size="0"/>
         </dto>
         <dto order="26" name="currentInstallment" mandatory="0"
-             package="com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO" artifactId="RBVDC201">
+             package="com.bbva.rbvd.dto.preformalization.input.Installment" artifactId="RBVDC118">
             <dto order="1" name="installmentAmount" mandatory="1"
                  package="com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO" artifactId="RBVDC201">
                 <parameter order="1" name="amount" mandatory="1" type="Double" size="15"/>
                 <parameter order="2" name="currency" mandatory="1" type="String" size="3"/>
             </dto>
             <dto order="2" name="period" mandatory="1"
-                 package="com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO" artifactId="RBVDC201">
+                 package="com.bbva.rbvd.dto.preformalization.input.ValidityPeriod" artifactId="RBVDC118">
                 <parameter order="1" name="startDate" mandatory="1" type="Date (YYYY-MM-DD)" size="0"/>
                 <parameter order="2" name="endDate" mandatory="1" type="Date (YYYY-MM-DD)" size="0"/>
             </dto>
             <dto order="3" name="installmentType" mandatory="0"
-                 package="com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO" artifactId="RBVDC201">
+                 package="com.bbva.rbvd.dto.preformalization.input.InstallmentType" artifactId="RBVDC118">
                 <parameter order="1" name="id" mandatory="1" type="String" size="10"/>
                 <parameter order="2" name="description" mandatory="0" type="String" size="100"/>
             </dto>
         </dto>
         <dto order="27" name="premiumDebt" mandatory="1"
-             package="com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO" artifactId="RBVDC201">
+             package="com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO" artifactId="RBVDC201">
             <parameter order="1" name="amount" mandatory="1" type="Double" size="15"/>
             <parameter order="2" name="currency" mandatory="1" type="String" size="3"/>
         </dto>
-        <dto order="28" name="nonRenewalPolicy" mandatory="0"
-             package="com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO"
-             artifactId="RBVDC201">
+        <dto order="28" name="renewalPolicy" mandatory="0"
+             package="com.bbva.rbvd.dto.preformalization.input.RenewalPolicy"
+             artifactId="RBVDC118">
             <parameter order="1" name="counter" mandatory="1" type="String" size="10"/>
             <parameter order="2" name="renewalDate" mandatory="0" type="Date (YYYY-MM-DD)" size="0"/>
         </dto>
@@ -440,19 +439,19 @@
             </dto>
         </dto>
         <dto order="33" name="lastInstallment" mandatory="0"
-             package="com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO" artifactId="RBVDC201">
+             package="com.bbva.rbvd.dto.preformalization.input.Installment" artifactId="RBVDC118">
             <dto order="1" name="period" mandatory="1"
-                 package="com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO" artifactId="RBVDC201">
+                 package="com.bbva.rbvd.dto.preformalization.input.ValidityPeriod" artifactId="RBVDC118">
                 <parameter order="1" name="startDate" mandatory="1" type="Date (YYYY-MM-DD)" size="0"/>
                 <parameter order="2" name="endDate" mandatory="0" type="Date (YYYY-MM-DD)" size="0"/>
             </dto>
         </dto>
         <parameter order="34" name="externalDocumentationSendDate" mandatory="0" type="Date (YYYY-MM-DD)" size="0"/>
         <dto order="35" name="nonRenewalPolicy" mandatory="0"
-             package="com.bbva.rbvd.dto.insrncsale.commons.QuotationStatusDTO"
-             artifactId="RBVDC201">
-            <dto order="1" name="reason" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO"
-                 artifactId="RBVDC201">
+             package="com.bbva.rbvd.dto.preformalization.input.RenewalPolicy"
+             artifactId="RBVDC118">
+            <dto order="1" name="reason" mandatory="0" package="com.bbva.rbvd.dto.preformalization.input.Reason"
+                 artifactId="RBVDC118">
                 <parameter order="1" name="id" mandatory="1" type="String" size="3"/>
                 <parameter order="2" name="description" mandatory="0" type="String" size="80"/>
                 <dto order="3" name="category" mandatory="0"
