@@ -1,6 +1,4 @@
-package com.bbva.rbvd.dto.preformalization.input;
-
-import com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO;
+package com.bbva.rbvd.dto.preformalization;
 
 public class RenewalPolicy {
     private Long counter;

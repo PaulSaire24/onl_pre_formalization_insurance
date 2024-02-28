@@ -9,4 +9,5 @@
 		</constructor-arg>
 	</bean>
 	<bean id="interBackendCicsUtilsFactory" class="com.bbva.rbvd.lib.r118.factory.InterBackendCicsUtilsFactoryTest"/>
+	<bean id="apiConnectorFactoryImpl" class="com.bbva.rbvd.lib.r118.factory.ApiConnectorFactoryTest"/>
 </beans>

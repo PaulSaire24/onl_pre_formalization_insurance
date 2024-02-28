@@ -1,0 +1,122 @@
+{
+  "quotationId": "0814000069917",
+  "productId": "830",
+  "productPlan": {
+    "id": "03"
+  },
+  "paymentMethod": {
+    "paymentType": "DIRECT_DEBIT",
+    "installmentFrequency": "ANNUAL",
+    "relatedContracts": [
+      {
+        "contractId": "4919148000539162",
+        "number": "4919148000539162",
+        "product": {
+          "id": "CARD"
+        }
+      }
+    ]
+  },
+  "isDataTreatment": true,
+  "validityPeriod": {
+    "startDate": "2024-02-20"
+  },
+  "totalAmount": {
+    "amount": 910.03,
+    "currency": "USD"
+  },
+  "insuredAmount": {
+    "amount": 12500,
+    "currency": "USD"
+  },
+  "holder": {
+    "id": "97194650",
+    "identityDocument": {
+      "documentType": {
+        "id": "DNI"
+      },
+      "number": "20230003"
+    },
+    "contactDetails": [
+      {
+        "contact": {
+          "contactDetailType": "EMAIL",
+          "address": "VICTOR.MORENO.ZAPATA@BBVA.COM"
+        }
+      },
+      {
+        "contact": {
+          "contactDetailType": "PHONE",
+          "phoneNumber": "920230003"
+        }
+      }
+    ]
+  },
+  "installmentPlan": {
+    "startDate": "2024-02-20",
+    "maturityDate": "2025-02-20",
+    "totalNumberInstallments": 1,
+    "period": {
+      "id": "ANNUAL"
+    },
+    "paymentAmount": {
+      "amount": 910.03,
+      "currency": "USD"
+    }
+  },
+  "hasAcceptedContract": true,
+  "inspection": {
+    "isRequired": true,
+    "fullName": "MARIELA CUBA SEGURAS",
+    "contactDetails": [
+      {
+        "contact": {
+          "contactDetailType": "EMAIL",
+          "address": "VICTOR.MORENO.ZAPATA@BBVA.COM"
+        }
+      },
+      {
+        "contact": {
+          "contactDetailType": "PHONE",
+          "phoneNumber": "920230003"
+        }
+      }
+    ]
+  },
+  "firstInstallment": {
+    "isPaymentRequired": true,
+    "paymentAmount": {
+      "amount": 910.03,
+      "currency": "USD"
+    }
+  },
+  "participants": [
+    {
+      "customerId": "97194650",
+      "identityDocument": {
+        "documentType": {
+          "id": "DNI"
+        },
+        "number": "20230003"
+      },
+      "participantType": {
+        "id": "PAYMENT_MANAGER"
+      }
+    }
+  ],
+  "insuranceCompany": {
+    "id": "01"
+  },
+  "businessAgent": {
+    "id": "121329"
+  },
+  "promoter": {
+    "id": "121329"
+  },
+  "bank": {
+    "id": "0011",
+    "branch": {
+      "id": "0172"
+    }
+  }
+}

@@ -1,7 +1,6 @@
-package com.bbva.rbvd.dto.preformalization.input;
+package com.bbva.rbvd.dto.preformalization;
 
 import com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * The ProductDto class...

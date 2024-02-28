@@ -2,7 +2,6 @@ package com.bbva.rbvd.dto.preformalization;
 
 import com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.*;
-import com.bbva.rbvd.dto.preformalization.input.*;
 
 import java.util.List;
 

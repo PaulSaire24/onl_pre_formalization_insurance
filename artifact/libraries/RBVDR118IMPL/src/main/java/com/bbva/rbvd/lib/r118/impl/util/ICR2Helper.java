@@ -2,43 +2,47 @@ package com.bbva.rbvd.lib.r118.impl.util;
 
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.*;
+import com.bbva.rbvd.dto.insrncsale.policy.InsuredAmountDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
+import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
+import com.bbva.rbvd.dto.preformalization.RelatedContract;
 
 import static java.util.Objects.nonNull;
 
 public class ICR2Helper {
 
-    public ICR2Request mapRequestFromPolicy(PolicyDTO policyDTO) {
+    public ICR2Request mapRequestFromPreformalizationBody(PreformalizationDTO preformalizationRequest) {
         ICR2Request icr2Request = new ICR2Request();
 
-        setBasicDetails(icr2Request, policyDTO);
-        setPaymentMethodDetails(icr2Request, policyDTO.getPaymentMethod());
-        setRelatedContractDetails(icr2Request, policyDTO.getRelatedContracts().get(ConstantsUtil.Number.CERO));
-        setHolderDetails(icr2Request, policyDTO.getHolder());
-        setInstallmentPlanDetails(icr2Request, policyDTO.getInstallmentPlan());
-        setInsuredAmountDetails(icr2Request, policyDTO.getInsuredAmount());
-        setParticipantDetails(icr2Request, policyDTO, ConstantsUtil.Participant.PAYMENT_MANAGER);
-        setParticipantDetails(icr2Request, policyDTO, ConstantsUtil.Participant.LEGAL_REPRESENTATIVE);
-        setTotalAmountDetails(icr2Request, policyDTO.getTotalAmount());
-
-        // icr2Request.setINDPREF();
+        setBasicDetails(icr2Request, preformalizationRequest);
+        setPaymentMethodDetails(icr2Request, preformalizationRequest.getPaymentMethod());
+        setRelatedContractDetails(icr2Request, preformalizationRequest.getRelatedContracts().get(ConstantsUtil.Number.CERO));
+        setHolderDetails(icr2Request, preformalizationRequest.getHolder());
+        setInstallmentPlanDetails(icr2Request, preformalizationRequest.getInstallmentPlan());
+        setInsuredAmountDetails(icr2Request, preformalizationRequest.getInsuredAmount());
+        setParticipantDetails(icr2Request, preformalizationRequest, ConstantsUtil.Participant.PAYMENT_MANAGER);
+        setParticipantDetails(icr2Request, preformalizationRequest, ConstantsUtil.Participant.LEGAL_REPRESENTATIVE);
+        setTotalAmountDetails(icr2Request, preformalizationRequest.getTotalAmount());
 
         return icr2Request;
     }
 
-    private void setBasicDetails(ICR2Request icr2Request, PolicyDTO policyDTO) {
-        icr2Request.setNUMPOL(policyDTO.getPolicyNumber());
-        icr2Request.setCODPRO(policyDTO.getProductId());
-        icr2Request.setFECINI(policyDTO.getValidityPeriod().getStartDate().toString());
-        icr2Request.setCODMOD(policyDTO.getProductPlan().getId());
-        icr2Request.setCOBRO(policyDTO.getFirstInstallment().getIsPaymentRequired() ? "S" : "N");
-        icr2Request.setGESTOR(policyDTO.getBusinessAgent().getId());
-        icr2Request.setPRESEN(policyDTO.getPromoter().getId());
-        icr2Request.setCODBAN(policyDTO.getBank().getId());
-        icr2Request.setOFICON(policyDTO.getBank().getBranch().getId());
-        icr2Request.setCODCIA(policyDTO.getInsuranceCompany().getId());
-        icr2Request.setSUBCANA(policyDTO.getSaleSupplier().getId());
-        icr2Request.setNUMCOTIZ(policyDTO.getQuotationId());
+    private void setBasicDetails(ICR2Request icr2Request, PreformalizationDTO preformalizationRequest) {
+        icr2Request.setNUMPOL(preformalizationRequest.getPolicyNumber());
+        icr2Request.setCODPRO(preformalizationRequest.getProductId());
+        icr2Request.setFECINI(preformalizationRequest.getValidityPeriod().getStartDate().toString());
+        icr2Request.setCODMOD(preformalizationRequest.getProduct().getPlan().getId());
+        icr2Request.setCOBRO(preformalizationRequest.getFirstInstallment().getIsPaymentRequired() ? "S" : "N");
+        icr2Request.setGESTOR(preformalizationRequest.getBusinessAgent().getId());
+        icr2Request.setPRESEN(preformalizationRequest.getPromoter().getId());
+        icr2Request.setCODBAN(preformalizationRequest.getBank().getId());
+        icr2Request.setOFICON(preformalizationRequest.getBank().getBranch().getId());
+        icr2Request.setCODCIA(preformalizationRequest.getInsuranceCompany().getId());
+        icr2Request.setNUMCOTIZ(preformalizationRequest.getQuotationId());
     }
 
     private void setPaymentMethodDetails(ICR2Request icr2Request, PolicyPaymentMethodDTO paymentMethod) {
@@ -48,11 +52,11 @@ public class ICR2Helper {
         }
     }
 
-    private void setRelatedContractDetails(ICR2Request icr2Request, RelatedContractDTO relatedContract) {
+    private void setRelatedContractDetails(ICR2Request icr2Request, RelatedContract relatedContract) {
         if (nonNull(relatedContract)) {
             String contractType = relatedContract.getContractDetails().getContractType();
             icr2Request.setNROCTA(relatedContract.getNumber());
-            icr2Request.setMEDPAG(relatedContract.getProduct().getId());
+            icr2Request.setMEDPAG(relatedContract.getContractDetails().getProductType().getId());
             icr2Request.setTCONVIN(contractType);
             icr2Request.setCONVIN(contractType.equals(ConstantsUtil.RelatedContractType.InternalContract) ? relatedContract.getContractDetails().getContractId() : relatedContract.getContractDetails().getNumber());
         }
@@ -82,8 +86,8 @@ public class ICR2Helper {
         }
     }
 
-    private void setParticipantDetails(ICR2Request icr2Request, PolicyDTO policyDTO, String role) {
-        ParticipantDTO participant = getParticipantByRole(policyDTO, role);
+    private void setParticipantDetails(ICR2Request icr2Request, PreformalizationDTO preformalizationRequest, String role) {
+        ParticipantDTO participant = getParticipantByRole(preformalizationRequest, role);
         if (nonNull(participant)) {
             icr2Request.setPARTIC(role);
             if (role.equals(ConstantsUtil.Participant.PAYMENT_MANAGER)) {
@@ -105,8 +109,8 @@ public class ICR2Helper {
         }
     }
 
-    private ParticipantDTO getParticipantByRole(PolicyDTO policyDTO, String role) {
-        return policyDTO.getParticipants().stream()
+    private ParticipantDTO getParticipantByRole(PreformalizationDTO preformalizationRequest, String role) {
+        return preformalizationRequest.getParticipants().stream()
                 .filter(participant -> participant.getParticipantType().getId().equals(role))
                 .findFirst()
                 .orElse(null);

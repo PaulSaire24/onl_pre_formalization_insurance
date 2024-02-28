@@ -1,4 +1,4 @@
-package com.bbva.rbvd.dto.preformalization.input;
+package com.bbva.rbvd.dto.preformalization;
 
 import com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO;

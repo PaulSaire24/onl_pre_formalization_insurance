@@ -11,13 +11,10 @@ public class ConstantsUtil {
         CONTRACTOR(8),
         INSURED(9),
         PAYMENT_MANAGER(23);
-
         private final Integer rol;
-
         ParticipantRol(Integer rol) {
             this.rol = rol;
         }
-
         public Integer getRol() {
             return rol;
         }

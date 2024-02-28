@@ -13,9 +13,8 @@ import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PromoterDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
-import com.bbva.rbvd.dto.preformalization.input.*;
+import com.bbva.rbvd.dto.preformalization.*;
 
 import java.util.List;
 
@@ -94,8 +93,8 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
     /**
      * Return value for input parameter relatedContracts
      */
-    protected List<RelatedContractDTO> getRelatedContracts() {
-        return (List<RelatedContractDTO>) this.getParameter("relatedContracts");
+    protected List<RelatedContract> getRelatedContracts() {
+        return (List<RelatedContract>) this.getParameter("relatedContracts");
     }
 
     /**

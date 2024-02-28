@@ -4,4 +4,5 @@
 	<osgi:service id="rbvdR118Osgi" ref="rbvdR118" interface="com.bbva.rbvd.lib.r118.RBVDR118"/>
 	<osgi:reference id="applicationConfigurationServiceFactory" bean-name="applicationConfigurationServiceFactory" interface="com.bbva.elara.configuration.manager.application.factory.ApplicationConfigurationServiceFactory"/>
 	<osgi:reference id="interBackendCicsUtilsFactory" bean-name="interBackendCicsUtilsFactory" interface="com.bbva.elara.utility.interbackend.cics.InterBackendCicsUtilsFactory"/>
+	<osgi:reference id="apiConnectorFactoryImpl" bean-name="apiConnectorFactoryImpl" interface="com.bbva.elara.utility.api.connector.APIConnectorFactory"/>
 </beans>
