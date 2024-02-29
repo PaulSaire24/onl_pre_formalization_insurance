@@ -1,4 +1,4 @@
-package com.bbva.rbvd.lib.r118.impl.util;
+package com.bbva.rbvd.rbvd118.impl.util;
 
 public class ConstantsUtil {
 
@@ -37,10 +37,6 @@ public class ConstantsUtil {
         public static final String QUERY_GET_INSURED_DATA_LIFE = "PISD.GET_INSURED_DATA_LIFE";
     }
 
-    public static final class Delimeter {
-        public static final String VERTICAL_BAR = "|";
-    }
-
     public static final class Number {
         public static final int DIEZ = 10;
         public static final int TRES = 3;
@@ -50,11 +46,6 @@ public class ConstantsUtil {
     }
 
     public static final class RBVDR118 {
-        public static final String FIELD_PREMIUM_AMOUNT = "PREMIUM_AMOUNT";
-        public static final String FIELD_PREMIUM_CURRENCY_ID = "PREMIUM_CURRENCY_ID";
-        public static final String FIELD_POLICY_PAYMENT_FREQUENCY_TYPE = "POLICY_PAYMENT_FREQUENCY_TYPE";
-        public static final String PROPERTY_RANGE_PAYMENT_AMOUNT = "property.range.payment.amount.insurance";
-        public static final String PROPERTY_VALIDATION_RANGE = "property.validation.range.";
         public static final String LIMA_TIME_ZONE = "America/Lima";
         public static final String GMT_TIME_ZONE = "GMT";
     }

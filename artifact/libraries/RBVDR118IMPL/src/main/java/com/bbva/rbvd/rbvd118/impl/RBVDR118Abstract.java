@@ -1,4 +1,4 @@
-package com.bbva.rbvd.lib.r118.impl;
+package com.bbva.rbvd.rbvd118.impl;
 
 import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
 import com.bbva.elara.library.AbstractLibrary;
@@ -8,10 +8,10 @@ import com.bbva.elara.utility.interbackend.cics.InterBackendCicsUtils;
 import com.bbva.pisd.lib.r012.PISDR012;
 import com.bbva.pisd.lib.r401.PISDR401;
 import com.bbva.rbvd.lib.r047.RBVDR047;
-import com.bbva.rbvd.lib.r118.RBVDR118;
-import com.bbva.rbvd.lib.r118.impl.util.ICR2Helper;
-import com.bbva.rbvd.lib.r118.impl.util.MapperHelper;
-import com.bbva.rbvd.lib.r118.impl.util.ValidationUtil;
+import com.bbva.rbvd.rbvd118.RBVDR118;
+import com.bbva.rbvd.rbvd118.impl.util.ICR2Helper;
+import com.bbva.rbvd.rbvd118.impl.util.MapperHelper;
+import com.bbva.rbvd.rbvd118.impl.util.ValidationUtil;
 
 /**
  * This class automatically defines the libraries and utilities that it will use.

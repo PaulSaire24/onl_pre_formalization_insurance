@@ -1,17 +1,19 @@
-package com.bbva.rbvd.lib.r118.impl;
+package com.bbva.rbvd.rbvd118.impl;
 
 import com.bbva.apx.exception.business.BusinessException;
+import com.bbva.pisd.dto.insurance.utils.PISDProperties;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
+import com.bbva.rbvd.dto.insrncsale.dao.InsuranceContractDAO;
 import com.bbva.rbvd.dto.insrncsale.dao.RequiredFieldsEmissionDAO;
 import com.bbva.rbvd.dto.insrncsale.policy.BusinessAgentDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PromoterDTO;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDErrors;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDValidation;
 import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
-import com.bbva.rbvd.lib.r118.impl.util.ConstantsUtil;
-import com.bbva.rbvd.lib.r118.impl.util.ValidationUtil;
+import com.bbva.rbvd.rbvd118.impl.util.ConstantsUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -24,8 +26,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
-import static com.bbva.rbvd.lib.r118.impl.util.ConstantsUtil.RBVDR118.GMT_TIME_ZONE;
-import static com.bbva.rbvd.lib.r118.impl.util.ConstantsUtil.RBVDR118.LIMA_TIME_ZONE;
+import static com.bbva.rbvd.rbvd118.impl.util.ConstantsUtil.RBVDR118.GMT_TIME_ZONE;
+import static com.bbva.rbvd.rbvd118.impl.util.ConstantsUtil.RBVDR118.LIMA_TIME_ZONE;
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -39,56 +41,61 @@ public class RBVDR118Impl extends RBVDR118Abstract {
     private static final String KEY_CYPHER_CODE = "apx-pe-fpextff1-do";
     private static final String CHANNEL_GLOMO = "pisd.channel.glomo.aap";
     private static final String CHANNEL_CONTACT_DETAIL = "pisd.channel.contact.detail.aap";
+    private static final String TAG_ENDORSEE = "ENDORSEE";
+    private static final String TAG_RUC = "RUC";
 
-    @Override
     public PreformalizationDTO executePreFormalization(PreformalizationDTO requestBody) {
-
         try {
             LOGGER.info("executePreFormalization - Start with values: {}", requestBody);
 
-            LOGGER.info("executePreFormalization - Validating if policy exists");
             validatePolicyExists(requestBody);
 
-            Map<String, Object> quotationIdArgument = this.mapperHelper.createSingleArgument(requestBody.getQuotationNumber(),
-                    RBVDProperties.FIELD_POLICY_QUOTA_INTERNAL_ID.getValue());
+            Map<String, Object> quotationIdArgument = mapperHelper.createSingleArgument(requestBody.getQuotationNumber(), RBVDProperties.FIELD_POLICY_QUOTA_INTERNAL_ID.getValue());
+            Map<String, Object> frequencyTypeArgument = mapperHelper.createSingleArgument(requestBody.getInstallmentPlan().getPeriod().getId(), RBVDProperties.FIELD_POLICY_PAYMENT_FREQUENCY_TYPE.getValue());
 
-            Map<String, Object> frequencyTypeArgument = this.mapperHelper.createSingleArgument(requestBody.getInstallmentPlan().getPeriod().getId(),
-                    RBVDProperties.FIELD_POLICY_PAYMENT_FREQUENCY_TYPE.getValue());
+            Map<String, Object> contractRequiredFields = pisdR012.executeGetASingleRow(RBVDProperties.DYNAMIC_QUERY_FOR_INSURANCE_CONTRACT.getValue(), quotationIdArgument);
+            Map<String, Object> paymentPeriodResponse = pisdR012.executeGetASingleRow(RBVDProperties.QUERY_SELECT_PAYMENT_PERIOD.getValue(), frequencyTypeArgument);
+            Map<String, Object> productResponse = (Map<String, Object>) pisdR401.executeGetProductById(ConstantsUtil.Queries.QUERY_SELECT_PRODUCT_BY_PRODUCT_TYPE, singletonMap(RBVDProperties.FIELD_INSURANCE_PRODUCT_TYPE.getValue(), requestBody.getProduct().getId()));
 
-            Map<String, Object> contractRequiredFields = pisdR012.executeGetASingleRow(RBVDProperties.DYNAMIC_QUERY_FOR_INSURANCE_CONTRACT.getValue(),
-                    quotationIdArgument);
+            RequiredFieldsEmissionDAO emissionDao = validationUtil.validateResponseQueryGetRequiredFields(contractRequiredFields, paymentPeriodResponse);
 
-            Map<String, Object> paymentPeriodResponse = pisdR012.executeGetASingleRow(RBVDProperties.QUERY_SELECT_PAYMENT_PERIOD.getValue(),
-                    frequencyTypeArgument);
+            evaluateIfPaymentIsRequired(requestBody);
 
-            Map<String, Object> productResponse = (Map<String, Object>) this.pisdR401.executeGetProductById(ConstantsUtil.Queries.QUERY_SELECT_PRODUCT_BY_PRODUCT_TYPE,
-                    singletonMap(RBVDProperties.FIELD_INSURANCE_PRODUCT_TYPE.getValue(), requestBody.getProduct().getId()));
-
-            RequiredFieldsEmissionDAO emissionDao = ValidationUtil.validateResponseQueryGetRequiredFields(contractRequiredFields, paymentPeriodResponse);
-
-            LOGGER.info("executePreFormalization - Evaluate if payment is required");
-            this.evaluateIfPaymentIsRequired(requestBody);
-
-            LOGGER.info("executePreFormalization - Mapping request to ICR2Request");
             ICR2Request icr2Request = icr2Helper.mapRequestFromPreformalizationBody(requestBody);
 
-            LOGGER.info("executePreFormalization - Calling RBVDR047 to executePolicyRegistration with values: {}", icr2Request);
             ICR2Response icr2Response = rbvdR047.executePolicyRegistration(icr2Request);
-            LOGGER.info("executePreFormalization - Response from RBVDR047: {}", icr2Response);
 
             String hostBranchId = icr2Response.getIcmrys2().getOFICON();
             requestBody.getBank().getBranch().setId(hostBranchId);
-            LOGGER.info("executePreFormalization - Host branch id: {}", hostBranchId);
 
-            LOGGER.info("executePreFormalization - Setting saleChannelId depending on branchId: {}", hostBranchId);
-            this.setSaleChannelIdFromBranchId(requestBody, hostBranchId);
+            setSaleChannelIdFromBranchId(requestBody, hostBranchId);
 
-            LOGGER.info("executePreFormalization - Validating digital sale");
             validateDigitalSale(requestBody);
+
+            Boolean isEndorsement = validateEndorsement(requestBody);
+
+            InsuranceContractDAO contractDao = mapperHelper.buildInsuranceContract(requestBody, emissionDao, icr2Response, isEndorsement);
+
+            Map<String, Object> argumentsForSaveContract = mapperHelper.createSaveContractArguments(contractDao);
+
+            int insertedContract = pisdR012.executeInsertSingleRow(PISDProperties.QUERY_INSERT_INSURANCE_CONTRACT.getValue(),
+                    argumentsForSaveContract,
+                    RBVDProperties.FIELD_INSURANCE_CONTRACT_ENTITY_ID.getValue(),
+                    RBVDProperties.FIELD_INSURANCE_CONTRACT_BRANCH_ID.getValue(),
+                    RBVDProperties.FIELD_INSURANCE_PRODUCT_ID.getValue(),
+                    RBVDProperties.FIELD_INSURANCE_MODALITY_TYPE.getValue(),
+                    RBVDProperties.FIELD_INSURANCE_COMPANY_ID.getValue(),
+                    RBVDProperties.FIELD_INSURANCE_CONTRACT_START_DATE.getValue(),
+                    RBVDProperties.FIELD_CUSTOMER_ID.getValue(),
+                    RBVDProperties.FIELD_INSRNC_CO_CONTRACT_STATUS_TYPE.getValue(),
+                    RBVDProperties.FIELD_INSRC_CONTRACT_INT_ACCOUNT_ID.getValue(),
+                    RBVDProperties.FIELD_USER_AUDIT_ID.getValue());
+
+            validateInsertion(insertedContract, RBVDErrors.INSERTION_ERROR_IN_CONTRACT_TABLE);
 
             return requestBody;
         } catch (BusinessException e) {
-            this.addAdviceWithDescription(e.getAdviceCode(), e.getMessage());
+            addAdviceWithDescription(e.getAdviceCode(), e.getMessage());
             return null;
         }
     }
@@ -161,5 +168,25 @@ public class RBVDR118Impl extends RBVDR118Abstract {
             requestBody.setPromoter(promoter);
         }
         requestBody.setBusinessAgent(businessAgent);
+    }
+
+    private boolean validateEndorsement(PreformalizationDTO requestBody) {
+        if (requestBody.getParticipants() == null || requestBody.getParticipants().size() <= ConstantsUtil.Number.UNO) {
+            return false;
+        }
+
+        ParticipantDTO participant = requestBody.getParticipants().get(ConstantsUtil.Number.UNO);
+        if (participant.getIdentityDocument() == null || participant.getBenefitPercentage() == null) {
+            return false;
+        }
+
+        return TAG_ENDORSEE.equals(participant.getParticipantType().getId())
+                && TAG_RUC.equals(participant.getIdentityDocument().getDocumentType().getId());
+    }
+
+    private void validateInsertion(int insertedRows, RBVDErrors error) {
+        if (insertedRows != 1) {
+            throw RBVDValidation.build(error);
+        }
     }
 }

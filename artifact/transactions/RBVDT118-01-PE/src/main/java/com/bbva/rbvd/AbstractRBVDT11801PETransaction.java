@@ -65,8 +65,8 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
     /**
      * Return value for input parameter validityPeriod
      */
-    protected ValidityPeriodDTO getValidityperiod() {
-        return (ValidityPeriodDTO) this.getParameter("validityPeriod");
+    protected ValidityPeriod getValidityperiod() {
+        return (ValidityPeriod) this.getParameter("validityPeriod");
     }
 
     /**
@@ -165,6 +165,13 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
      */
     protected String getCouponCode() {
         return (String) this.getParameter("couponCode");
+    }
+
+    /**
+     * Return value for input parameter identityVerificationCode
+     */
+    protected String getIdentityVerificationCode() {
+        return (String) this.getParameter("identityVerificationCode");
     }
 
     public void setId(String id) {

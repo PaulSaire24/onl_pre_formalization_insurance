@@ -34,6 +34,7 @@ public class PreformalizationDTO extends CommonFieldsDTO {
     private String subscriptionType;
     private Installment lastInstallment;
     private RenewalPolicy nonRenewalPolicy;
+    private String identityVerificationCode;
 
     public Product getProduct() {
         return product;
@@ -259,6 +260,14 @@ public class PreformalizationDTO extends CommonFieldsDTO {
         this.nonRenewalPolicy = nonRenewalPolicy;
     }
 
+    public String getIdentityVerificationCode() {
+        return identityVerificationCode;
+    }
+
+    public void setIdentityVerificationCode(String identityVerificationCode) {
+        this.identityVerificationCode = identityVerificationCode;
+    }
+
     @Override
     public String toString() {
         return "PreformalizationDTO{" +
@@ -279,18 +288,18 @@ public class PreformalizationDTO extends CommonFieldsDTO {
                 ", quotationNumber='" + quotationNumber + '\'' +
                 ", alias='" + alias + '\'' +
                 ", productType='" + productType + '\'' +
-                ", status=" + insuranceStatus +
+                ", insuranceStatus=" + insuranceStatus +
                 ", paymentConfiguration=" + paymentConfiguration +
                 ", cancelationDate='" + cancelationDate + '\'' +
-                ", validityPeriod=" + insuranceValidityPeriod +
+                ", insuranceValidityPeriod=" + insuranceValidityPeriod +
                 ", currentInstallment=" + currentInstallment +
                 ", premiumDebt=" + premiumDebt +
                 ", renewalPolicy=" + renewalPolicy +
                 ", certificateNumber='" + certificateNumber + '\'' +
                 ", subscriptionType='" + subscriptionType + '\'' +
-                ", bank=" + getBank() +
                 ", lastInstallment=" + lastInstallment +
                 ", nonRenewalPolicy=" + nonRenewalPolicy +
+                ", identityVerificationCode='" + identityVerificationCode + '\'' +
                 '}';
     }
 }

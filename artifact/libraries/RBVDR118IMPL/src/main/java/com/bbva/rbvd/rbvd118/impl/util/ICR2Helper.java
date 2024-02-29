@@ -1,4 +1,4 @@
-package com.bbva.rbvd.lib.r118.impl.util;
+package com.bbva.rbvd.rbvd118.impl.util;
 
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
@@ -6,7 +6,6 @@ import com.bbva.rbvd.dto.insrncsale.policy.InsuredAmountDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
 import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
 import com.bbva.rbvd.dto.preformalization.RelatedContract;
@@ -31,7 +30,7 @@ public class ICR2Helper {
         return icr2Request;
     }
 
-    private void setBasicDetails(ICR2Request icr2Request, PreformalizationDTO preformalizationRequest) {
+    public void setBasicDetails(ICR2Request icr2Request, PreformalizationDTO preformalizationRequest) {
         icr2Request.setNUMPOL(preformalizationRequest.getPolicyNumber());
         icr2Request.setCODPRO(preformalizationRequest.getProductId());
         icr2Request.setFECINI(preformalizationRequest.getValidityPeriod().getStartDate().toString());
@@ -45,7 +44,7 @@ public class ICR2Helper {
         icr2Request.setNUMCOTIZ(preformalizationRequest.getQuotationId());
     }
 
-    private void setPaymentMethodDetails(ICR2Request icr2Request, PolicyPaymentMethodDTO paymentMethod) {
+    public void setPaymentMethodDetails(ICR2Request icr2Request, PolicyPaymentMethodDTO paymentMethod) {
         if (nonNull(paymentMethod)) {
             icr2Request.setMTDPGO(paymentMethod.getPaymentType());
             icr2Request.setTFOPAG(paymentMethod.getInstallmentFrequency());
@@ -86,7 +85,7 @@ public class ICR2Helper {
         }
     }
 
-    private void setParticipantDetails(ICR2Request icr2Request, PreformalizationDTO preformalizationRequest, String role) {
+    public void setParticipantDetails(ICR2Request icr2Request, PreformalizationDTO preformalizationRequest, String role) {
         ParticipantDTO participant = getParticipantByRole(preformalizationRequest, role);
         if (nonNull(participant)) {
             icr2Request.setPARTIC(role);

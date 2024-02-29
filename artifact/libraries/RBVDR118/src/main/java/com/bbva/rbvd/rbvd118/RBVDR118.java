@@ -1,4 +1,4 @@
-package com.bbva.rbvd.lib.r118;
+package com.bbva.rbvd.rbvd118;
 
 import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
 

@@ -4,7 +4,7 @@ import com.bbva.elara.domain.transaction.RequestHeaderParamsName;
 import com.bbva.elara.domain.transaction.Severity;
 import com.bbva.elara.domain.transaction.response.HttpResponseCode;
 import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
-import com.bbva.rbvd.lib.r118.RBVDR118;
+import com.bbva.rbvd.rbvd118.RBVDR118;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         requestBody.setQuotationNumber(this.getQuotationnumber());
         requestBody.setProduct(this.getProduct());
         requestBody.setPaymentMethod(this.getPaymentmethod());
-        requestBody.setValidityPeriod(this.getValidityperiod());
+        requestBody.setInsuranceValidityPeriod(this.getValidityperiod());
         requestBody.setTotalAmount(this.getTotalAmount());
         requestBody.setInsuredAmount(this.getInsuredAmount());
         requestBody.setDataTreatment(this.getIsDataTreatment());
@@ -80,6 +80,7 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         requestBody.setBank(this.getBank());
         requestBody.setInsuranceCompany(this.getInsuranceCompany());
         requestBody.setCouponCode(this.getCouponCode());
+        requestBody.setIdentityVerificationCode(this.getIdentityVerificationCode());
 
         requestBody.setTraceId(traceId);
         requestBody.setSaleChannelId(saleChannelId);
