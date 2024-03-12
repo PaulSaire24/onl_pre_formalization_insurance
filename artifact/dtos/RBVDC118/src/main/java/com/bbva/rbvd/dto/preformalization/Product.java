@@ -1,5 +1,6 @@
 package com.bbva.rbvd.dto.preformalization;
 
+
 import com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO;
 
 /**
