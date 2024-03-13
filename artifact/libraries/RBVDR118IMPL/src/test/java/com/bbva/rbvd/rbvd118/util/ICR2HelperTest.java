@@ -2,11 +2,9 @@ package com.bbva.rbvd.rbvd118.util;
 
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.InsuredAmountDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.*;
 import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
+import com.bbva.rbvd.dto.preformalization.RelatedContract;
 import com.bbva.rbvd.rbvd118.dummies.ICR2HelperDummy;
 import com.bbva.rbvd.rbvd118.impl.util.ConstantsUtil;
 import com.bbva.rbvd.rbvd118.impl.util.ICR2Helper;
@@ -76,6 +74,8 @@ public class ICR2HelperTest {
         when(preformalizationRequest.getInsuranceCompany()).thenReturn(ICR2HelperDummy.preformalizationRequest.getInsuranceCompany());
         when(preformalizationRequest.getQuotationId()).thenReturn(ICR2HelperDummy.preformalizationRequest.getQuotationId());
         when(preformalizationRequest.getParticipants()).thenReturn(ICR2HelperDummy.preformalizationRequest.getParticipants());
+        when(preformalizationRequest.getPaymentMethod()).thenReturn(ICR2HelperDummy.preformalizationRequest.getPaymentMethod());
+        when(preformalizationRequest.getRelatedContracts()).thenReturn(ICR2HelperDummy.preformalizationRequest.getRelatedContracts());
     }
 
     @Test
@@ -229,12 +229,12 @@ public class ICR2HelperTest {
         verify(icr2Request, never()).setNUMCOTIZ(anyString());
     }
 
-    /*@Test
+    @Test
     public void setPaymentMethodDetailsShouldSetCorrectValuesWhenPaymentMethodIsNotNull() {
-        icr2Helper.setPaymentMethodDetails(icr2Request, paymentMethod);
+        icr2Helper.setPaymentMethodDetails(icr2Request, preformalizationRequest.getPaymentMethod());
 
-        verify(icr2Request, times(1)).setMTDPGO(paymentMethod.getPaymentType());
-        verify(icr2Request, times(1)).setTFOPAG(paymentMethod.getInstallmentFrequency());
+        verify(icr2Request, times(1)).setMTDPGO(preformalizationRequest.getPaymentMethod().getPaymentType());
+        verify(icr2Request, times(1)).setTFOPAG(preformalizationRequest.getPaymentMethod().getInstallmentFrequency());
     }
 
     @Test
@@ -247,11 +247,13 @@ public class ICR2HelperTest {
 
     @Test
     public void setRelatedContractDetailsShouldSetCorrectValuesWhenRelatedContractIsNotNull() {
+        RelatedContract relatedContract = preformalizationRequest.getRelatedContracts().get(0);
         icr2Helper.setRelatedContractDetails(icr2Request, relatedContract);
 
-        verify(icr2Request, times(1)).setNROCTA(relatedContract.getNumber());
-        verify(icr2Request, times(1)).setMEDPAG(relatedContract.getContractDetails().getProductType().getId());
-        // Continue for all the setters
+        verify(icr2Request).setNROCTA(relatedContract.getNumber());
+        verify(icr2Request).setMEDPAG(relatedContract.getContractDetails().getProductType().getId());
+        verify(icr2Request).setTCONVIN(relatedContract.getContractDetails().getContractType());
+        verify(icr2Request).setCONVIN(relatedContract.getContractDetails().getContractId());
     }
 
     @Test
@@ -260,7 +262,7 @@ public class ICR2HelperTest {
 
         verify(icr2Request, never()).setNROCTA(anyString());
         verify(icr2Request, never()).setMEDPAG(anyString());
-        // Continue for all the setters
-    }*/
-
+        verify(icr2Request, never()).setTCONVIN(anyString());
+        verify(icr2Request, never()).setCONVIN(anyString());
+    }
 }

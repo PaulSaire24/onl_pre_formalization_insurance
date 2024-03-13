@@ -4,6 +4,7 @@ import com.bbva.rbvd.dto.insrncsale.commons.BankDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.*;
 import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
 import com.bbva.rbvd.dto.preformalization.Product;
+import com.bbva.rbvd.dto.preformalization.RelatedContract;
 import com.bbva.rbvd.dto.preformalization.ValidityPeriod;
 
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ public class PreformalizationRequestBuilder {
 
     public PreformalizationRequestBuilder() {
         preformalizationDTO = new PreformalizationDTO();
+        preformalizationDTO.setParticipants(new ArrayList<>());
+        preformalizationDTO.setRelatedContracts(new ArrayList<>());
     }
 
     public static PreformalizationRequestBuilder instance() {
@@ -73,6 +76,16 @@ public class PreformalizationRequestBuilder {
 
     public PreformalizationRequestBuilder addParticipant(ParticipantDTO participant) {
         preformalizationDTO.getParticipants().add(participant);
+        return this;
+    }
+
+    public PreformalizationRequestBuilder withPaymentMethod(PolicyPaymentMethodDTO paymentMethod) {
+        preformalizationDTO.setPaymentMethod(paymentMethod);
+        return this;
+    }
+
+    public PreformalizationRequestBuilder addRelatedContract(RelatedContract relatedContract) {
+        preformalizationDTO.getRelatedContracts().add(relatedContract);
         return this;
     }
 

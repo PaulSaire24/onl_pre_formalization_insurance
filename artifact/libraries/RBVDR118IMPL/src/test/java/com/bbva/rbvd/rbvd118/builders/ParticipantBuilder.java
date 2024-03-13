@@ -1,5 +1,6 @@
 package com.bbva.rbvd.rbvd118.builders;
 
+import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantTypeDTO;
 
@@ -21,6 +22,11 @@ public class ParticipantBuilder {
 
     public ParticipantBuilder withType(ParticipantTypeDTO type) {
         participantDTO.setParticipantType(type);
+        return this;
+    }
+
+    public ParticipantBuilder withIdentityDocument(IdentityDocumentDTO identityDocument) {
+        participantDTO.setIdentityDocument(identityDocument);
         return this;
     }
 

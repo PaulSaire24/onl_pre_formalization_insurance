@@ -98,7 +98,7 @@ public class MapperHelper {
         return contractDao;
     }
 
-    private static void validatePrevPendBillRcptsNumber(PreformalizationDTO preformalizationBody, RequiredFieldsEmissionDAO emissionDao, InsuranceContractDAO contractDao) {
+    public void validatePrevPendBillRcptsNumber(PreformalizationDTO preformalizationBody, RequiredFieldsEmissionDAO emissionDao, InsuranceContractDAO contractDao) {
         BigDecimal prevPendBillRcptsNumber;
         String productId = preformalizationBody.getProductId();
         boolean isPaymentRequired = preformalizationBody.getFirstInstallment().getIsPaymentRequired();
@@ -118,7 +118,7 @@ public class MapperHelper {
         return String.format("%02d/%02d/%d", localDate.getDayOfMonth(), localDate.getMonthOfYear(), localDate.getYear());
     }
 
-    private static LocalDate convertDateToLocalDate(Date date) {
+    public LocalDate convertDateToLocalDate(Date date) {
         return new LocalDate(date, DateTimeZone.forID(GMT_TIME_ZONE));
     }
 
