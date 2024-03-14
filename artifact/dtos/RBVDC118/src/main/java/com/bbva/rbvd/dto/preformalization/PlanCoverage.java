@@ -6,7 +6,6 @@ public class PlanCoverage extends CommonFieldsDTO {
 
     private InsuranceBranch insuranceBranch;
 
-
     public InsuranceBranch getInsuranceBranch() {
         return insuranceBranch;
     }

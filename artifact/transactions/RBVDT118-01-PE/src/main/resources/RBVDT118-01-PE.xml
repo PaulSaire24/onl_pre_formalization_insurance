@@ -150,14 +150,16 @@
 					<parameter order="1" name="id" mandatory="1" type="String" size="10"/>
 					<parameter order="2" name="name" mandatory="1" type="String" size="60"/>
 				</dto>
-				<dto order="4" name="coverage" mandatory="1" package="com.bbva.rbvd.dto.preformalization.PlanCoverage" artifactId="RBVDC118">
-					<parameter order="1" name="id" mandatory="1" type="String" size="10"/>
-					<parameter order="2" name="name" mandatory="1" type="String" size="60"/>
-					<dto order="4" name="insuranceBranch" mandatory="1" package="com.bbva.rbvd.dto.preformalization.InsuranceBranch" artifactId="RBVDC118">
+				<list order="4" name="coverage" mandatory="0">
+					<dto order="1" name="Type" mandatory="0" package="com.bbva.rbvd.dto.preformalization.PlanCoverage" artifactId="RBVDC118">
 						<parameter order="1" name="id" mandatory="1" type="String" size="10"/>
 						<parameter order="2" name="name" mandatory="1" type="String" size="60"/>
+						<dto order="4" name="insuranceBranch" mandatory="1" package="com.bbva.rbvd.dto.preformalization.InsuranceBranch" artifactId="RBVDC118">
+							<parameter order="1" name="id" mandatory="1" type="String" size="10"/>
+							<parameter order="2" name="name" mandatory="1" type="String" size="60"/>
+						</dto>
 					</dto>
-				</dto>
+				</list>
 			</dto>
 		</dto>
 		<parameter order="7" name="hasAcceptedContract" mandatory="0" type="Boolean" size="0"/>

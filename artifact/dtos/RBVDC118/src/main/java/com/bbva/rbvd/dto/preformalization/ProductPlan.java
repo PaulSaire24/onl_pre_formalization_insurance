@@ -2,11 +2,13 @@ package com.bbva.rbvd.dto.preformalization;
 
 import com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO;
 
+import java.util.List;
+
 public class ProductPlan extends CommonFieldsDTO {
 
     public PlanType planType;
 
-    public PlanCoverage coverage;
+    public List<PlanCoverage> coverage;
 
     public PlanType getPlanType() {
         return planType;
@@ -16,11 +18,11 @@ public class ProductPlan extends CommonFieldsDTO {
         this.planType = planType;
     }
 
-    public PlanCoverage getCoverage() {
+    public List<PlanCoverage> getCoverage() {
         return coverage;
     }
 
-    public void setCoverage(PlanCoverage coverage) {
+    public void setCoverage(List<PlanCoverage> coverage) {
         this.coverage = coverage;
     }
 
