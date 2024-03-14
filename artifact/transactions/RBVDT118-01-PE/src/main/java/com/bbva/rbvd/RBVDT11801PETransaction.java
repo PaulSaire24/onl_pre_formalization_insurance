@@ -4,7 +4,7 @@ import com.bbva.elara.domain.transaction.RequestHeaderParamsName;
 import com.bbva.elara.domain.transaction.Severity;
 import com.bbva.elara.domain.transaction.response.HttpResponseCode;
 import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
-import com.bbva.rbvd.rbvd118.RBVDR118;
+import com.bbva.rbvd.lib.rbvd118.RBVDR118;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,17 +39,17 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         } else {
             this.setSeverity(Severity.ENR);
         }
-
     }
 
-    private void mapResponse(PreformalizationDTO responseBody) {
+    public void mapResponse(PreformalizationDTO responseBody) {
         Calendar operationDate = Calendar.getInstance();
         operationDate.setTimeZone(TimeZone.getTimeZone("America/Lima"));
         operationDate.setTime(responseBody.getOperationDate());
-
+        // String operationDateStr = String.format("%02d/%02d/%d", localDate.getDayOfMonth(), localDate.getMonthOfYear(), localDate.getYear());
+        // setOperationDate();
     }
 
-    private PreformalizationDTO getPolicyDTO() {
+    public PreformalizationDTO getPolicyDTO() {
         PreformalizationDTO requestBody = new PreformalizationDTO();
         String traceId = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.REQUESTID);
         String saleChannelId = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.CHANNELCODE);
@@ -95,7 +95,7 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         return requestBody;
     }
 
-    private void loggHeaders() {
+    public void loggHeaders() {
         String traceId = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.REQUESTID);
         LOGGER.info("Cabecera traceId: {}", traceId);
         String saleChannelId = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.CHANNELCODE);
