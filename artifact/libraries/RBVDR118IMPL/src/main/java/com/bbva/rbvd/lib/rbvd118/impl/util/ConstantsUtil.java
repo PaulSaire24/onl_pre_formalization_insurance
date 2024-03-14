@@ -51,7 +51,7 @@ public class ConstantsUtil {
     }
 
     public static final class RelatedContractType {
-        public static final String InternalContract = "INTERNAL_CONTRACT";
-        public static final String ExternalContract = "EXTERNAL_CONTRACT";
+        public static final String INTERNAL_CONTRACT = "INTERNAL_CONTRACT";
+        public static final String EXTERNAL_CONTRACT = "EXTERNAL_CONTRACT";
     }
 }

@@ -8,7 +8,7 @@ public class ProductPlan extends CommonFieldsDTO {
 
     public PlanType planType;
 
-    public List<PlanCoverage> coverage;
+    public transient List<PlanCoverage> coverage;
 
     public PlanType getPlanType() {
         return planType;

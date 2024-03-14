@@ -15,7 +15,7 @@
     <properties>
         <osgi.version.manifest>0.0</osgi.version.manifest>
         <sonar.coverage.exclusion>
-            /src/main/java/com/bbva/rbvd/dto/preformalization/*.java,
+            /src/main/java/com/bbva/rbvd/dto/preformalization/*.java
         </sonar.coverage.exclusion>
     </properties>
     <dependencies>

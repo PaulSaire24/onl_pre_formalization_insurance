@@ -29,11 +29,11 @@ public class PreformalizationDTO extends CommonFieldsDTO {
     private ValidityPeriod insuranceValidityPeriod;
     private Installment currentInstallment;
     private TotalAmountDTO premiumDebt;
-    private RenewalPolicy renewalPolicy;
+    private transient RenewalPolicy renewalPolicy;
     private String certificateNumber;
     private String subscriptionType;
     private Installment lastInstallment;
-    private RenewalPolicy nonRenewalPolicy;
+    private transient RenewalPolicy nonRenewalPolicy;
     private String identityVerificationCode;
 
     public Product getProduct() {

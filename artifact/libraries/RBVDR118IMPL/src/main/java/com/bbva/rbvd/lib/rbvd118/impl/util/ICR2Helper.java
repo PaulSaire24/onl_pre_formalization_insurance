@@ -55,7 +55,7 @@ public class ICR2Helper {
             icr2Request.setNROCTA(relatedContract.getNumber());
             icr2Request.setMEDPAG(relatedContract.getContractDetails().getProductType().getId());
             icr2Request.setTCONVIN(contractType);
-            icr2Request.setCONVIN(contractType.equals(ConstantsUtil.RelatedContractType.InternalContract) ? relatedContract.getContractDetails().getContractId() : relatedContract.getContractDetails().getNumber());
+            icr2Request.setCONVIN(contractType.equals(ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT) ? relatedContract.getContractDetails().getContractId() : relatedContract.getContractDetails().getNumber());
         }
     }
 

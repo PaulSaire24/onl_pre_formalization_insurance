@@ -123,7 +123,7 @@ public class ICR2HelperDummy {
             .addRelatedContract(RelatedContractBuilder.instance()
                     .withRelationType(id)
                     .withContractDetails(ContractDetailsBuilder.instance()
-                            .withContractType(ConstantsUtil.RelatedContractType.InternalContract)
+                            .withContractType(ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT)
                             .withContractId(id)
                             .withNumber(id)
                             .withNumberType(id)
