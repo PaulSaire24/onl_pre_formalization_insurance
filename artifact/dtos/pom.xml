@@ -12,5 +12,7 @@
 	<version>0.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>DTOS-onl_pre_formalization_insurance</name>
-	<modules/>
+	<modules>
+		<module>RBVDC118</module>
+	</modules>
 </project>

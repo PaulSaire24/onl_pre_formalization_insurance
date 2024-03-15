@@ -1,0 +1,60 @@
+package com.bbva.rbvd.lib.rbvd118.dummies;
+
+import com.bbva.rbvd.dto.insrncsale.dao.InsuranceContractDAO;
+import com.bbva.rbvd.lib.rbvd118.builders.ContractDaoBuilder;
+
+import java.math.BigDecimal;
+
+public class MapperHelperDummy {
+
+    public static InsuranceContractDAO contractDAO = ContractDaoBuilder.instance()
+            .withEntityId("fakeEntityId")
+            .withBranchId("fakeBranchId")
+            .withIntAccountId("fakeIntAccountId")
+            .withFirstVerfnDigitId("fakeFirstVerfnDigitId")
+            .withSecondVerfnDigitId("fakeSecondVerfnDigitId")
+            .withPolicyQuotaInternalId("fakePolicyQuotaInternalId")
+            .withInsuranceProductId(BigDecimal.ZERO)
+            .withInsuranceModalityType("fakeInsuranceModalityType")
+            .withInsuranceCompanyId(BigDecimal.ZERO)
+            .withPolicyId("fakePolicyId")
+            .withInsuranceManagerId("fakeInsuranceManagerId")
+            .withInsurancePromoterId("fakeInsurancePromoterId")
+            .withContractManagerBranchId("fakeContractManagerBranchId")
+            .withContractInceptionDate("2024-03-01")
+            .withInsuranceContractStartDate("2024-03-01")
+            .withInsuranceContractEndDate("2024-03-01")
+            .withValidityMonthsNumber(BigDecimal.ZERO)
+            .withInsurancePolicyEndDate("2024-03-01")
+            .withCustomerId("fakeCustomerId")
+            .withDomicileContractId("fakeDomicileContractId")
+            .withCardIssuingMarkType("fakeCardIssuingMarkType")
+            .withIssuedReceiptNumber(BigDecimal.ZERO)
+            .withPaymentFrequencyId(BigDecimal.ZERO)
+            .withPremiumAmount(BigDecimal.ZERO)
+            .withSettlePendingPremiumAmount(BigDecimal.ZERO)
+            .withCurrencyId("fakeCurrencyId")
+            .withLastInstallmentDate("2024-03-01")
+            .withInstallmentPeriodFinalDate("2024-03-01")
+            .withInsuredAmount(BigDecimal.ZERO)
+            .withBeneficiaryType("fakeBeneficiaryType")
+            .withRenewalNumber(BigDecimal.ZERO)
+            .withCtrctDisputeStatusType("fakeCtrctDisputeStatusType")
+            .withPeriodNextPaymentDate("2024-03-01")
+            .withEndorsementPolicyIndType("fakeEndorsementPolicyIndType")
+            .withInsrncCoContractStatusType("fakeInsrncCoContractStatusType")
+            .withContractStatusId("fakeContractStatusId")
+            .withCreationUserId("fakeCreationUserId")
+            .withUserAuditId("fakeUserAuditId")
+            .withInsurPendingDebtIndType("fakeInsurPendingDebtIndType")
+            .withTotalDebtAmount(BigDecimal.ZERO)
+            .withPrevPendBillRcptsNumber(BigDecimal.ZERO)
+            .withSettlementVarPremiumAmount(BigDecimal.ZERO)
+            .withSettlementFixPremiumAmount(BigDecimal.ZERO)
+            .withInsuranceCompanyProductId("fakeInsuranceCompanyProductId")
+            .withAutomaticDebitIndicatorType("fakeAutomaticDebitIndicatorType")
+            .withBiometryTransactionId("fakeBiometryTransactionId")
+            .withTelemarketingTransactionId("fakeTelemarketingTransactionId")
+            .withOriginalPaymentSubchannelId("fakeOriginalPaymentSubchannelId")
+            .build();
+}
