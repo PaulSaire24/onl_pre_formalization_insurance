@@ -4,12 +4,12 @@
 	<parent>
 		<groupId>com.bbva.rbvd</groupId>
 		<artifactId>LIBRARIES-onl_pre_formalization_insurance</artifactId>
-		<version>0.1.0-SNAPSHOT</version>
+		<version>0.1.0</version>
 	</parent>
 	<groupId>com.bbva.rbvd</groupId>
 	<artifactId>RBVDR118</artifactId>
 	<name>RBVDR118</name>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<packaging>bundle</packaging>
 	<description>Lib to pre-formalizate a contract</description>
 	<properties>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.bbva.rbvd.dto.preformalization</groupId>
             <artifactId>RBVDC118</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
