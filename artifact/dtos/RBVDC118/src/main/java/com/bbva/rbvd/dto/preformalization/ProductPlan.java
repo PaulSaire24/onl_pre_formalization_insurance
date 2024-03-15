@@ -6,9 +6,8 @@ import java.util.List;
 
 public class ProductPlan extends CommonFieldsDTO {
 
-    public PlanType planType;
-
-    public transient List<PlanCoverage> coverage;
+    private PlanType planType;
+    private List<PlanCoverage> coverage;
 
     public PlanType getPlanType() {
         return planType;
