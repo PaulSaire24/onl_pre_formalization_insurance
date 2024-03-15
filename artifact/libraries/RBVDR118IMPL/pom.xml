@@ -14,9 +14,9 @@
 	<description>Lib to pre-formalizate a contract</description>
 	<properties>
 		<osgi.version.manifest>0.0</osgi.version.manifest>
-		<sonar.coverage.exclusion>
+		<sonar.coverage.exclusions>
 			/src/main/java/com/bbva/rbvd/lib/rbvd118/impl/util/ConstantsUtil.java
-		</sonar.coverage.exclusion>
+		</sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
