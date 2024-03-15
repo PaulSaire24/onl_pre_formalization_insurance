@@ -13,9 +13,6 @@
 	<description>Trx to pre-formalizate a contract</description>
 	<properties>
 		<arc.osgi.version>0.0</arc.osgi.version>
-		<sonar.coverage.exclusions>
-			/src/main/java/com/bbva/rbvd/AbstractRBVDT11801PETransaction.java
-		</sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>

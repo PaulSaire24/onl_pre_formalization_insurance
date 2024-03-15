@@ -8,9 +8,7 @@ import com.bbva.rbvd.lib.rbvd118.RBVDR118;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Calendar;
 import java.util.Objects;
-import java.util.TimeZone;
 
 /**
  * Trx to pre-formalizate a contract
@@ -42,11 +40,41 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
     }
 
     public void mapResponse(PreformalizationDTO responseBody) {
-        Calendar operationDate = Calendar.getInstance();
-        operationDate.setTimeZone(TimeZone.getTimeZone("America/Lima"));
-        operationDate.setTime(responseBody.getOperationDate());
-        // String operationDateStr = String.format("%02d/%02d/%d", localDate.getDayOfMonth(), localDate.getMonthOfYear(), localDate.getYear());
-        // setOperationDate();
+        setId(responseBody.getId());
+        setQuotationNumber(responseBody.getQuotationNumber());
+        setPolicyNumber(responseBody.getPolicyNumber());
+        setProductType(responseBody.getProductType());
+        setProduct(responseBody.getProduct());
+        setHasAcceptedContract(responseBody.isHasAcceptedContract());
+        setIsDataTreatment(responseBody.isDataTreatment());
+        setPaymentMethod(responseBody.getPaymentMethod());
+        setParticipants(responseBody.getParticipants());
+        setFirstInstallment(responseBody.getFirstInstallment());
+        setPromoter(responseBody.getPromoter());
+        setInspection(responseBody.getInspection());
+        setRelatedContracts(responseBody.getRelatedContracts());
+        setTotalAmount(responseBody.getTotalAmount());
+        setTotalAmountWithoutTax(responseBody.getTotalAmountWithoutTax());
+        setInsuredAmount(responseBody.getInsuredAmount());
+        setInstallmentPlan(responseBody.getInstallmentPlan());
+        setOperationDate(responseBody.getOperationDate().toString());
+        setStatus(responseBody.getInsuranceStatus());
+        setInsuranceCompany(responseBody.getInsuranceCompany());
+        setPaymentConfiguration(responseBody.getPaymentConfiguration());
+        setHolder(responseBody.getHolder());
+        setCancelationDate(responseBody.getCancelationDate());
+        setValidityPeriod(responseBody.getInsuranceValidityPeriod());
+        setCurrentInstallment(responseBody.getCurrentInstallment());
+        setPremiumDebt(responseBody.getPremiumDebt());
+        setRenewalPolicy(responseBody.getRenewalPolicy());
+        setCertificateNumber(responseBody.getCertificateNumber());
+        setSubscriptionType(responseBody.getSubscriptionType());
+        setBusinessAgent(responseBody.getBusinessAgent());
+        setBank(responseBody.getBank());
+        setLastInstallment(responseBody.getLastInstallment());
+        //setExternalDocumentationSendDate();
+        setNonRenewalPolicy(responseBody.getNonRenewalPolicy());
+        setCouponCode(responseBody.getCouponCode());
     }
 
     public PreformalizationDTO getPolicyDTO() {
@@ -114,5 +142,9 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         LOGGER.info("Cabecera operationDate: {}", headerOperationDate);
         String operationTime = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.OPERATIONTIME);
         LOGGER.info("Cabecera operationTime: {}", operationTime);
+    }
+
+    public Object publicGetParameter(String parameter) {
+        return this.getParameter(parameter);
     }
 }

@@ -38,4 +38,7 @@
 		<prop key="XXX.username"></prop>
 		<prop key="XXX.password"></prop>
 	</util:properties>
+	<bean id="rbvdR118" class="org.mockito.Mockito" factory-method="mock">
+		<constructor-arg value="com.bbva.rbvd.lib.rbvd118.RBVDR118"/>
+	</bean>
 </beans>
