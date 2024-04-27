@@ -13,11 +13,11 @@ import com.bbva.rbvd.dto.insrncsale.policy.BusinessAgentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PromoterDTO;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDErrors;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
-import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
+import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
 import com.bbva.rbvd.lib.r047.RBVDR047;
 import com.bbva.rbvd.lib.rbvd118.dummies.ICR2HelperDummy;
 import com.bbva.rbvd.lib.rbvd118.impl.RBVDR118Impl;
-import com.bbva.rbvd.lib.rbvd118.impl.util.ICR2Helper;
+import com.bbva.rbvd.lib.rbvd118.impl.business.ICR2Business;
 import com.bbva.rbvd.lib.rbvd118.impl.util.MapperHelper;
 import com.bbva.rbvd.lib.rbvd118.impl.util.ValidationUtil;
 import org.junit.Before;
@@ -64,7 +64,7 @@ public class RBVDR118ImplTest {
     private ApplicationConfigurationService applicationConfigurationService;
 
     @Mock
-    private PreformalizationDTO requestBody;
+    private InsuranceDTO requestBody;
 
     @Mock
     private ICR2Response icr2Response;
@@ -73,7 +73,7 @@ public class RBVDR118ImplTest {
     private RequiredFieldsEmissionDAO emissionDao;
 
     @Mock
-    private ICR2Helper icr2Helper;
+    private ICR2Business icr2Helper;
 
     @Mock
     private ICMRYS2 icmrys2;
@@ -110,7 +110,7 @@ public class RBVDR118ImplTest {
         when(mapperHelper.createSaveContractArguments(any())).thenReturn(new HashMap<>());
         when(pisdR012.executeInsertSingleRow(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(1);
 
-        PreformalizationDTO result = rbvdr118Impl.executePreFormalization(requestBody);
+        InsuranceDTO result = rbvdr118Impl.executeLogicPreFormalization(requestBody);
 
         assertNotNull(result);
     }
@@ -122,7 +122,7 @@ public class RBVDR118ImplTest {
         response.put(RBVDProperties.FIELD_RESULT_NUMBER.getValue(), BigDecimal.ONE);
         when(pisdR012.executeGetASingleRow(any(), any())).thenReturn(response);
 
-        assertThrows(BusinessException.class, () -> rbvdr118Impl.validatePolicyExists(requestBody));
+        assertThrows(BusinessException.class, () -> rbvdr118Impl.validatePolicyExists(requestBody.getQuotationNumber()));
     }
 
     @Test()

@@ -6,7 +6,7 @@ import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
 import com.bbva.rbvd.dto.insrncsale.dao.InsuranceContractDAO;
 import com.bbva.rbvd.dto.insrncsale.dao.RequiredFieldsEmissionDAO;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
-import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
+import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
 import com.bbva.rbvd.lib.rbvd118.dummies.ICR2HelperDummy;
 import com.bbva.rbvd.lib.rbvd118.impl.util.MapperHelper;
 import org.joda.time.DateTimeZone;
@@ -32,7 +32,7 @@ public class MapperHelperTest {
     @Mock
     private ApplicationConfigurationService applicationConfigurationService;
     @Mock
-    private PreformalizationDTO preformalizationBody;
+    private InsuranceDTO preformalizationBody;
     @Mock
     private RequiredFieldsEmissionDAO emissionDao;
     @Mock

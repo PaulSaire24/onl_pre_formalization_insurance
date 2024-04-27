@@ -5,7 +5,7 @@ import com.bbva.rbvd.dto.insrncsale.policy.*;
 
 import java.util.List;
 
-public class PreformalizationDTO extends CommonFieldsDTO {
+public class InsuranceDTO extends CommonFieldsDTO {
     private Product product;
     private TotalAmountDTO totalAmount;
     private TotalAmountDTO totalAmountWithoutTax;
@@ -270,7 +270,7 @@ public class PreformalizationDTO extends CommonFieldsDTO {
 
     @Override
     public String toString() {
-        return "PreformalizationDTO{" +
+        return "InsuranceDTO{" +
                 "product=" + product +
                 ", totalAmount=" + totalAmount +
                 ", totalAmountWithoutTax=" + totalAmountWithoutTax +

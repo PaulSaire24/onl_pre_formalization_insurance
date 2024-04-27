@@ -4,14 +4,15 @@ import com.bbva.rbvd.dto.insrncsale.commons.BankDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.*;
 import com.bbva.rbvd.dto.preformalization.*;
+import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
 
 import java.util.ArrayList;
 
 public class PreformalizationRequestBuilder {
-    private final PreformalizationDTO preformalizationDTO;
+    private final InsuranceDTO preformalizationDTO;
 
     public PreformalizationRequestBuilder() {
-        preformalizationDTO = new PreformalizationDTO();
+        preformalizationDTO = new InsuranceDTO();
         preformalizationDTO.setParticipants(new ArrayList<>());
         preformalizationDTO.setRelatedContracts(new ArrayList<>());
     }
@@ -107,7 +108,7 @@ public class PreformalizationRequestBuilder {
         return this;
     }
 
-    public PreformalizationDTO build() {
+    public InsuranceDTO build() {
         return preformalizationDTO;
     }
 }

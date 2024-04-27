@@ -2,7 +2,6 @@ package com.bbva.rbvd.lib.rbvd118.impl.util;
 
 public class ConstantsUtil {
 
-    public static final String FIELD_PRODUCT_SHORT_DESC = "PRODUCT_SHORT_DESC";
 
     private ConstantsUtil() {
     }
@@ -54,4 +53,14 @@ public class ConstantsUtil {
         public static final String INTERNAL_CONTRACT = "INTERNAL_CONTRACT";
         public static final String EXTERNAL_CONTRACT = "EXTERNAL_CONTRACT";
     }
+
+    public static final class ApxConsole{
+        public static final String KEY_TLMKT_CODE = "telemarketing.code";
+        public static final String KEY_PIC_CODE = "pic.code";
+        public static final String KEY_CONTACT_CENTER_CODE = "cc.code";
+        public static final String KEY_AGENT_PROMOTER_CODE = "agent.and.promoter.code";
+        public static final String CHANNEL_GLOMO = "pisd.channel.glomo.aap";
+        public static final String CHANNEL_CONTACT_DETAIL = "pisd.channel.contact.detail.aap";
+    }
+
 }

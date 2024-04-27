@@ -3,11 +3,11 @@ package com.bbva.rbvd.lib.rbvd118.util;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.*;
-import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
+import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
 import com.bbva.rbvd.dto.preformalization.RelatedContract;
 import com.bbva.rbvd.lib.rbvd118.dummies.ICR2HelperDummy;
 import com.bbva.rbvd.lib.rbvd118.impl.util.ConstantsUtil;
-import com.bbva.rbvd.lib.rbvd118.impl.util.ICR2Helper;
+import com.bbva.rbvd.lib.rbvd118.impl.business.ICR2Business;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,13 +26,13 @@ import static org.mockito.Mockito.*;
 public class ICR2HelperTest {
 
     @InjectMocks
-    private ICR2Helper icr2Helper;
+    private ICR2Business icr2Helper;
 
     @Mock
     private ICR2Request icr2Request;
 
     @Mock
-    private PreformalizationDTO preformalizationRequest;
+    private InsuranceDTO preformalizationRequest;
 
     @Mock
     private HolderDTO holder;

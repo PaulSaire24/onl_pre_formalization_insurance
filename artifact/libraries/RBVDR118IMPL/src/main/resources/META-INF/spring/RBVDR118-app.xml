@@ -5,5 +5,6 @@
 		<property name="pisdR401" ref="pisdR401"/>
 		<property name="pisdR012" ref="pisdR012"/>
 		<property name="rbvdR047" ref="rbvdR047"/>
+		<property name="pisdR226" ref="pisdR226"/>
 	</bean>
 </beans>

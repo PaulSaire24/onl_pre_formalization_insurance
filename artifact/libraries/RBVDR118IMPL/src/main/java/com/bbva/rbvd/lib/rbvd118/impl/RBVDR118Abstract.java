@@ -6,11 +6,12 @@ import com.bbva.elara.utility.api.connector.APIConnector;
 import com.bbva.elara.utility.api.connector.APIConnectorBuilder;
 import com.bbva.elara.utility.interbackend.cics.InterBackendCicsUtils;
 import com.bbva.pisd.lib.r012.PISDR012;
+import com.bbva.pisd.lib.r226.PISDR226;
 import com.bbva.pisd.lib.r401.PISDR401;
 import com.bbva.rbvd.lib.rbvd118.impl.util.ValidationUtil;
 import com.bbva.rbvd.lib.r047.RBVDR047;
 import com.bbva.rbvd.lib.rbvd118.RBVDR118;
-import com.bbva.rbvd.lib.rbvd118.impl.util.ICR2Helper;
+import com.bbva.rbvd.lib.rbvd118.impl.business.ICR2Business;
 import com.bbva.rbvd.lib.rbvd118.impl.util.MapperHelper;
 
 /**
@@ -36,7 +37,8 @@ public abstract class RBVDR118Abstract extends AbstractLibrary implements RBVDR1
 
     protected MapperHelper mapperHelper;
 
-    protected ICR2Helper icr2Helper;
+    protected ICR2Business icr2Business;
+    protected PISDR226 pisdr226;
 
 
     /**
@@ -96,7 +98,11 @@ public abstract class RBVDR118Abstract extends AbstractLibrary implements RBVDR1
         this.mapperHelper = mapperHelper;
     }
 
-    public void setIcr2Helper(ICR2Helper icr2Helper) {
-        this.icr2Helper = icr2Helper;
+    public void setIcr2Business(ICR2Business icr2Business) {
+        this.icr2Business = icr2Business;
+    }
+
+    public void setPisdr226(PISDR226 pisdr226) {
+        this.pisdr226 = pisdr226;
     }
 }

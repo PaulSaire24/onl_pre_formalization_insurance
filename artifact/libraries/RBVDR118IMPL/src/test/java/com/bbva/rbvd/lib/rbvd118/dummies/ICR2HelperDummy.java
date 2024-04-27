@@ -3,7 +3,7 @@ package com.bbva.rbvd.lib.rbvd118.dummies;
 import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantTypeDTO;
-import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
+import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
 import com.bbva.rbvd.lib.rbvd118.builders.BankBuilder;
 import com.bbva.rbvd.lib.rbvd118.builders.ContractDetailsBuilder;
 import com.bbva.rbvd.lib.rbvd118.builders.FirstInstallmentBuilder;
@@ -54,7 +54,7 @@ public class ICR2HelperDummy {
             .withCurrency(paymentCurrency)
             .build();
 
-    public static PreformalizationDTO preformalizationRequest = PreformalizationRequestBuilder.instance()
+    public static InsuranceDTO preformalizationRequest = PreformalizationRequestBuilder.instance()
             .withPolicyNumber(PreformalizationRequest.policyNumber)
             .withProduct(ProductBuilder.instance()
                     .withId(PreformalizationRequest.productId)

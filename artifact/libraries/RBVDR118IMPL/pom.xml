@@ -109,6 +109,11 @@
 			<artifactId>elara-utility-api-connector</artifactId>
 			<version>${apx.api.connector.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bbva.pisd</groupId>
+			<artifactId>PISDR226</artifactId>
+			<version>0.2.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>

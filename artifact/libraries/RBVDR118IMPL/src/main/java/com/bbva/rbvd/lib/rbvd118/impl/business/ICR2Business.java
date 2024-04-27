@@ -1,32 +1,37 @@
-package com.bbva.rbvd.lib.rbvd118.impl.util;
+package com.bbva.rbvd.lib.rbvd118.impl.business;
 
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.*;
-import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.InsuredAmountDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
+import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
 import com.bbva.rbvd.dto.preformalization.RelatedContract;
+import com.bbva.rbvd.lib.rbvd118.impl.util.ConstantsUtil;
 
 import static java.util.Objects.nonNull;
 
-public class ICR2Helper {
+public class ICR2Business {
 
-    public ICR2Request mapRequestFromPreformalizationBody(PreformalizationDTO preformalizationRequest) {
+    public ICR2Request mapRequestFromPreformalizationBody(InsuranceDTO requestBody) {
         ICR2Request icr2Request = new ICR2Request();
 
-        setBasicDetails(icr2Request, preformalizationRequest);
-        setPaymentMethodDetails(icr2Request, preformalizationRequest.getPaymentMethod());
-        setRelatedContractDetails(icr2Request, preformalizationRequest.getRelatedContracts().get(ConstantsUtil.Number.CERO));
-        setHolderDetails(icr2Request, preformalizationRequest.getHolder());
-        setInstallmentPlanDetails(icr2Request, preformalizationRequest.getInstallmentPlan());
-        setInsuredAmountDetails(icr2Request, preformalizationRequest.getInsuredAmount());
-        setParticipantDetails(icr2Request, preformalizationRequest, ConstantsUtil.Participant.PAYMENT_MANAGER);
-        setParticipantDetails(icr2Request, preformalizationRequest, ConstantsUtil.Participant.LEGAL_REPRESENTATIVE);
-        setTotalAmountDetails(icr2Request, preformalizationRequest.getTotalAmount());
+        setBasicDetails(icr2Request, requestBody);
+        setPaymentMethodDetails(icr2Request, requestBody.getPaymentMethod());
+        setRelatedContractDetails(icr2Request, requestBody.getRelatedContracts().get(ConstantsUtil.Number.CERO));
+        setHolderDetails(icr2Request, requestBody.getHolder());
+        setInstallmentPlanDetails(icr2Request, requestBody.getInstallmentPlan());
+        setInsuredAmountDetails(icr2Request, requestBody.getInsuredAmount());
+        setParticipantDetails(icr2Request, requestBody, ConstantsUtil.Participant.PAYMENT_MANAGER);
+        setParticipantDetails(icr2Request, requestBody, ConstantsUtil.Participant.LEGAL_REPRESENTATIVE);
+        setTotalAmountDetails(icr2Request, requestBody.getTotalAmount());
 
         return icr2Request;
     }
 
-    public void setBasicDetails(ICR2Request icr2Request, PreformalizationDTO preformalizationRequest) {
+    public void setBasicDetails(ICR2Request icr2Request, InsuranceDTO preformalizationRequest) {
         if (nonNull(preformalizationRequest)) {
             icr2Request.setNUMPOL(preformalizationRequest.getPolicyNumber());
             icr2Request.setCODPRO(preformalizationRequest.getProduct().getId());
@@ -83,7 +88,7 @@ public class ICR2Helper {
         }
     }
 
-    public void setParticipantDetails(ICR2Request icr2Request, PreformalizationDTO preformalizationRequest, String role) {
+    public void setParticipantDetails(ICR2Request icr2Request, InsuranceDTO preformalizationRequest, String role) {
         ParticipantDTO participant = getParticipantByRole(preformalizationRequest, role);
         if (nonNull(participant)) {
             icr2Request.setPARTIC(role);
@@ -106,7 +111,7 @@ public class ICR2Helper {
         }
     }
 
-    public ParticipantDTO getParticipantByRole(PreformalizationDTO preformalizationRequest, String role) {
+    public ParticipantDTO getParticipantByRole(InsuranceDTO preformalizationRequest, String role) {
         return preformalizationRequest.getParticipants().stream()
                 .filter(participant -> participant.getParticipantType().getId().equals(role))
                 .findFirst()
