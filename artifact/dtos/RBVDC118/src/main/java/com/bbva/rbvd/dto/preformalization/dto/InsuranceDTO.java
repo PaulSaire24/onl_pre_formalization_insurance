@@ -1,11 +1,12 @@
-package com.bbva.rbvd.dto.preformalization;
+package com.bbva.rbvd.dto.preformalization.dto;
 
-import com.bbva.rbvd.dto.insrncsale.commons.CommonFieldsDTO;
+
 import com.bbva.rbvd.dto.insrncsale.policy.*;
+import com.bbva.rbvd.dto.preformalization.*;
 
 import java.util.List;
 
-public class InsuranceDTO extends CommonFieldsDTO {
+public class InsuranceDTO {
     private Product product;
     private TotalAmountDTO totalAmount;
     private TotalAmountDTO totalAmountWithoutTax;
@@ -29,12 +30,13 @@ public class InsuranceDTO extends CommonFieldsDTO {
     private ValidityPeriod insuranceValidityPeriod;
     private Installment currentInstallment;
     private TotalAmountDTO premiumDebt;
-    private transient RenewalPolicy renewalPolicy;
+    private RenewalPolicy renewalPolicy;
     private String certificateNumber;
     private String subscriptionType;
     private Installment lastInstallment;
-    private transient RenewalPolicy nonRenewalPolicy;
+    private RenewalPolicy nonRenewalPolicy;
     private String identityVerificationCode;
+    private String id;
 
     public Product getProduct() {
         return product;

@@ -3,7 +3,8 @@ package com.bbva.rbvd.lib.rbvd118.dummies;
 import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantTypeDTO;
-import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
+import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.lib.rbvd118.builders.BankBuilder;
 import com.bbva.rbvd.lib.rbvd118.builders.ContractDetailsBuilder;
 import com.bbva.rbvd.lib.rbvd118.builders.FirstInstallmentBuilder;
@@ -20,7 +21,6 @@ import com.bbva.rbvd.lib.rbvd118.builders.ProductBuilder;
 import com.bbva.rbvd.lib.rbvd118.builders.RelatedContractBuilder;
 import com.bbva.rbvd.lib.rbvd118.builders.TotalAmountBuilder;
 import com.bbva.rbvd.lib.rbvd118.builders.ValidityPeriodBuilder;
-import com.bbva.rbvd.lib.rbvd118.impl.util.ConstantsUtil;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -54,7 +54,7 @@ public class ICR2HelperDummy {
             .withCurrency(paymentCurrency)
             .build();
 
-    public static InsuranceDTO preformalizationRequest = PreformalizationRequestBuilder.instance()
+    public static PolicyDTO preformalizationRequest = PreformalizationRequestBuilder.instance()
             .withPolicyNumber(PreformalizationRequest.policyNumber)
             .withProduct(ProductBuilder.instance()
                     .withId(PreformalizationRequest.productId)

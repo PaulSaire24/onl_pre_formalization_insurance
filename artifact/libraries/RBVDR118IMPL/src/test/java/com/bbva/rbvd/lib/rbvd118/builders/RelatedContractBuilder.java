@@ -1,14 +1,16 @@
 package com.bbva.rbvd.lib.rbvd118.builders;
 
+import com.bbva.rbvd.dto.insrncsale.policy.ContractDetailsDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.RelationTypeDTO;
 import com.bbva.rbvd.dto.preformalization.ContractDetails;
 import com.bbva.rbvd.dto.preformalization.RelatedContract;
 
 public class RelatedContractBuilder {
-    private final RelatedContract relatedContract;
+    private final RelatedContractDTO relatedContract;
 
     public RelatedContractBuilder() {
-        relatedContract = new RelatedContract();
+        relatedContract = new RelatedContractDTO();
     }
 
     public static RelatedContractBuilder instance() {
@@ -22,12 +24,12 @@ public class RelatedContractBuilder {
         return this;
     }
 
-    public RelatedContractBuilder withContractDetails(ContractDetails contractDetails) {
+    public RelatedContractBuilder withContractDetails(ContractDetailsDTO contractDetails) {
         relatedContract.setContractDetails(contractDetails);
         return this;
     }
 
-    public RelatedContract build() {
+    public RelatedContractDTO build() {
         return relatedContract;
     }
 }

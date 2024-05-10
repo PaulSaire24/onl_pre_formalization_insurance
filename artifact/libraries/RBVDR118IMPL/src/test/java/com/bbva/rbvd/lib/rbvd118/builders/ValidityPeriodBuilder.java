@@ -1,15 +1,16 @@
 package com.bbva.rbvd.lib.rbvd118.builders;
 
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.preformalization.ValidityPeriod;
 
 import java.util.Date;
 
 public class ValidityPeriodBuilder {
 
-    private final ValidityPeriod validityPeriod;
+    private final ValidityPeriodDTO validityPeriod;
 
     private ValidityPeriodBuilder() {
-        this.validityPeriod = new ValidityPeriod();
+        this.validityPeriod = new ValidityPeriodDTO();
     }
 
     public static ValidityPeriodBuilder instance() {
@@ -26,7 +27,7 @@ public class ValidityPeriodBuilder {
         return this;
     }
 
-    public ValidityPeriod build() {
+    public ValidityPeriodDTO build() {
         return this.validityPeriod;
     }
 }

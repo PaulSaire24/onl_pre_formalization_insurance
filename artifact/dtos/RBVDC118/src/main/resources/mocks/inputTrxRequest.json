@@ -1,0 +1,118 @@
+{
+  "quotationNumber": "0814000072051",
+  "product": {
+    "id": "841",
+    "plan": {
+      "id": "01"
+    }
+  },
+  "holder": {
+    "id": "00051578",
+    "fullName": "Peter Parker",
+    "identityDocument": {
+      "documentType": {
+        "id": "DNI"
+      },
+      "number": "08364521"
+    },
+    "contactDetails": [
+      {
+        "contact": {
+          "contactDetailType": "EMAIL",
+          "address": "carlos.carrillo.delgado@bbva.com",
+          "phoneNumber": ""
+        }
+      },
+      {
+        "contact": {
+          "contactDetailType": "PHONE",
+          "address": "",
+          "phoneNumber": "900027383"
+        }
+      }
+    ]
+  },
+  "paymentMethod": {
+    "paymentType": "DIRECT_DEBIT",
+    "installmentFrequency": "ANNUAL"
+  },
+  "validityPeriod": {
+    "startDate": "2024-04-23"
+  },
+  "totalAmount": {
+    "amount": 4089.22,
+    "currency": "PEN"
+  },
+  "insuredAmount": {
+    "amount": 10000,
+    "currency": "PEN"
+  },
+  "isDataTreatment": false,
+  "relatedContracts": [
+    {
+      "relationType": {
+        "id": "ASSOCIATED"
+      },
+      "contractDetails": {
+        "contractType": "EXTERNAL_CONTRACT",
+        "contractId":"00110486000210183535",
+        "number": "00110486000210183535",
+        "numberType": {
+          "id": "SIMPLE_ACCOUNT"
+        },
+        "productType": {
+          "id": "ACCOUNT"
+        }
+      }
+    }
+  ],
+  "installmentPlan": {
+    "startDate": "2024-04-23",
+    "totalNumberInstallments": 1,
+    "period": {
+      "id": "ANNUAL"
+    },
+    "paymentAmount": {
+      "amount": 4089.22,
+      "currency": "PEN"
+    }
+  },
+  "hasAcceptedContract": true,
+  "firstInstallment": {
+    "isPaymentRequired": false,
+    "paymentAmount": {
+      "amount": 4089.22,
+      "currency": "PEN"
+    }
+  },
+  "participants": [
+    {
+      "identityDocument": {
+        "documentType": {
+          "id": "DNI"
+        },
+        "number": "08364521"
+      },
+      "participantType": {
+        "id": "PAYMENT_MANAGER"
+      },
+      "customerId": "00051578"
+    }
+  ],
+  "businessAgent": {
+    "id": "121328"
+  },
+  "promoter": {
+    "id": "121328"
+  },
+  "insuranceCompany": {
+    "id": "01"
+  },
+  "bank": {
+    "id": "0011",
+    "branch": {
+      "id": "0135"
+    }
+  },
+  "identityVerificationCode": "923123"
+}

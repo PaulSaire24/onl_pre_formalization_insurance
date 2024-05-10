@@ -5,8 +5,8 @@ import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.*;
 import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
 import com.bbva.rbvd.dto.preformalization.RelatedContract;
+import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.lib.rbvd118.dummies.ICR2HelperDummy;
-import com.bbva.rbvd.lib.rbvd118.impl.util.ConstantsUtil;
 import com.bbva.rbvd.lib.rbvd118.impl.business.ICR2Business;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class ICR2HelperTest {
     private ICR2Request icr2Request;
 
     @Mock
-    private InsuranceDTO preformalizationRequest;
+    private PolicyDTO preformalizationRequest;
 
     @Mock
     private HolderDTO holder;
@@ -70,7 +70,7 @@ public class ICR2HelperTest {
         // Set preformalizationRequest defaults
         when(preformalizationRequest.getPolicyNumber()).thenReturn(ICR2HelperDummy.preformalizationRequest.getPolicyNumber());
         when(preformalizationRequest.getProduct()).thenReturn(ICR2HelperDummy.preformalizationRequest.getProduct());
-        when(preformalizationRequest.getInsuranceValidityPeriod()).thenReturn(ICR2HelperDummy.preformalizationRequest.getInsuranceValidityPeriod());
+        when(preformalizationRequest.getValidityPeriod()).thenReturn(ICR2HelperDummy.preformalizationRequest.getValidityPeriod());
         when(preformalizationRequest.getFirstInstallment()).thenReturn(ICR2HelperDummy.preformalizationRequest.getFirstInstallment());
         when(preformalizationRequest.getBusinessAgent()).thenReturn(ICR2HelperDummy.preformalizationRequest.getBusinessAgent());
         when(preformalizationRequest.getPromoter()).thenReturn(ICR2HelperDummy.preformalizationRequest.getPromoter());
@@ -205,7 +205,7 @@ public class ICR2HelperTest {
 
         verify(icr2Request, times(1)).setNUMPOL(preformalizationRequest.getPolicyNumber());
         verify(icr2Request, times(1)).setCODPRO(preformalizationRequest.getProduct().getId());
-        verify(icr2Request, times(1)).setFECINI(preformalizationRequest.getInsuranceValidityPeriod().getStartDate().toString());
+        verify(icr2Request, times(1)).setFECINI(preformalizationRequest.getValidityPeriod().getStartDate().toString());
         verify(icr2Request, times(1)).setCODMOD(preformalizationRequest.getProduct().getPlan().getId());
         verify(icr2Request, times(1)).setCOBRO(preformalizationRequest.getFirstInstallment().getIsPaymentRequired() ? "S" : "N");
         verify(icr2Request, times(1)).setGESTOR(preformalizationRequest.getBusinessAgent().getId());
@@ -251,7 +251,7 @@ public class ICR2HelperTest {
 
     @Test
     public void setRelatedContractDetailsShouldSetCorrectValuesWhenRelatedContractIsNotNull() {
-        RelatedContract relatedContract = preformalizationRequest.getRelatedContracts().get(0);
+        RelatedContractDTO relatedContract = preformalizationRequest.getRelatedContracts().get(0);
         icr2Helper.setRelatedContractDetails(icr2Request, relatedContract);
 
         verify(icr2Request).setNROCTA(relatedContract.getNumber());

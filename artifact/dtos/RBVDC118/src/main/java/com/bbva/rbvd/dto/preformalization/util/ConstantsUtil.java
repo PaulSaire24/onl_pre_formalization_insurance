@@ -1,7 +1,6 @@
-package com.bbva.rbvd.lib.rbvd118.impl.util;
+package com.bbva.rbvd.dto.preformalization.util;
 
 public class ConstantsUtil {
-
 
     private ConstantsUtil() {
     }
@@ -62,5 +61,9 @@ public class ConstantsUtil {
         public static final String CHANNEL_GLOMO = "pisd.channel.glomo.aap";
         public static final String CHANNEL_CONTACT_DETAIL = "pisd.channel.contact.detail.aap";
     }
+
+    public static final String S_VALUE = "S";
+    public static final String N_VALUE = "N";
+    public static final String PAYMENT_METHOD_VALUE = "DIRECT_DEBIT";
 
 }

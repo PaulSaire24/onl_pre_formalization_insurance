@@ -2,6 +2,7 @@ package com.bbva.rbvd.lib.rbvd118.builders;
 
 import com.bbva.rbvd.dto.insrncsale.commons.BankDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.*;
 import com.bbva.rbvd.dto.preformalization.*;
 import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
@@ -9,10 +10,10 @@ import com.bbva.rbvd.dto.preformalization.dto.InsuranceDTO;
 import java.util.ArrayList;
 
 public class PreformalizationRequestBuilder {
-    private final InsuranceDTO preformalizationDTO;
+    private final PolicyDTO preformalizationDTO;
 
     public PreformalizationRequestBuilder() {
-        preformalizationDTO = new InsuranceDTO();
+        preformalizationDTO = new PolicyDTO();
         preformalizationDTO.setParticipants(new ArrayList<>());
         preformalizationDTO.setRelatedContracts(new ArrayList<>());
     }
@@ -27,13 +28,13 @@ public class PreformalizationRequestBuilder {
         return this;
     }
 
-    public PreformalizationRequestBuilder withProduct(Product product) {
+    public PreformalizationRequestBuilder withProduct(ProductDTO product) {
         preformalizationDTO.setProduct(product);
         return this;
     }
 
-    public PreformalizationRequestBuilder withValidityPeriod(ValidityPeriod validityPeriod) {
-        preformalizationDTO.setInsuranceValidityPeriod(validityPeriod);
+    public PreformalizationRequestBuilder withValidityPeriod(ValidityPeriodDTO validityPeriod) {
+        preformalizationDTO.setValidityPeriod(validityPeriod);
         return this;
     }
 
@@ -98,7 +99,7 @@ public class PreformalizationRequestBuilder {
         return this;
     }
 
-    public PreformalizationRequestBuilder addRelatedContract(RelatedContract relatedContract) {
+    public PreformalizationRequestBuilder addRelatedContract(RelatedContractDTO relatedContract) {
         preformalizationDTO.getRelatedContracts().add(relatedContract);
         return this;
     }
@@ -108,7 +109,7 @@ public class PreformalizationRequestBuilder {
         return this;
     }
 
-    public InsuranceDTO build() {
+    public PolicyDTO build() {
         return preformalizationDTO;
     }
 }

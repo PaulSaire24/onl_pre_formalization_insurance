@@ -1,13 +1,15 @@
 package com.bbva.rbvd.lib.rbvd118.builders;
 
+import com.bbva.rbvd.dto.insrncsale.policy.PlanDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.ProductDTO;
 import com.bbva.rbvd.dto.preformalization.Product;
 import com.bbva.rbvd.dto.preformalization.ProductPlan;
 
 public class ProductBuilder {
-    private final Product product;
+    private final ProductDTO product;
 
     private ProductBuilder() {
-        product = new Product();
+        product = new ProductDTO();
     }
 
     public static ProductBuilder instance() {
@@ -20,12 +22,12 @@ public class ProductBuilder {
     }
 
     public ProductBuilder withPlan(String planId) {
-        ProductPlan plan = new ProductPlan();
+        PlanDTO plan = new PlanDTO();
         product.setPlan(plan);
         return this;
     }
 
-    public Product build() {
+    public ProductDTO build() {
         return product;
     }
 }

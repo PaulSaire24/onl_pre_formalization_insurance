@@ -3,7 +3,7 @@ package com.bbva.rbvd;
 import com.bbva.elara.domain.transaction.RequestHeaderParamsName;
 import com.bbva.elara.domain.transaction.Severity;
 import com.bbva.elara.domain.transaction.response.HttpResponseCode;
-import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.lib.rbvd118.RBVDR118;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +25,9 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
 
         this.loggHeaders();
 
-        PreformalizationDTO requestBody = this.getPolicyDTO();
+        PolicyDTO requestBody = this.getPolicyDTO();
 
-        PreformalizationDTO responseBody;
-
-        responseBody = rbvdR118.executePreFormalization(requestBody);
+        PolicyDTO responseBody = rbvdR118.executeLogicPreFormalization(requestBody);
 
         if (Objects.nonNull(responseBody)) {
             this.mapResponse(responseBody);
@@ -39,46 +37,47 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         }
     }
 
-    public void mapResponse(PreformalizationDTO responseBody) {
+    public void mapResponse(PolicyDTO responseBody) {
         setId(responseBody.getId());
-        setQuotationNumber(responseBody.getQuotationNumber());
-        setPolicyNumber(responseBody.getPolicyNumber());
-        setProductType(responseBody.getProductType());
+        setQuotationnumber(responseBody.getQuotationNumber());
+        setPolicynumber(responseBody.getPolicyNumber());
+        setAlias(responseBody.getAlias());
+        setProducttype(responseBody.getProductType());
         setProduct(responseBody.getProduct());
-        setHasAcceptedContract(responseBody.isHasAcceptedContract());
-        setIsDataTreatment(responseBody.isDataTreatment());
-        setPaymentMethod(responseBody.getPaymentMethod());
+        setHasacceptedcontract(responseBody.getHasAcceptedContract());
+        setIsdatatreatment(responseBody.getIsDataTreatment());
+        setPaymentmethod(responseBody.getPaymentMethod());
         setParticipants(responseBody.getParticipants());
-        setFirstInstallment(responseBody.getFirstInstallment());
+        setFirstinstallment(responseBody.getFirstInstallment());
         setPromoter(responseBody.getPromoter());
         setInspection(responseBody.getInspection());
-        setRelatedContracts(responseBody.getRelatedContracts());
-        setTotalAmount(responseBody.getTotalAmount());
-        setTotalAmountWithoutTax(responseBody.getTotalAmountWithoutTax());
-        setInsuredAmount(responseBody.getInsuredAmount());
-        setInstallmentPlan(responseBody.getInstallmentPlan());
-        setOperationDate(responseBody.getOperationDate().toString());
-        setStatus(responseBody.getInsuranceStatus());
-        setInsuranceCompany(responseBody.getInsuranceCompany());
-        setPaymentConfiguration(responseBody.getPaymentConfiguration());
+        setRelatedcontracts(responseBody.getRelatedContracts());
+        setTotalamount(responseBody.getTotalAmount());
+        setTotalamountwithouttax(responseBody.getTotalAmountWithoutTax());
+        setInsuredamount(responseBody.getInsuredAmount());
+        setInstallmentplan(responseBody.getInstallmentPlan());
+        setOperationdate(responseBody.getOperationDate());
+        setStatus(responseBody.getStatus());
+        setInsurancecompany(responseBody.getInsuranceCompany());
+        setPaymentconfiguration(responseBody.getPaymentConfiguration());
         setHolder(responseBody.getHolder());
-        setCancelationDate(responseBody.getCancelationDate());
-        setValidityPeriod(responseBody.getInsuranceValidityPeriod());
-        setCurrentInstallment(responseBody.getCurrentInstallment());
-        setPremiumDebt(responseBody.getPremiumDebt());
-        setRenewalPolicy(responseBody.getRenewalPolicy());
-        setCertificateNumber(responseBody.getCertificateNumber());
-        setSubscriptionType(responseBody.getSubscriptionType());
-        setBusinessAgent(responseBody.getBusinessAgent());
+        setCancelationdate(responseBody.getCancelationDate());
+        setValidityperiod(responseBody.getValidityPeriod());
+        setCurrentinstallment(responseBody.getCurrentInstallment());
+        setPremiumdebt(responseBody.getPremiumDebt());
+        setRenewalpolicy(responseBody.getRenewalPolicy());
+        setCertificatenumber(responseBody.getCertificateNumber());
+        setSubscriptiontype(responseBody.getSubscriptionType());
+        setBusinessagent(responseBody.getBusinessAgent());
         setBank(responseBody.getBank());
-        setLastInstallment(responseBody.getLastInstallment());
-        //setExternalDocumentationSendDate();
-        setNonRenewalPolicy(responseBody.getNonRenewalPolicy());
-        setCouponCode(responseBody.getCouponCode());
+        setLastinstallment(responseBody.getLastInstallment());
+        setExternaldocumentationsenddate(responseBody.getExternalDocumentationSendDate());
+        setNonrenewalpolicy(responseBody.getNonRenewalPolicy());
+        setCouponcode(responseBody.getCouponCode());
     }
 
-    public PreformalizationDTO getPolicyDTO() {
-        PreformalizationDTO requestBody = new PreformalizationDTO();
+    public PolicyDTO getPolicyDTO() {
+        PolicyDTO requestBody = new PolicyDTO();
         String traceId = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.REQUESTID);
         String saleChannelId = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.CHANNELCODE);
         String user = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.USERCODE);
@@ -89,26 +88,26 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         String headerOperationDate = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.OPERATIONDATE);
         String operationTime = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.OPERATIONTIME);
 
+        requestBody.setAlias(this.getAlias());
         requestBody.setQuotationNumber(this.getQuotationnumber());
         requestBody.setProduct(this.getProduct());
-        requestBody.setPaymentMethod(this.getPaymentmethod());
-        requestBody.setInsuranceValidityPeriod(this.getValidityperiod());
-        requestBody.setTotalAmount(this.getTotalAmount());
-        requestBody.setInsuredAmount(this.getInsuredAmount());
-        requestBody.setDataTreatment(this.getIsDataTreatment());
         requestBody.setHolder(this.getHolder());
-        requestBody.setRelatedContracts(this.getRelatedContracts());
-        requestBody.setInstallmentPlan(this.getInstallmentPlan());
-        requestBody.setHasAcceptedContract(this.getHasAcceptedContract());
+        requestBody.setPaymentMethod(this.getPaymentmethod());
+        requestBody.setValidityPeriod(this.getValidityperiod());
+        requestBody.setTotalAmount(this.getTotalamount());
+        requestBody.setInsuredAmount(this.getInsuredamount());
+        requestBody.setDataTreatment(this.getIsdatatreatment());
+        requestBody.setRelatedContracts(this.getRelatedcontracts());
+        requestBody.setInstallmentPlan(this.getInstallmentplan());
+        requestBody.setHasAcceptedContract(this.getHasacceptedcontract());
         requestBody.setInspection(this.getInspection());
-        requestBody.setFirstInstallment(this.getFirstInstallment());
+        requestBody.setFirstInstallment(this.getFirstinstallment());
         requestBody.setParticipants(this.getParticipants());
-        requestBody.setBusinessAgent(this.getBusinessAgent());
+        requestBody.setBusinessAgent(this.getBusinessagent());
         requestBody.setPromoter(this.getPromoter());
+        requestBody.setInsuranceCompany(this.getInsurancecompany());
         requestBody.setBank(this.getBank());
-        requestBody.setInsuranceCompany(this.getInsuranceCompany());
-        requestBody.setCouponCode(this.getCouponCode());
-        requestBody.setIdentityVerificationCode(this.getIdentityVerificationCode());
+        requestBody.setCouponCode(this.getCouponcode());
 
         requestBody.setTraceId(traceId);
         requestBody.setSaleChannelId(saleChannelId);
@@ -144,7 +143,4 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         LOGGER.info("Cabecera operationTime: {}", operationTime);
     }
 
-    public Object publicGetParameter(String parameter) {
-        return this.getParameter(parameter);
-    }
 }

@@ -1,14 +1,16 @@
 package com.bbva.rbvd.lib.rbvd118.builders;
 
+import com.bbva.rbvd.dto.insrncsale.commons.DescriptionDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.ContractDetailsDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.NumberTypeDTO;
 import com.bbva.rbvd.dto.preformalization.ContractDetails;
 import com.bbva.rbvd.dto.preformalization.ProductType;
 
 public class ContractDetailsBuilder {
-    private final ContractDetails contractDetails;
+    private final ContractDetailsDTO contractDetails;
 
     public ContractDetailsBuilder() {
-        contractDetails = new ContractDetails();
+        contractDetails = new ContractDetailsDTO();
     }
 
     public static ContractDetailsBuilder instance() {
@@ -38,13 +40,13 @@ public class ContractDetailsBuilder {
     }
 
     public ContractDetailsBuilder withProductType(String productTypeId) {
-        ProductType productType = new ProductType();
+        DescriptionDTO productType = new DescriptionDTO();
         productType.setId(productTypeId);
         contractDetails.setProductType(productType);
         return this;
     }
 
-    public ContractDetails build() {
+    public ContractDetailsDTO build() {
         return contractDetails;
     }
 }

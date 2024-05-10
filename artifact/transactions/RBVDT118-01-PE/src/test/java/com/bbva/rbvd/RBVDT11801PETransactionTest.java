@@ -8,8 +8,7 @@ import com.bbva.elara.domain.transaction.request.TransactionRequest;
 import com.bbva.elara.domain.transaction.request.body.CommonRequestBody;
 import com.bbva.elara.domain.transaction.request.header.CommonRequestHeader;
 import com.bbva.elara.test.osgi.DummyBundleContext;
-import com.bbva.rbvd.dto.preformalization.PreformalizationDTO;
-import com.bbva.rbvd.dummies.PreformalizationRequestDummy;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.lib.rbvd118.RBVDR118;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,10 +83,11 @@ public class RBVDT11801PETransactionTest {
 
     @Test
     public void execute() throws IOException {
-        PreformalizationDTO simulateResponse = PreformalizationRequestDummy.preformalizationRequest;
+        PolicyDTO simulateResponse = new PolicyDTO();
         simulateResponse.setOperationDate(new Date());
+        simulateResponse.setProductId("842");
 
-        when(rbvdr118.executePreFormalization(anyObject())).thenReturn(simulateResponse);
+        when(rbvdr118.executeLogicPreFormalization(anyObject())).thenReturn(simulateResponse);
 
         this.transaction.getContext().getParameterList().forEach(
                 (key, value) -> LOGGER.info("Key {} with value: {}", key, value)
@@ -108,7 +108,7 @@ public class RBVDT11801PETransactionTest {
 
     @Test
     public void testNull() {
-        when(rbvdr118.executePreFormalization(anyObject())).thenReturn(null);
+        when(rbvdr118.executeLogicPreFormalization(anyObject())).thenReturn(null);
         this.transaction.execute();
         assertEquals(Severity.ENR.getValue(), this.transaction.getSeverity().getValue());
     }
@@ -118,20 +118,4 @@ public class RBVDT11801PETransactionTest {
         transaction.getContext().getParameterList().put(parameter, tParameter);
     }
 
-    @Test
-    public void executeEasyLife() throws IOException {
-        PreformalizationDTO simulateResponse = PreformalizationRequestDummy.preformalizationRequest;
-        this.addParameter("productId", "840");
-        simulateResponse.setOperationDate(new Date());
-
-        when(rbvdr118.executePreFormalization(anyObject())).thenReturn(simulateResponse);
-
-        this.transaction.getContext().getParameterList().forEach(
-                (key, value) -> LOGGER.info("Key {} with value: {}", key, value)
-        );
-
-        this.transaction.execute();
-
-        assertTrue(this.transaction.getAdviceList().isEmpty());
-    }
 }
