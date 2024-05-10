@@ -1,12 +1,9 @@
 package com.bbva.rbvd.lib.rbvd118.impl;
 
-import com.bbva.apx.exception.business.BusinessException;
 import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
-import com.bbva.rbvd.dto.insrncsale.policy.BusinessAgentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PromoterDTO;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDErrors;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDValidation;
@@ -18,16 +15,19 @@ import com.bbva.rbvd.lib.rbvd118.impl.service.dao.impl.ContractDAOImpl;
 import com.bbva.rbvd.lib.rbvd118.impl.service.dao.impl.ParticipantDAOImpl;
 import com.bbva.rbvd.lib.rbvd118.impl.transform.bean.QuotationBean;
 import com.bbva.rbvd.lib.rbvd118.impl.util.ValidationUtil;
-import org.apache.commons.lang3.StringUtils;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.List;
+import java.util.Date;
 
-import static java.util.Objects.isNull;
+
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class RBVDR118Impl extends RBVDR118Abstract {
