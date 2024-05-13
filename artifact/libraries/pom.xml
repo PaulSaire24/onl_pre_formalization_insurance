@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 	<name>LIBRARIES-onl_pre_formalization_insurance</name>
 	<modules>
-		<module>RBVDR118</module>
-		<module>RBVDR118IMPL</module>
+		<module>RBVDR415</module>
+		<module>RBVDR415IMPL</module>
 	</modules>
 </project>

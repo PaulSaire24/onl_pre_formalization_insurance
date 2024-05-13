@@ -1,10 +1,10 @@
 package com.bbva.rbvd;
 
+import com.bbva.rbvd.lib.r415.RBVDR415;
 import com.bbva.elara.domain.transaction.RequestHeaderParamsName;
 import com.bbva.elara.domain.transaction.Severity;
 import com.bbva.elara.domain.transaction.response.HttpResponseCode;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.lib.rbvd118.RBVDR118;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,15 +19,14 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
 
     @Override
     public void execute() {
+		RBVDR415 rbvdR415 = this.getServiceLibrary(RBVDR415.class);
         LOGGER.info("RBVDT11801PETransaction - START");
-
-        RBVDR118 rbvdR118 = this.getServiceLibrary(RBVDR118.class);
 
         this.loggHeaders();
 
         PolicyDTO requestBody = this.getPolicyDTO();
 
-        PolicyDTO responseBody = rbvdR118.executeLogicPreFormalization(requestBody);
+        PolicyDTO responseBody = rbvdR415.executeLogicPreFormalization(requestBody);
 
         if (Objects.nonNull(responseBody)) {
             this.mapResponse(responseBody);

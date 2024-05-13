@@ -1,15 +1,27 @@
 package com.bbva.rbvd;
 
 import com.bbva.elara.transaction.AbstractTransaction;
-import com.bbva.rbvd.dto.insrncsale.commons.*;
-import com.bbva.rbvd.dto.insrncsale.policy.*;
-import com.bbva.rbvd.dto.preformalization.Installment;
-import com.bbva.rbvd.dto.preformalization.InsuranceStatus;
-import com.bbva.rbvd.dto.preformalization.PaymentConfiguration;
-import com.bbva.rbvd.dto.preformalization.Product;
-import com.bbva.rbvd.dto.preformalization.RelatedContract;
-import com.bbva.rbvd.dto.preformalization.RenewalPolicy;
-import com.bbva.rbvd.dto.preformalization.ValidityPeriod;
+import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.PolicyInspectionDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.QuotationStatusDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.BankDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.ProductDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.InsuredAmountDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.FirstInstallmentDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.InsuranceCompanyDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PaymentConfigurationDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.BusinessAgentDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PromoterDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.CurrentInstallmentDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.RenewalPolicyDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.InstallmentPlansDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.NonRenewalPolicyDTO;
 import java.util.Date;
 import java.util.List;
 

@@ -9,7 +9,7 @@ import com.bbva.elara.domain.transaction.request.body.CommonRequestBody;
 import com.bbva.elara.domain.transaction.request.header.CommonRequestHeader;
 import com.bbva.elara.test.osgi.DummyBundleContext;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.lib.rbvd118.RBVDR118;
+import com.bbva.rbvd.lib.r415.RBVDR415;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,8 +48,8 @@ public class RBVDT11801PETransactionTest {
     @Resource(name = "dummyBundleContext")
     private DummyBundleContext bundleContext;
 
-    @Resource(name = "rbvdR118")
-    private RBVDR118 rbvdr118;
+    @Resource(name = "rbvdR415")
+    private RBVDR415 rbvdR415;
 
     @Mock
     private CommonRequestHeader header;
@@ -87,7 +87,7 @@ public class RBVDT11801PETransactionTest {
         simulateResponse.setOperationDate(new Date());
         simulateResponse.setProductId("842");
 
-        when(rbvdr118.executeLogicPreFormalization(anyObject())).thenReturn(simulateResponse);
+        when(rbvdR415.executeLogicPreFormalization(anyObject())).thenReturn(simulateResponse);
 
         this.transaction.getContext().getParameterList().forEach(
                 (key, value) -> LOGGER.info("Key {} with value: {}", key, value)
@@ -108,7 +108,7 @@ public class RBVDT11801PETransactionTest {
 
     @Test
     public void testNull() {
-        when(rbvdr118.executeLogicPreFormalization(anyObject())).thenReturn(null);
+        when(rbvdR415.executeLogicPreFormalization(anyObject())).thenReturn(null);
         this.transaction.execute();
         assertEquals(Severity.ENR.getValue(), this.transaction.getSeverity().getValue());
     }

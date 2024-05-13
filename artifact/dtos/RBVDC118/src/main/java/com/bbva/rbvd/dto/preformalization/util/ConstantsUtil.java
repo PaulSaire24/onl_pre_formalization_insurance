@@ -43,7 +43,7 @@ public class ConstantsUtil {
         public static final int CERO = 0;
     }
 
-    public static final class RBVDR118 {
+    public static final class TimeZone {
         public static final String LIMA_TIME_ZONE = "America/Lima";
         public static final String GMT_TIME_ZONE = "GMT";
     }
