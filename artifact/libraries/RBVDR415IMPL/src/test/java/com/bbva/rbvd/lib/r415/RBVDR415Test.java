@@ -2,9 +2,6 @@ package com.bbva.rbvd.lib.r415;
 
 import com.bbva.apx.exception.business.BusinessException;
 import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
-import com.bbva.elara.domain.transaction.Context;
-import com.bbva.elara.domain.transaction.ThreadContext;
-import javax.annotation.Resource;
 
 import com.bbva.pisd.dto.insurance.utils.PISDProperties;
 import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
@@ -25,12 +22,10 @@ import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.lib.r047.RBVDR047;
 import com.bbva.rbvd.lib.r415.impl.RBVDR415Impl;
 import com.bbva.rbvd.lib.r415.impl.business.ICR2Business;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
-import org.springframework.aop.framework.Advised;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -63,8 +58,6 @@ public class RBVDR415Test {
 
 	private PISDR226 pisdR226;
 
-	private ApplicationConfigurationService applicationConfigurationService;
-
 	private PolicyDTO requestBody;
 
 	private ICR2Response icr2Response;
@@ -85,7 +78,7 @@ public class RBVDR415Test {
 		pisdR226 = Mockito.mock(PISDR226.class);
 		pisdR401 = Mockito.mock(PISDR401.class);
 		rbvdR047 = Mockito.mock(RBVDR047.class);
-		applicationConfigurationService = Mockito.mock(ApplicationConfigurationService.class);
+		ApplicationConfigurationService applicationConfigurationService = Mockito.mock(ApplicationConfigurationService.class);
 
 
 		rbvdr415.setPisdR226(pisdR226);
