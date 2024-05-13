@@ -69,7 +69,6 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 
 		String hostBranchId = icr2Response.getIcmrys2().getOFICON();
 		requestBody.getBank().getBranch().setId(hostBranchId);
-
 		setSaleChannelIdFromBranchId(requestBody, hostBranchId);
 
 		boolean isEndorsement = ValidationUtil.validateEndorsement(requestBody);
@@ -79,7 +78,6 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		contractDAO.insertInsuranceContract(requestBody, quotationDAO, icr2Response, isEndorsement, paymentPeriod);
 
 		IParticipantDAO participantDAO = new ParticipantDAOImpl(this.pisdR012);
-
 		//Busca roles por producto y plan
 		List<Map<String, Object>> rolesFromDB = participantDAO.getRolesByProductIdAndModality(
 				quotationDAO.getInsuranceProductId(), requestBody.getProduct().getPlan().getId());
@@ -93,9 +91,7 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 	}
 
 	public void validatePolicyExists(String quotation) {
-
 		boolean validateExist = this.pisdR226.executeFindQuotationIfExistInContract(quotation);
-
 		if (validateExist) {
 			throw RBVDValidation.build(RBVDErrors.POLICY_ALREADY_EXISTS);
 		}
