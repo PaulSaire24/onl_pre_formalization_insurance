@@ -10,17 +10,22 @@ import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
+import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 import static java.util.Objects.nonNull;
 
 public class ICR2Business {
+    private ICR2Business(){}
 
     public static ICR2Request mapRequestFromPreformalizationBody(PolicyDTO requestBody) {
         ICR2Request icr2Request = new ICR2Request();
 
         setBasicDetails(icr2Request, requestBody);
         setPaymentMethodDetails(icr2Request, requestBody.getPaymentMethod());
-        setRelatedContractDetails(icr2Request, requestBody.getRelatedContracts().get(ConstantsUtil.Number.CERO));
+        setRelatedContractDetails(icr2Request, requestBody.getRelatedContracts());
         setHolderDetails(icr2Request, requestBody.getHolder());
         setInstallmentPlanDetails(icr2Request, requestBody.getInstallmentPlan());
         setInsuredAmountDetails(icr2Request, requestBody.getInsuredAmount());
@@ -31,20 +36,18 @@ public class ICR2Business {
         return icr2Request;
     }
 
-    public static void setBasicDetails(ICR2Request icr2Request, PolicyDTO preformalizationRequest) {
-        if (nonNull(preformalizationRequest)) {
-            icr2Request.setNUMPOL(preformalizationRequest.getPolicyNumber());
-            icr2Request.setCODPRO(preformalizationRequest.getProduct().getId());
-            icr2Request.setFECINI(preformalizationRequest.getValidityPeriod().getStartDate().toString());
-            icr2Request.setCODMOD(preformalizationRequest.getProduct().getPlan().getId());
-            icr2Request.setCOBRO(preformalizationRequest.getFirstInstallment().getIsPaymentRequired() ? "S" : "N");
-            icr2Request.setGESTOR(preformalizationRequest.getBusinessAgent().getId());
-            icr2Request.setPRESEN(preformalizationRequest.getPromoter().getId());
-            icr2Request.setCODBAN(preformalizationRequest.getBank().getId());
-            icr2Request.setOFICON(preformalizationRequest.getBank().getBranch().getId());
-            icr2Request.setCODCIA(preformalizationRequest.getInsuranceCompany().getId());
-            icr2Request.setNUMCOTIZ(preformalizationRequest.getQuotationId());
-        }
+    public static void setBasicDetails(ICR2Request icr2Request, PolicyDTO requestBody) {
+        icr2Request.setNUMPOL(requestBody.getPolicyNumber());
+        icr2Request.setCODPRO(requestBody.getProduct().getId());
+        icr2Request.setFECINI(requestBody.getValidityPeriod().getStartDate().toString());
+        icr2Request.setCODMOD(requestBody.getProduct().getPlan().getId());
+        icr2Request.setCOBRO(requestBody.getFirstInstallment().getIsPaymentRequired() ? "S" : "N");
+        icr2Request.setGESTOR(requestBody.getBusinessAgent().getId());
+        icr2Request.setPRESEN(requestBody.getPromoter().getId());
+        icr2Request.setCODBAN(requestBody.getBank().getId());
+        icr2Request.setOFICON(requestBody.getBank().getBranch().getId());
+        icr2Request.setCODCIA(requestBody.getInsuranceCompany().getId());
+        icr2Request.setNUMCOTIZ(requestBody.getQuotationId());
     }
 
     public static void setPaymentMethodDetails(ICR2Request icr2Request, PolicyPaymentMethodDTO paymentMethod) {
@@ -54,13 +57,15 @@ public class ICR2Business {
         }
     }
 
-    public static void setRelatedContractDetails(ICR2Request icr2Request, RelatedContractDTO relatedContract) {
-        if (nonNull(relatedContract)) {
+    public static void setRelatedContractDetails(ICR2Request icr2Request, List<RelatedContractDTO> listRelatedContract) {
+        if (!CollectionUtils.isEmpty(listRelatedContract)) {
+            RelatedContractDTO relatedContract = listRelatedContract.get(0);
             String contractType = relatedContract.getContractDetails().getContractType();
             icr2Request.setNROCTA(relatedContract.getNumber());
             icr2Request.setMEDPAG(relatedContract.getContractDetails().getProductType().getId());
             icr2Request.setTCONVIN(contractType);
-            icr2Request.setCONVIN(contractType.equals(ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT) ? relatedContract.getContractDetails().getContractId() : relatedContract.getContractDetails().getNumber());
+            icr2Request.setCONVIN(contractType.equals(ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT)
+                    ? relatedContract.getContractDetails().getContractId() : relatedContract.getContractDetails().getNumber());
         }
     }
 
@@ -88,8 +93,8 @@ public class ICR2Business {
         }
     }
 
-    public static void setParticipantDetails(ICR2Request icr2Request, PolicyDTO preformalizationRequest, String role) {
-        ParticipantDTO participant = getParticipantByRole(preformalizationRequest, role);
+    public static void setParticipantDetails(ICR2Request icr2Request, PolicyDTO requestBody, String role) {
+        ParticipantDTO participant = ValidationUtil.filterOneParticipantByType(requestBody.getParticipants(), role);
         if (nonNull(participant)) {
             icr2Request.setPARTIC(role);
             if (role.equals(ConstantsUtil.Participant.PAYMENT_MANAGER)) {
@@ -109,12 +114,5 @@ public class ICR2Business {
             icr2Request.setPRITOT(totalAmount.getAmount().toString());
             icr2Request.setDIVPRI(totalAmount.getCurrency());
         }
-    }
-
-    public static ParticipantDTO getParticipantByRole(PolicyDTO preformalizationRequest, String role) {
-        return preformalizationRequest.getParticipants().stream()
-                .filter(participant -> participant.getParticipantType().getId().equals(role))
-                .findFirst()
-                .orElse(null);
     }
 }
