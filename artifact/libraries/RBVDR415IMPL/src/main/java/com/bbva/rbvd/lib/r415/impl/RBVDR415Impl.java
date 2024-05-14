@@ -65,7 +65,7 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		QuotationDAO quotationDAO = QuotationBean.transformQuotationMapToBean(contractRequiredFields);
 
 		ICR2Request icr2Request = ICR2Business.mapRequestFromPreformalizationBody(requestBody);
-		ICR2Response icr2Response = rbvdR047.executePolicyRegistration(icr2Request);
+		ICR2Response icr2Response = rbvdR047.executePreFormalizationContract(icr2Request);
 
 		String hostBranchId = icr2Response.getIcmrys2().getOFICON();
 		requestBody.getBank().getBranch().setId(hostBranchId);

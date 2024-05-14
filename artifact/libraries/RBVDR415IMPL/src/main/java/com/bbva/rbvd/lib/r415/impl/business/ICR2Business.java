@@ -1,6 +1,7 @@
 package com.bbva.rbvd.lib.r415.impl.business;
 
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
+import com.bbva.rbvd.dto.cicsconnection.icr2.enums.YesNoIndicator;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO;
@@ -10,6 +11,7 @@ import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
+import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
 import org.springframework.util.CollectionUtils;
 
@@ -39,15 +41,15 @@ public class ICR2Business {
     public static void setBasicDetails(ICR2Request icr2Request, PolicyDTO requestBody) {
         icr2Request.setNUMPOL(requestBody.getPolicyNumber());
         icr2Request.setCODPRO(requestBody.getProduct().getId());
-        icr2Request.setFECINI(requestBody.getValidityPeriod().getStartDate().toString());
+        icr2Request.setFECINI(ConvertUtil.convertDateToLocalDate(requestBody.getValidityPeriod().getStartDate()).toString());
         icr2Request.setCODMOD(requestBody.getProduct().getPlan().getId());
-        icr2Request.setCOBRO(requestBody.getFirstInstallment().getIsPaymentRequired() ? "S" : "N");
+        icr2Request.setCOBRO(requestBody.getFirstInstallment().getIsPaymentRequired() ? YesNoIndicator.YES : YesNoIndicator.NO);
         icr2Request.setGESTOR(requestBody.getBusinessAgent().getId());
         icr2Request.setPRESEN(requestBody.getPromoter().getId());
         icr2Request.setCODBAN(requestBody.getBank().getId());
         icr2Request.setOFICON(requestBody.getBank().getBranch().getId());
         icr2Request.setCODCIA(requestBody.getInsuranceCompany().getId());
-        icr2Request.setNUMCOTIZ(requestBody.getQuotationId());
+        icr2Request.setINDPREF("S");
     }
 
     public static void setPaymentMethodDetails(ICR2Request icr2Request, PolicyPaymentMethodDTO paymentMethod) {
@@ -61,7 +63,7 @@ public class ICR2Business {
         if (!CollectionUtils.isEmpty(listRelatedContract)) {
             RelatedContractDTO relatedContract = listRelatedContract.get(0);
             String contractType = relatedContract.getContractDetails().getContractType();
-            icr2Request.setNROCTA(relatedContract.getNumber());
+            icr2Request.setNROCTA(relatedContract.getContractDetails().getNumber());
             icr2Request.setMEDPAG(relatedContract.getContractDetails().getProductType().getId());
             icr2Request.setTCONVIN(contractType);
             icr2Request.setCONVIN(contractType.equals(ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT)
@@ -73,13 +75,13 @@ public class ICR2Business {
         if (nonNull(holder)) {
             icr2Request.setCODASE(holder.getId());
             icr2Request.setTIPDOC(holder.getIdentityDocument().getDocumentType().getId());
-            icr2Request.setNUMASE(holder.getIdentityDocument().getDocumentNumber());
+            icr2Request.setNUMASE(holder.getIdentityDocument().getNumber());
         }
     }
 
     public static void setInstallmentPlanDetails(ICR2Request icr2Request, PolicyInstallmentPlanDTO installmentPlan) {
         if (nonNull(installmentPlan)) {
-            icr2Request.setFECPAG(installmentPlan.getStartDate().toString());
+            icr2Request.setFECPAG(ConvertUtil.convertDateToLocalDate(installmentPlan.getStartDate()).toString());
             icr2Request.setNUMCUO(installmentPlan.getTotalNumberInstallments().toString());
             icr2Request.setMTOCUO(installmentPlan.getPaymentAmount().getAmount().toString());
             icr2Request.setDIVCUO(installmentPlan.getPaymentAmount().getCurrency());
@@ -98,13 +100,13 @@ public class ICR2Business {
         if (nonNull(participant)) {
             icr2Request.setPARTIC(role);
             if (role.equals(ConstantsUtil.Participant.PAYMENT_MANAGER)) {
-                icr2Request.setCODRSP(participant.getId());
+                icr2Request.setCODRSP(participant.getCustomerId());
                 icr2Request.setTIPDO1(participant.getIdentityDocument().getDocumentType().getId());
-                icr2Request.setNUMRSP(participant.getIdentityDocument().getDocumentNumber());
+                icr2Request.setNUMRSP(participant.getIdentityDocument().getNumber());
             } else if (role.equals(ConstantsUtil.Participant.LEGAL_REPRESENTATIVE)) {
-                icr2Request.setCODRPL(participant.getId());
+                icr2Request.setCODRPL(participant.getCustomerId());
                 icr2Request.setTIPDOR(participant.getIdentityDocument().getDocumentType().getId());
-                icr2Request.setNUMRPL(participant.getIdentityDocument().getDocumentNumber());
+                icr2Request.setNUMRPL(participant.getIdentityDocument().getNumber());
             }
         }
     }

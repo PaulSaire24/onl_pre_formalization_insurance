@@ -120,7 +120,7 @@ public class RBVDR415Test {
 		icmrys2.setOFICON("1234");
 		icmrys2.setNUMCON("00110482734000098127");
 		icr2Response.setIcmrys2(icmrys2);
-		when(rbvdR047.executePolicyRegistration(Mockito.anyObject())).thenReturn(icr2Response);
+		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
 
 		when(pisdR226.executeInsertInsuranceContract(Mockito.anyMap())).thenReturn(1);
 	}
@@ -184,7 +184,7 @@ public class RBVDR415Test {
 				.thenReturn(result);
 
 		icr2Response.getIcmrys2().setOFICON("7794");
-		when(rbvdR047.executePolicyRegistration(Mockito.anyObject())).thenReturn(icr2Response);
+		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
 
 		//Se agrega asegurado
 		ParticipantDTO insured = mockCreateParticipant("FOREIGNERS","97793201","69503241210","INSURED");
@@ -231,7 +231,7 @@ public class RBVDR415Test {
 
 		// Verificar que los métodos posteriores no se ejecutan
 		verify(pisdR226, never()).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, never()).executePolicyRegistration(any());
+		verify(rbvdR047, never()).executePreFormalizationContract(any());
 	}
 
 	@Test(expected = BusinessException.class)
@@ -245,7 +245,7 @@ public class RBVDR415Test {
 
 		// Verificar que los métodos posteriores no se ejecutan
 		verify(pisdR226, never()).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, never()).executePolicyRegistration(any());
+		verify(rbvdR047, never()).executePreFormalizationContract(any());
 	}
 
 	private ParticipantDTO mockCreateParticipant(String document,String customerId, String documentNumber,
