@@ -82,15 +82,15 @@ public class ICR2Business {
     public static void setInstallmentPlanDetails(ICR2Request icr2Request, PolicyInstallmentPlanDTO installmentPlan) {
         if (nonNull(installmentPlan)) {
             icr2Request.setFECPAG(ConvertUtil.convertDateToLocalDate(installmentPlan.getStartDate()).toString());
-            icr2Request.setNUMCUO(installmentPlan.getTotalNumberInstallments().toString());
-            icr2Request.setMTOCUO(installmentPlan.getPaymentAmount().getAmount().toString());
+            icr2Request.setNUMCUO(installmentPlan.getTotalNumberInstallments());
+            icr2Request.setMTOCUO(ConvertUtil.getBigDecimalValue(installmentPlan.getPaymentAmount().getAmount()));
             icr2Request.setDIVCUO(installmentPlan.getPaymentAmount().getCurrency());
         }
     }
 
     public static void setInsuredAmountDetails(ICR2Request icr2Request, InsuredAmountDTO insuredAmount) {
         if (nonNull(insuredAmount)) {
-            icr2Request.setSUMASE(insuredAmount.getAmount().toString());
+            icr2Request.setSUMASE(ConvertUtil.getBigDecimalValue(insuredAmount.getAmount()));
             icr2Request.setDIVSUM(insuredAmount.getCurrency());
         }
     }
@@ -113,7 +113,7 @@ public class ICR2Business {
 
     public static void setTotalAmountDetails(ICR2Request icr2Request, TotalAmountDTO totalAmount) {
         if (nonNull(totalAmount)) {
-            icr2Request.setPRITOT(totalAmount.getAmount().toString());
+            icr2Request.setPRITOT(ConvertUtil.getBigDecimalValue(totalAmount.getAmount()));
             icr2Request.setDIVPRI(totalAmount.getCurrency());
         }
     }
