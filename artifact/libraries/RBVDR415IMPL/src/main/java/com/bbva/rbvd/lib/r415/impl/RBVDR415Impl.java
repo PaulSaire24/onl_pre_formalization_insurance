@@ -1,5 +1,6 @@
 package com.bbva.rbvd.lib.r415.impl;
 
+import com.bbva.pisd.dto.contract.search.ReceiptSearchCriteria;
 import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
@@ -42,7 +43,11 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 
 	@Override
 	public PolicyDTO executeLogicPreFormalization(PolicyDTO requestBody) {
-		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - Params: {}", requestBody);
+		// No tocar por error de modulos
+		ReceiptSearchCriteria receiptSearchCriteria = new ReceiptSearchCriteria();
+		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - receiptSearchCriteria para que no salga error xd: {}", receiptSearchCriteria);
+
+		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - requestBody: {}", requestBody);
 
 		validatePolicyExists(requestBody.getQuotationNumber());
 
