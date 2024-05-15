@@ -1,6 +1,5 @@
 package com.bbva.rbvd.dto.preformalization.mock;
 
-import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,9 +7,9 @@ import java.io.InputStream;
 public class ObjectMapperHelper {
 
     private static final ObjectMapperHelper INSTANCE = new ObjectMapperHelper();
-    private ObjectMapper mapper;
+    private ObjectMapperHelper mapper;
 
-    private ObjectMapperHelper() { this.mapper = new ObjectMapper(); }
+    private ObjectMapperHelper() { this.mapper = new ObjectMapperHelper(); }
 
     public static ObjectMapperHelper getInstance() { return INSTANCE; }
 

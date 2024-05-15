@@ -210,7 +210,7 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	}
 
 	/**
-	 * Set value for Product output parameter product
+	 * Set value for ProductDTO output parameter product
 	 */
 	protected void setProduct(final ProductDTO field){
 		this.addParameter("product", field);
@@ -322,7 +322,7 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	}
 
 	/**
-	 * Set value for PaymentConfiguration output parameter paymentConfiguration
+	 * Set value for PaymentConfigurationDTO output parameter paymentConfiguration
 	 */
 	protected void setPaymentconfiguration(final PaymentConfigurationDTO field){
 		this.addParameter("paymentConfiguration", field);
