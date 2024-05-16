@@ -1,7 +1,7 @@
 package com.bbva.rbvd.lib.r415.impl.transform.map;
 
-import com.bbva.rbvd.dto.insrncsale.dao.InsuranceContractDAO;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
+import com.bbva.rbvd.dto.preformalization.dao.ContractDAO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ public class ContractMap {
     private ContractMap(){}
 
 
-    public static Map<String, Object> createSaveContractArguments(InsuranceContractDAO contractDao) {
+    public static Map<String, Object> createSaveContractArguments(ContractDAO contractDao) {
         Map<String, Object> arguments = new HashMap<>();
         arguments.put(RBVDProperties.FIELD_INSURANCE_CONTRACT_ENTITY_ID.getValue(), contractDao.getEntityId());
         arguments.put(RBVDProperties.FIELD_INSURANCE_CONTRACT_BRANCH_ID.getValue(), contractDao.getBranchId());
