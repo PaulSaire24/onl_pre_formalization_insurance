@@ -1,5 +1,6 @@
 package com.bbva.rbvd.lib.r415.impl.service.dao.impl;
 
+import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
 import com.bbva.pisd.dto.insurance.utils.PISDProperties;
 import com.bbva.pisd.lib.r012.PISDR012;
 import com.bbva.rbvd.dto.insrncsale.dao.IsrcContractParticipantDAO;
@@ -19,15 +20,18 @@ import java.util.Map;
 public class ParticipantDAOImpl implements IParticipantDAO {
 
     private final PISDR012 pisdr012;
+    private final ApplicationConfigurationService applicationConfigurationService;
 
-    public ParticipantDAOImpl(PISDR012 pisdr012) {
+    public ParticipantDAOImpl(PISDR012 pisdr012,ApplicationConfigurationService applicationConfigurationService) {
         this.pisdr012 = pisdr012;
+        this.applicationConfigurationService = applicationConfigurationService;
     }
 
 
     @Override
     public void insertInsuranceParticipants(PolicyDTO requestBody, List<Map<String, Object>> rolesFromDB, String contractId) {
-        List<IsrcContractParticipantDAO> participants = ParticipantBean.buildIsrcContractParticipants(
+        ParticipantBean participantBean = new ParticipantBean(this.applicationConfigurationService);
+        List<IsrcContractParticipantDAO> participants = participantBean.buildIsrcContractParticipants(
                 requestBody, rolesFromDB, contractId);
         Map<String, Object>[] participantsArguments = ParticipantMap.createSaveParticipantArguments(participants);
         int[] saveParticipants = this.pisdr012.executeMultipleInsertionOrUpdate(RBVDProperties.QUERY_INSERT_INSRNC_CTR_PARTICIPANT.getValue(),

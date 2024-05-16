@@ -83,7 +83,7 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		IContractDAO contractDAO = new ContractDAOImpl(this.pisdR226);
 		contractDAO.insertInsuranceContract(requestBody, quotationDAO, icr2Response, isEndorsement, paymentPeriod);
 
-		IParticipantDAO participantDAO = new ParticipantDAOImpl(this.pisdR012);
+		IParticipantDAO participantDAO = new ParticipantDAOImpl(this.pisdR012, this.applicationConfigurationService);
 		//Busca roles por producto y plan
 		List<Map<String, Object>> rolesFromDB = participantDAO.getRolesByProductIdAndModality(
 				quotationDAO.getInsuranceProductId(), requestBody.getProduct().getPlan().getId());

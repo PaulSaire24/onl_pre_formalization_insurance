@@ -1,5 +1,6 @@
 package com.bbva.rbvd.lib.r415.impl.transform.bean;
 
+import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
 import com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO;
 import com.bbva.rbvd.dto.insrncsale.dao.IsrcContractParticipantDAO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
@@ -18,10 +19,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ParticipantBean {
+    private final ApplicationConfigurationService applicationConfigurationService;
 
-    private ParticipantBean(){}
+    public ParticipantBean(ApplicationConfigurationService applicationConfigurationService){
+        this.applicationConfigurationService = applicationConfigurationService;
+    }
 
-    public static List<IsrcContractParticipantDAO> buildIsrcContractParticipants(PolicyDTO requestBody,
+    public List<IsrcContractParticipantDAO> buildIsrcContractParticipants(PolicyDTO requestBody,
                                                                                  List<Map<String, Object>> rolesFromDB, String contractId) {
         ParticipantDTO paymentManager = requestBody.getParticipants().get(0);
         List<ParticipantDTO> legalRepre = ValidationUtil.filterListParticipantsByType(requestBody.getParticipants(),
@@ -41,13 +45,13 @@ public class ParticipantBean {
 
         BigDecimal finalPartyOrderNumber = partyOrderNumber;
         List<IsrcContractParticipantDAO> listParticipants = participantRoles.stream()
-                .map(rol -> ParticipantBean.createBasicParticipantDao(contractId,rol, finalPartyOrderNumber,paymentManager,requestBody))
+                .map(rol -> createBasicParticipantDao(contractId,rol, finalPartyOrderNumber,paymentManager,requestBody))
                 .collect(Collectors.toList());
 
         if(!CollectionUtils.isEmpty(legalRepre)){
             for(ParticipantDTO legal : legalRepre){
                 listParticipants.add(
-                        ParticipantBean.createBasicParticipantDao(contractId,
+                        createBasicParticipantDao(contractId,
                                 ConvertUtil.getBigDecimalValue(ConstantsUtil.Number.TRES),
                                 partyOrderNumber, legal,requestBody));
                 partyOrderNumber = partyOrderNumber.add(BigDecimal.valueOf(1L));
@@ -57,7 +61,7 @@ public class ParticipantBean {
         if(insured != null){
             for (ParticipantDTO ins : insured) {
                 listParticipants.add(
-                        ParticipantBean.createBasicParticipantDao(contractId,
+                        createBasicParticipantDao(contractId,
                                 ConvertUtil.getBigDecimalValue(ConstantsUtil.Number.DOS),partyOrderNumber,
                                 ins,requestBody));
                 partyOrderNumber = partyOrderNumber.add(BigDecimal.valueOf(1L));
@@ -66,7 +70,7 @@ public class ParticipantBean {
 
         if(!CollectionUtils.isEmpty(beneficiary)){
             for(ParticipantDTO benef : beneficiary){
-                listParticipants.add(ParticipantBean.createParticipantBeneficiaryDao(contractId,
+                listParticipants.add(createParticipantBeneficiaryDao(contractId,
                         ConvertUtil.getBigDecimalValue(ConstantsUtil.Number.DOS),
                         benef,requestBody,partyOrderNumber));
                 partyOrderNumber = partyOrderNumber.add(BigDecimal.valueOf(1L));
@@ -82,7 +86,7 @@ public class ParticipantBean {
         }
     }
 
-    private static IsrcContractParticipantDAO createParticipantBeneficiaryDao(String id, BigDecimal rol,
+    private IsrcContractParticipantDAO createParticipantBeneficiaryDao(String id, BigDecimal rol,
                                                                              ParticipantDTO participant,
                                                                               PolicyDTO requestBody,
                                                                              BigDecimal partyOrderNumber) {
@@ -107,7 +111,7 @@ public class ParticipantBean {
         return participantDao;
     }
 
-    private static IsrcContractParticipantDAO createBasicParticipantDao(String contractId, BigDecimal rol,
+    private IsrcContractParticipantDAO createBasicParticipantDao(String contractId, BigDecimal rol,
                                                                    BigDecimal partyOrderNumber, ParticipantDTO participant,
                                                                         PolicyDTO requestBody) {
         IsrcContractParticipantDAO participantDao = new IsrcContractParticipantDAO();
@@ -116,7 +120,8 @@ public class ParticipantBean {
         participantDao.setIntAccountId(contractId.substring(10));
         participantDao.setParticipantRoleId(rol);
         participantDao.setPartyOrderNumber(partyOrderNumber);
-        participantDao.setPersonalDocType(participant.getIdentityDocument().getDocumentType().getId());
+        participantDao.setPersonalDocType(this.applicationConfigurationService.getProperty(
+                participant.getIdentityDocument().getDocumentType().getId()));
         participantDao.setParticipantPersonalId(participant.getIdentityDocument().getNumber());
         participantDao.setCustomerId(Objects.nonNull(participant.getCustomerId()) ? participant.getCustomerId() : null);
         participantDao.setCreationUserId(requestBody.getCreationUser());
