@@ -35,6 +35,22 @@ public class ConstantsUtil {
         public static final String QUERY_GET_INSURED_DATA_LIFE = "PISD.GET_INSURED_DATA_LIFE";
     }
 
+    public enum StatusContract{
+
+        PENDIENTE("PEN");
+
+        private String value;
+
+        StatusContract(String value){
+            this.value = value;
+        }
+
+        public String getValue(){
+            return value;
+        }
+
+    }
+
     public static final class Number {
         public static final int DIEZ = 10;
         public static final int TRES = 3;

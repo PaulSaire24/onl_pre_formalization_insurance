@@ -28,7 +28,7 @@ public class ContractBean {
 
         InsuranceContractDAO contractDao = new InsuranceContractDAO();
         ICMRYS2 icmrys2 = icr2Response.getIcmrys2();
-        String currentDate = ConvertUtil.generateCorrectDateFormat(LocalDate.now());
+        String currentDate = ConvertUtil.generateCorrectDateFormat(new LocalDate());
 
         contractDao.setEntityId(icmrys2.getNUMCON().substring(0, 4));
         contractDao.setBranchId(icmrys2.getNUMCON().substring(4, 8));
@@ -50,8 +50,8 @@ public class ContractBean {
         contractDao.setInsuredAmount(ConvertUtil.getBigDecimalValue(input.getInsuredAmount().getAmount()));
         contractDao.setCtrctDisputeStatusType(input.getSaleChannelId());
         contractDao.setEndorsementPolicyIndType((isEndorsement) ? ConstantsUtil.S_VALUE : ConstantsUtil.N_VALUE);
-        contractDao.setInsrncCoContractStatusType("PEN");
-        contractDao.setContractStatusId("PEN");
+        contractDao.setInsrncCoContractStatusType(ConstantsUtil.StatusContract.PENDIENTE.getValue());
+        contractDao.setContractStatusId(ConstantsUtil.StatusContract.PENDIENTE.getValue());
         contractDao.setCreationUserId(input.getCreationUser());
         contractDao.setUserAuditId(input.getUserAudit());
         contractDao.setInsurPendingDebtIndType((input.getFirstInstallment().getIsPaymentRequired())
