@@ -11,7 +11,7 @@
 		</dto>
 		<dto order="4" name="holder" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.commons.HolderDTO" artifactId="RBVDC201">
 			<parameter order="1" name="id" mandatory="1" type="String" size="20"/>
-			<parameter order="2" name="fullName" mandatory="1" type="String" size="200"/>
+			<parameter order="2" name="fullName" mandatory="0" type="String" size="200"/>
 			<dto order="3" name="identityDocument" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO" artifactId="RBVDC201">
 				<dto order="1" name="documentType" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO" artifactId="RBVDC201">
 					<parameter order="1" name="id" mandatory="1" type="String" size="30"/>
@@ -136,16 +136,16 @@
 	<paramsOut>
 		<parameter order="1" name="id" mandatory="1" type="String" size="20"/>
 		<parameter order="2" name="quotationNumber" mandatory="1" type="String" size="20"/>
-		<parameter order="3" name="policyNumber" mandatory="1" type="String" size="20"/>
+		<parameter order="3" name="policyNumber" mandatory="0" type="String" size="20"/>
 		<parameter order="4" name="alias" mandatory="0" type="String" size="60"/>
-		<parameter order="5" name="productType" mandatory="1" type="String" size="20"/>
+		<parameter order="5" name="productType" mandatory="0" type="String" size="20"/>
 		<dto order="6" name="product" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.policy.ProductDTO" artifactId="RBVDC201">
 			<parameter order="1" name="id" mandatory="1" type="String" size="10"/>
 			<parameter order="2" name="name" mandatory="1" type="String" size="60"/>
 			<dto order="3" name="plan" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.policy.PlanDTO" artifactId="RBVDC201">
 				<parameter order="1" name="id" mandatory="1" type="String" size="10"/>
 				<parameter order="2" name="description" mandatory="0" type="String" size="100"/>
-				<dto order="3" name="planType" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.commons.DescriptionDTO" artifactId="RBVDC201">
+				<dto order="3" name="planType" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.DescriptionDTO" artifactId="RBVDC201">
 					<parameter order="1" name="id" mandatory="1" type="String" size="10"/>
 					<parameter order="2" name="name" mandatory="1" type="String" size="60"/>
 				</dto>
@@ -289,7 +289,7 @@
 		</dto>
 		<dto order="23" name="holder" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.commons.HolderDTO" artifactId="RBVDC201">
 			<parameter order="1" name="id" mandatory="1" type="String" size="8"/>
-			<parameter order="2" name="fullName" mandatory="1" type="String" size="80"/>
+			<parameter order="2" name="fullName" mandatory="0" type="String" size="80"/>
 			<dto order="3" name="identityDocument" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO" artifactId="RBVDC201">
 				<dto order="1" name="documentType" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO" artifactId="RBVDC201">
 					<parameter order="1" name="id" mandatory="1" type="String" size="30"/>
@@ -309,10 +309,10 @@
 		</dto>
 		<parameter order="24" name="cancelationDate" mandatory="0" type="Date (YYYY-MM-DD)" size="0"/>
 		<dto order="25" name="validityPeriod" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO" artifactId="RBVDC201">
-			<parameter order="1" name="unit" mandatory="1" type="String" size="20"/>
+			<parameter order="1" name="unit" mandatory="0" type="String" size="20"/>
 			<parameter order="2" name="description" mandatory="0" type="String" size="80"/>
 			<parameter order="3" name="startDate" mandatory="1" type="Date (YYYY-MM-DD)" size="0"/>
-			<parameter order="4" name="endDate" mandatory="1" type="Date (YYYY-MM-DD)" size="0"/>
+			<parameter order="4" name="endDate" mandatory="0" type="Date (YYYY-MM-DD)" size="0"/>
 		</dto>
 		<dto order="26" name="currentInstallment" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.policy.CurrentInstallmentDTO" artifactId="RBVDC201">
 			<dto order="1" name="installmentAmount" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO" artifactId="RBVDC201">

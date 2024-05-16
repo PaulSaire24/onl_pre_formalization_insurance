@@ -2,6 +2,7 @@ package com.bbva.rbvd.lib.r415.impl;
 
 import com.bbva.pisd.dto.contract.search.ReceiptSearchCriteria;
 import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
+import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
@@ -60,8 +61,8 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		Map<String, Object> contractRequiredFields = pisdR012.executeGetASingleRow(
 				RBVDProperties.DYNAMIC_QUERY_FOR_INSURANCE_CONTRACT.getValue(), quotationIdArgument);
 
-		PaymentPeriodEntity paymentPeriod = this.pisdR226.executeFindPaymentPeriodByType(
-				requestBody.getInstallmentPlan().getPeriod().getId());
+		String frequencyType = this.applicationConfigurationService.getProperty(requestBody.getInstallmentPlan().getPeriod().getId());
+		PaymentPeriodEntity paymentPeriod = this.pisdR226.executeFindPaymentPeriodByType(frequencyType);
 
 		if (isEmpty(contractRequiredFields)) {
 			throw RBVDValidation.build(RBVDErrors.NON_EXISTENT_QUOTATION);
@@ -87,12 +88,30 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		List<Map<String, Object>> rolesFromDB = participantDAO.getRolesByProductIdAndModality(
 				quotationDAO.getInsuranceProductId(), requestBody.getProduct().getPlan().getId());
 
+		//falta enviar el applicationconfiguration servcie al participant
 		if(!isEmpty(rolesFromDB) && !isEmpty(requestBody.getParticipants())){
 			//Registra participantes
 			participantDAO.insertInsuranceParticipants(requestBody, rolesFromDB, icr2Response.getIcmrys2().getNUMCON());
 		}
 
+		//Mapeo de campos de salida de trx
+		String contractId = getContractFrontIcr2(icr2Response.getIcmrys2());
+		filltOutputTrx(requestBody,contractId,quotationDAO);
+
 		return requestBody;
+	}
+
+	private void filltOutputTrx(PolicyDTO policyDTO,String contractId,QuotationDAO quotationDAO){
+		policyDTO.setId(contractId);
+		policyDTO.getProduct().setName(quotationDAO.getInsuranceProductDesc());
+	}
+
+	private String getContractFrontIcr2(ICMRYS2 icmrys2) {
+		return icmrys2.getNUMCON().substring(0, 4) +
+				icmrys2.getNUMCON().substring(4, 8) +
+				icmrys2.getNUMCON().charAt(8) +
+				icmrys2.getNUMCON().charAt(9) +
+				icmrys2.getNUMCON().substring(10);
 	}
 
 	public void validatePolicyExists(String quotation) {
