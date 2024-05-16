@@ -69,9 +69,11 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		}
 
 		QuotationDAO quotationDAO = QuotationBean.transformQuotationMapToBean(contractRequiredFields);
+		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - quotationDAO: {}", quotationDAO);
 
 		ICR2Request icr2Request = ICR2Business.mapRequestFromPreformalizationBody(requestBody);
 		ICR2Response icr2Response = rbvdR047.executePreFormalizationContract(icr2Request);
+		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - icr2Response: {}", icr2Response);
 
 		String hostBranchId = icr2Response.getIcmrys2().getOFICON();
 		requestBody.getBank().getBranch().setId(hostBranchId);
@@ -87,8 +89,8 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		//Busca roles por producto y plan
 		List<Map<String, Object>> rolesFromDB = participantDAO.getRolesByProductIdAndModality(
 				quotationDAO.getInsuranceProductId(), requestBody.getProduct().getPlan().getId());
+		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - rolesFromDB: {}", rolesFromDB);
 
-		//falta enviar el applicationconfiguration servcie al participant
 		if(!isEmpty(rolesFromDB) && !isEmpty(requestBody.getParticipants())){
 			//Registra participantes
 			participantDAO.insertInsuranceParticipants(requestBody, rolesFromDB, icr2Response.getIcmrys2().getNUMCON());

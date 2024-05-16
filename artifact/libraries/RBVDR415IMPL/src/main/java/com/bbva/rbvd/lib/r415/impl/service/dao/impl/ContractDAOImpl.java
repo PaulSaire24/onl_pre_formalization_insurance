@@ -11,10 +11,13 @@ import com.bbva.rbvd.lib.r415.impl.service.dao.IContractDAO;
 import com.bbva.rbvd.lib.r415.impl.transform.bean.ContractBean;
 import com.bbva.rbvd.lib.r415.impl.transform.map.ContractMap;
 import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class ContractDAOImpl implements IContractDAO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContractDAOImpl.class);
 
     private final PISDR226 pisdr226;
 
@@ -28,8 +31,10 @@ public class ContractDAOImpl implements IContractDAO {
                                         ICR2Response icr2Response, boolean isEndorsement, PaymentPeriodEntity paymentPeriod) {
         InsuranceContractDAO contractDao = ContractBean.buildInsuranceContract(input, quotationDAO,
                 icr2Response, isEndorsement, paymentPeriod);
+        LOGGER.info("***** ContractDAOImpl - insertInsuranceContract() | contractDao: {} *****",contractDao.toString());
 
         Map<String, Object> argumentsForSaveContract = ContractMap.createSaveContractArguments(contractDao);
+        LOGGER.info("***** ContractDAOImpl - insertInsuranceContract() | argumentsForSaveContract: {} *****",argumentsForSaveContract);
 
         int insertContract = this.pisdr226.executeInsertInsuranceContract(argumentsForSaveContract);
 
