@@ -100,6 +100,8 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		String contractId = getContractFrontIcr2(icr2Response.getIcmrys2());
 		filltOutputTrx(requestBody,contractId,quotationDAO);
 
+		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - output: {}", requestBody);
+		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - Fin del proceso");
 		return requestBody;
 	}
 
