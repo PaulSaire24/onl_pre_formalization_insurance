@@ -4,9 +4,9 @@ import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.pisd.lib.r226.PISDR226;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.dto.insrncsale.utils.RBVDErrors;
 import com.bbva.rbvd.dto.preformalization.dao.ContractDAO;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
+import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import com.bbva.rbvd.lib.r415.impl.service.dao.IContractDAO;
 import com.bbva.rbvd.lib.r415.impl.transform.bean.ContractBean;
 import com.bbva.rbvd.lib.r415.impl.transform.map.ContractMap;
@@ -38,7 +38,9 @@ public class ContractDAOImpl implements IContractDAO {
 
         int insertContract = this.pisdr226.executeInsertInsuranceContract(argumentsForSaveContract);
 
-        ValidationUtil.validateInsertion(insertContract, RBVDErrors.INSERTION_ERROR_IN_CONTRACT_TABLE);
+        ValidationUtil.validateInsertion(insertContract,
+                RBVDMessageError.ERROR_INSERT_INSURANCE_CONTRACT.getAdviceCode(),
+                RBVDMessageError.ERROR_INSERT_INSURANCE_CONTRACT.getMessage());
     }
 
 }

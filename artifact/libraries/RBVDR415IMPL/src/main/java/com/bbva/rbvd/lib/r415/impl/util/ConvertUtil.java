@@ -10,7 +10,6 @@ import java.util.Date;
 public class ConvertUtil {
     private ConvertUtil(){}
 
-    private static final String GMT_TIME_ZONE = "GMT";
 
     public static String generateCorrectDateFormat(LocalDate localDate) {
         String day = (localDate.getDayOfMonth() < 10)
@@ -23,7 +22,7 @@ public class ConvertUtil {
     }
 
     public static LocalDate convertDateToLocalDate(Date date) {
-        return new LocalDate(date, DateTimeZone.forID(GMT_TIME_ZONE));
+        return new LocalDate(date, DateTimeZone.forID("GMT"));
     }
 
     public static BigDecimal getBigDecimalValue(Object value){

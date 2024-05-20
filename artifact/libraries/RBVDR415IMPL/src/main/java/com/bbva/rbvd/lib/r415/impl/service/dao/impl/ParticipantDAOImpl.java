@@ -5,9 +5,8 @@ import com.bbva.pisd.dto.insurance.utils.PISDProperties;
 import com.bbva.pisd.lib.r012.PISDR012;
 import com.bbva.rbvd.dto.insrncsale.dao.IsrcContractParticipantDAO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.dto.insrncsale.utils.RBVDErrors;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
-import com.bbva.rbvd.lib.r415.impl.RBVDR415Impl;
+import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import com.bbva.rbvd.lib.r415.impl.service.dao.IParticipantDAO;
 import com.bbva.rbvd.lib.r415.impl.transform.bean.ParticipantBean;
 import com.bbva.rbvd.lib.r415.impl.transform.map.ParticipantMap;
@@ -45,7 +44,9 @@ public class ParticipantDAOImpl implements IParticipantDAO {
         int[] saveParticipants = this.pisdr012.executeMultipleInsertionOrUpdate(RBVDProperties.QUERY_INSERT_INSRNC_CTR_PARTICIPANT.getValue(),
                 participantsArguments);
 
-        ValidationUtil.validateMultipleInsertion(saveParticipants, RBVDErrors.INSERTION_ERROR_IN_PARTICIPANT_TABLE);
+        ValidationUtil.validateMultipleInsertion(saveParticipants,
+                RBVDMessageError.ERROR_INSERT_PARTICIPANTS.getAdviceCode(),
+                RBVDMessageError.ERROR_INSERT_PARTICIPANTS.getMessage());
     }
 
     @Override

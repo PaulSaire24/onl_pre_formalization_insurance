@@ -1,22 +1,22 @@
 package com.bbva.rbvd.lib.r415.impl;
 
+import com.bbva.apx.exception.business.BusinessException;
 import com.bbva.pisd.dto.contract.search.ReceiptSearchCriteria;
 import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.dto.insrncsale.utils.RBVDErrors;
-import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
-import com.bbva.rbvd.dto.insrncsale.utils.RBVDValidation;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
+import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import com.bbva.rbvd.lib.r415.impl.business.ICR2Business;
 import com.bbva.rbvd.lib.r415.impl.service.dao.IContractDAO;
 import com.bbva.rbvd.lib.r415.impl.service.dao.IParticipantDAO;
+import com.bbva.rbvd.lib.r415.impl.service.dao.IQuotationDAO;
 import com.bbva.rbvd.lib.r415.impl.service.dao.impl.ContractDAOImpl;
 import com.bbva.rbvd.lib.r415.impl.service.dao.impl.ParticipantDAOImpl;
-import com.bbva.rbvd.lib.r415.impl.transform.bean.QuotationBean;
+import com.bbva.rbvd.lib.r415.impl.service.dao.impl.QuotationDAOImpl;
 import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -24,7 +24,6 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -44,65 +43,73 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 
 	@Override
 	public PolicyDTO executeLogicPreFormalization(PolicyDTO requestBody) {
-		// No tocar por error de modulos
-		ReceiptSearchCriteria receiptSearchCriteria = new ReceiptSearchCriteria();
-		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - receiptSearchCriteria para que no salga error xd: {}", receiptSearchCriteria);
+		try {
+			// No tocar por error de modulos
+			ReceiptSearchCriteria receiptSearchCriteria = new ReceiptSearchCriteria();
+			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - receiptSearchCriteria para que no salga error xd: {}", receiptSearchCriteria);
 
-		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - requestBody: {}", requestBody);
+			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - requestBody: {}", requestBody);
 
-		validatePolicyExists(requestBody.getQuotationNumber());
+			boolean validateExist = this.pisdR226.executeFindQuotationIfExistInContract(requestBody.getQuotationNumber());
+			ValidationUtil.validateQuotationExistsInContract(validateExist);
 
-		evaluateIfPaymentIsRequired(requestBody);
+			evaluateIfPaymentIsRequired(requestBody);
 
-		Map<String, Object> quotationIdArgument = Collections.singletonMap(
-				RBVDProperties.FIELD_POLICY_QUOTA_INTERNAL_ID.getValue(),requestBody.getQuotationNumber());
+			IQuotationDAO quotationDAO = new QuotationDAOImpl(this.pisdR012);
+			QuotationDAO quotationDetail = quotationDAO.getQuotationDetails(requestBody.getQuotationNumber());
+			ValidationUtil.validateObjectIsNull(quotationDetail,
+					RBVDMessageError.QUOTATION_NOT_EXIST.getAdviceCode(),
+					RBVDMessageError.QUOTATION_NOT_EXIST.getMessage());
 
-		//DEVUELVE MUCHOS CAMPOS, REEMPLAZAR POR OTRO QUERY. Usar lib_dao_insurance_quotation
-		Map<String, Object> contractRequiredFields = pisdR012.executeGetASingleRow(
-				RBVDProperties.DYNAMIC_QUERY_FOR_INSURANCE_CONTRACT.getValue(), quotationIdArgument);
+			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - quotationDAO: {}", quotationDetail);
 
-		String frequencyType = this.applicationConfigurationService.getProperty(requestBody.getInstallmentPlan().getPeriod().getId());
-		PaymentPeriodEntity paymentPeriod = this.pisdR226.executeFindPaymentPeriodByType(frequencyType);
+			//Obtiene el periodo de pago
+			String frequencyType = this.applicationConfigurationService.getProperty(requestBody.getInstallmentPlan().getPeriod().getId());
+			PaymentPeriodEntity paymentPeriod = this.pisdR226.executeFindPaymentPeriodByType(frequencyType);
+			ValidationUtil.validateObjectIsNull(paymentPeriod,
+					RBVDMessageError.PAYMENT_PERIOD_NOT_EXIST.getAdviceCode(),
+					RBVDMessageError.PAYMENT_PERIOD_NOT_EXIST.getMessage());
 
-		if (isEmpty(contractRequiredFields)) {
-			throw RBVDValidation.build(RBVDErrors.NON_EXISTENT_QUOTATION);
+			ICR2Request icr2Request = ICR2Business.mapRequestFromPreformalizationBody(requestBody);
+			ICR2Response icr2Response = rbvdR047.executePreFormalizationContract(icr2Request);
+
+			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - icr2Response: {}", icr2Response);
+
+			ValidationUtil.checkHostAdviceErrors(icr2Response);
+
+			String hostBranchId = icr2Response.getIcmrys2().getOFICON();
+			requestBody.getBank().getBranch().setId(hostBranchId);
+			setSaleChannelIdFromBranchId(requestBody, hostBranchId);
+
+			boolean isEndorsement = ValidationUtil.validateEndorsement(requestBody);
+
+			//Inserta contrato
+			IContractDAO contractDAO = new ContractDAOImpl(this.pisdR226);
+			contractDAO.insertInsuranceContract(requestBody, quotationDetail, icr2Response, isEndorsement, paymentPeriod);
+
+			IParticipantDAO participantDAO = new ParticipantDAOImpl(this.pisdR012, this.applicationConfigurationService);
+
+			//Busca roles por producto y plan
+			List<Map<String, Object>> rolesFromDB = participantDAO.getRolesByProductIdAndModality(
+					quotationDetail.getInsuranceProductId(), requestBody.getProduct().getPlan().getId());
+			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - rolesFromDB: {}", rolesFromDB);
+
+			if(!isEmpty(rolesFromDB) && !isEmpty(requestBody.getParticipants())){
+				//Registra participantes
+				participantDAO.insertInsuranceParticipants(requestBody, rolesFromDB, icr2Response.getIcmrys2().getNUMCON());
+			}
+
+			String contractId = getContractFrontIcr2Response(icr2Response.getIcmrys2());
+			filltOutputTrx(requestBody,contractId,quotationDetail);
+
+			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - output: {}", requestBody);
+			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - Fin del proceso");
+			return requestBody;
+		}catch (BusinessException tuex){
+			LOGGER.error("RBVDR415Impl - executeLogicPreFormalization() - BusinessException: {}", tuex.getMessage());
+			this.addAdviceWithDescription(tuex.getAdviceCode(),tuex.getMessage());
+			return null;
 		}
-
-		QuotationDAO quotationDAO = QuotationBean.transformQuotationMapToBean(contractRequiredFields);
-		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - quotationDAO: {}", quotationDAO);
-
-		ICR2Request icr2Request = ICR2Business.mapRequestFromPreformalizationBody(requestBody);
-		ICR2Response icr2Response = rbvdR047.executePreFormalizationContract(icr2Request);
-		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - icr2Response: {}", icr2Response);
-
-		String hostBranchId = icr2Response.getIcmrys2().getOFICON();
-		requestBody.getBank().getBranch().setId(hostBranchId);
-		setSaleChannelIdFromBranchId(requestBody, hostBranchId);
-
-		boolean isEndorsement = ValidationUtil.validateEndorsement(requestBody);
-
-		//Inserta contrato
-		IContractDAO contractDAO = new ContractDAOImpl(this.pisdR226);
-		contractDAO.insertInsuranceContract(requestBody, quotationDAO, icr2Response, isEndorsement, paymentPeriod);
-
-		IParticipantDAO participantDAO = new ParticipantDAOImpl(this.pisdR012, this.applicationConfigurationService);
-		//Busca roles por producto y plan
-		List<Map<String, Object>> rolesFromDB = participantDAO.getRolesByProductIdAndModality(
-				quotationDAO.getInsuranceProductId(), requestBody.getProduct().getPlan().getId());
-		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - rolesFromDB: {}", rolesFromDB);
-
-		if(!isEmpty(rolesFromDB) && !isEmpty(requestBody.getParticipants())){
-			//Registra participantes
-			participantDAO.insertInsuranceParticipants(requestBody, rolesFromDB, icr2Response.getIcmrys2().getNUMCON());
-		}
-
-		//Mapeo de campos de salida de trx
-		String contractId = getContractFrontIcr2(icr2Response.getIcmrys2());
-		filltOutputTrx(requestBody,contractId,quotationDAO);
-
-		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - output: {}", requestBody);
-		LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - Fin del proceso");
-		return requestBody;
 	}
 
 	private void filltOutputTrx(PolicyDTO policyDTO,String contractId,QuotationDAO quotationDAO){
@@ -110,19 +117,12 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		policyDTO.getProduct().setName(quotationDAO.getInsuranceProductDesc());
 	}
 
-	private String getContractFrontIcr2(ICMRYS2 icmrys2) {
+	private String getContractFrontIcr2Response(ICMRYS2 icmrys2) {
 		return icmrys2.getNUMCON().substring(0, 4) +
 				icmrys2.getNUMCON().substring(4, 8) +
 				icmrys2.getNUMCON().charAt(8) +
 				icmrys2.getNUMCON().charAt(9) +
 				icmrys2.getNUMCON().substring(10);
-	}
-
-	public void validatePolicyExists(String quotation) {
-		boolean validateExist = this.pisdR226.executeFindQuotationIfExistInContract(quotation);
-		if (validateExist) {
-			throw RBVDValidation.build(RBVDErrors.POLICY_ALREADY_EXISTS);
-		}
 	}
 
 	public void evaluateIfPaymentIsRequired(PolicyDTO requestBody) {

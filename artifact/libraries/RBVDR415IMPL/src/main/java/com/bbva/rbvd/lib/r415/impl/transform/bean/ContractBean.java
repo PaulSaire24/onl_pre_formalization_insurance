@@ -88,7 +88,7 @@ public class ContractBean {
 
     private static String getDomicileContractId(List<RelatedContractDTO> relatedContractList){
         if(CollectionUtils.isEmpty(relatedContractList)) return null;
-        return relatedContractList.get(0).getContractDetails().getContractId();
+        return relatedContractList.get(0).getContractDetails().getNumber();
     }
 
     private static BigDecimal getPrevPendBillRcptsNumber(PolicyDTO preformalizationBody, QuotationDAO emissionDao) {

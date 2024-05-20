@@ -3,6 +3,8 @@ package com.bbva.rbvd.lib.r415;
 import com.bbva.apx.exception.business.BusinessException;
 import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
 
+import com.bbva.elara.domain.transaction.Context;
+import com.bbva.elara.domain.transaction.ThreadContext;
 import com.bbva.pisd.dto.insurance.utils.PISDProperties;
 import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.pisd.lib.r012.PISDR012;
@@ -10,6 +12,7 @@ import com.bbva.pisd.lib.r226.PISDR226;
 import com.bbva.pisd.lib.r401.PISDR401;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
+import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
 import com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
 import com.bbva.rbvd.dto.insrncsale.dao.RequiredFieldsEmissionDAO;
@@ -19,6 +22,7 @@ import com.bbva.rbvd.dto.insrncsale.policy.ParticipantTypeDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
+import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import com.bbva.rbvd.lib.r047.RBVDR047;
 import com.bbva.rbvd.lib.r415.impl.RBVDR415Impl;
 import com.bbva.rbvd.lib.r415.impl.business.ICR2Business;
@@ -26,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -34,7 +39,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static com.bbva.pisd.dto.insurance.utils.PISDConstants.CHANNEL_GLOMO;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -44,10 +49,13 @@ import static org.mockito.Mockito.*;
 		"classpath:/META-INF/spring/RBVDR415-app-test.xml",
 		"classpath:/META-INF/spring/RBVDR415-arc.xml",
 		"classpath:/META-INF/spring/RBVDR415-arc-test.xml" })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class RBVDR415Test {
 
+	@Spy
+	private Context context;
 
-	private RBVDR415Impl rbvdr415;
+	private RBVDR415Impl rbvdr415 = new RBVDR415Impl();;
 
 	private PISDR012 pisdR012;
 
@@ -71,8 +79,9 @@ public class RBVDR415Test {
 
 	@Before
 	public void setUp() throws Exception {
-
-		rbvdr415 = new RBVDR415Impl();
+		MockitoAnnotations.initMocks(this);
+		context = new Context();
+		ThreadContext.set(context);
 
 		pisdR012 = Mockito.mock(PISDR012.class);
 		pisdR226 = Mockito.mock(PISDR226.class);
@@ -221,31 +230,102 @@ public class RBVDR415Test {
 	}
 
 
-	@Test(expected = BusinessException.class)
-	public void executeLogicPreFormalization_TestQuotationExist(){
+	@Test
+	public void executeLogicPreFormalization_TestQuotationExistInContract(){
 
-		when(pisdR226.executeFindQuotationIfExistInContract(Mockito.anyString())).thenReturn(true);
+		when(pisdR226.executeFindQuotationIfExistInContract(requestBody.getQuotationNumber())).thenReturn(true);
 
-		rbvdr415.executeLogicPreFormalization(requestBody);
+		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
 
+		assertNull(response);
+		assertEquals(1,this.context.getAdviceList().size());
+		assertEquals(RBVDMessageError.QUOTATION_EXIST_IN_CONTRACT.getAdviceCode(),this.context.getAdviceList().get(0).getCode());
 
 		// Verificar que los métodos posteriores no se ejecutan
 		verify(pisdR226, never()).executeFindPaymentPeriodByType(any());
 		verify(rbvdR047, never()).executePreFormalizationContract(any());
 	}
 
-	@Test(expected = BusinessException.class)
-	public void executeLogicPreFormalization_TestQuotationInvalid(){
+	@Test
+	public void executeLogicPreFormalization_TestQuotationNotExist(){
 		when(pisdR012.executeGetASingleRow(
 				RBVDProperties.DYNAMIC_QUERY_FOR_INSURANCE_CONTRACT.getValue(),
 				Collections.singletonMap(RBVDProperties.FIELD_POLICY_QUOTA_INTERNAL_ID.getValue(),requestBody.getQuotationNumber())))
 				.thenReturn(Collections.emptyMap());
 
-		rbvdr415.executeLogicPreFormalization(requestBody);
+		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNull(response);
+		assertEquals(1,this.context.getAdviceList().size());
+		assertEquals(RBVDMessageError.QUOTATION_NOT_EXIST.getAdviceCode(),this.context.getAdviceList().get(0).getCode());
 
 		// Verificar que los métodos posteriores no se ejecutan
 		verify(pisdR226, never()).executeFindPaymentPeriodByType(any());
 		verify(rbvdR047, never()).executePreFormalizationContract(any());
+	}
+
+	@Test
+	public void executeLogicPreFormalization_TestIcr2ResponseWithHostAdviceError(){
+		icr2Response.setHostAdviceCode(Collections.singletonList(new HostAdvice("ICER024", "FECHA DE INICIO DE COBERT VACIO")));
+		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
+
+		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNull(response);
+		assertEquals(1,this.context.getAdviceList().size());
+		assertEquals("ICER024",this.context.getAdviceList().get(0).getCode());
+
+		// Verificar que no inserte contrato ni participantes
+		verify(pisdR226, never()).executeInsertInsuranceContract(any());
+		verify(pisdR012, never()).executeMultipleInsertionOrUpdate(any(),any());
+	}
+
+	@Test
+	public void executeLogicPreFormalization_TestErrorInsertContract(){
+		when(pisdR226.executeInsertInsuranceContract(Mockito.anyMap())).thenReturn(0);
+
+		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNull(response);
+		assertEquals(1,this.context.getAdviceList().size());
+		assertEquals(RBVDMessageError.ERROR_INSERT_INSURANCE_CONTRACT.getAdviceCode(),this.context.getAdviceList().get(0).getCode());
+
+		// Verificar que no inserte participantes
+		verify(pisdR012, never()).executeMultipleInsertionOrUpdate(any(),any());
+	}
+
+	@Test
+	public void executeLogicPreFormalization_TestRolesByProductIsEmpty(){
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), Collections.emptyList());
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(response);
+
+		// Verificar que no inserte participantes
+		verify(pisdR012, never()).executeMultipleInsertionOrUpdate(any(),any());
+	}
+
+	@Test
+	public void executeLogicPreFormalization_TestErrorInsertParticipants(){
+		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
+				.thenReturn(new int[]{1,0,1});
+
+		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNull(response);
+		assertEquals(1,this.context.getAdviceList().size());
+		assertEquals(RBVDMessageError.ERROR_INSERT_PARTICIPANTS.getAdviceCode(),this.context.getAdviceList().get(0).getCode());
 	}
 
 	private ParticipantDTO mockCreateParticipant(String document,String customerId, String documentNumber,
