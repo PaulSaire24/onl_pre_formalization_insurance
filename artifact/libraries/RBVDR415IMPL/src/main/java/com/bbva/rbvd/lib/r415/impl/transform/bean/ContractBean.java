@@ -5,7 +5,6 @@ import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
-import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
 import com.bbva.rbvd.dto.preformalization.dao.ContractDAO;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
@@ -91,16 +90,14 @@ public class ContractBean {
         return relatedContractList.get(0).getContractDetails().getNumber();
     }
 
-    private static BigDecimal getPrevPendBillRcptsNumber(PolicyDTO preformalizationBody, QuotationDAO emissionDao) {
+    private static BigDecimal getPrevPendBillRcptsNumber(PolicyDTO preformalizationBody, QuotationDAO quotationDAO) {
 
         BigDecimal prevPendBillRcptsNumber;
-        String productId = preformalizationBody.getProduct().getId();
         boolean isPaymentRequired = preformalizationBody.getFirstInstallment().getIsPaymentRequired();
         Long totalNumberInstallments = preformalizationBody.getInstallmentPlan().getTotalNumberInstallments();
 
-        if (productId.equals(RBVDProperties.INSURANCE_PRODUCT_TYPE_VIDA_EASYYES.getValue())
-                || productId.equals(RBVDProperties.INSURANCE_PRODUCT_TYPE_VIDA_2.getValue())) {
-            prevPendBillRcptsNumber = emissionDao.getContractDurationNumber();
+        if ("VIDA".equals(quotationDAO.getInsuranceBusinessName())) {
+            prevPendBillRcptsNumber = quotationDAO.getContractDurationNumber();
         } else {
             prevPendBillRcptsNumber = BigDecimal.valueOf(isPaymentRequired ? totalNumberInstallments - 1 : totalNumberInstallments);
         }

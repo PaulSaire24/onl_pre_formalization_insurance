@@ -1,6 +1,5 @@
 package com.bbva.rbvd.lib.r415;
 
-import com.bbva.apx.exception.business.BusinessException;
 import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
 
 import com.bbva.elara.domain.transaction.Context;
@@ -10,6 +9,7 @@ import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.pisd.lib.r012.PISDR012;
 import com.bbva.pisd.lib.r226.PISDR226;
 import com.bbva.pisd.lib.r401.PISDR401;
+import com.bbva.pisd.lib.r601.PISDR601;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
 import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
@@ -62,7 +62,7 @@ public class RBVDR415Test {
 	private PISDR401 pisdR401;
 
 	private RBVDR047 rbvdR047;
-
+	private PISDR601 pisdr601;
 
 	private PISDR226 pisdR226;
 
@@ -70,9 +70,6 @@ public class RBVDR415Test {
 
 	private ICR2Response icr2Response;
 
-	private RequiredFieldsEmissionDAO emissionDao;
-
-	private ICR2Business icr2Helper;
 
 	private MockData mockData;
 
@@ -87,13 +84,14 @@ public class RBVDR415Test {
 		pisdR226 = Mockito.mock(PISDR226.class);
 		pisdR401 = Mockito.mock(PISDR401.class);
 		rbvdR047 = Mockito.mock(RBVDR047.class);
+		pisdr601 = Mockito.mock(PISDR601.class);
 		ApplicationConfigurationService applicationConfigurationService = Mockito.mock(ApplicationConfigurationService.class);
-
 
 		rbvdr415.setPisdR226(pisdR226);
 		rbvdr415.setPisdR012(pisdR012);
 		rbvdr415.setRbvdR047(rbvdR047);
 		rbvdr415.setPisdR401(pisdR401);
+		rbvdr415.setPisdR601(pisdr601);
 		rbvdr415.setApplicationConfigurationService(applicationConfigurationService);
 
 		mockData = MockData.getInstance();
@@ -114,7 +112,7 @@ public class RBVDR415Test {
 		paymentPeriodEntity.setPaymentFrequencyName("ANUAL");
 		when(pisdR226.executeFindPaymentPeriodByType(Mockito.anyString())).thenReturn(paymentPeriodEntity);
 
-		Map<String, Object> responseQueryGetRequiredFields = new HashMap<>();
+		/*Map<String, Object> responseQueryGetRequiredFields = new HashMap<>();
 		responseQueryGetRequiredFields.put(RBVDProperties.FIELD_INSURANCE_PRODUCT_ID.getValue(), new BigDecimal(13));
 		responseQueryGetRequiredFields.put(PISDProperties.FIELD_INSURANCE_PRODUCT_DESC.getValue(),"Insurance Product Description");
 		responseQueryGetRequiredFields.put(RBVDProperties.FIELD_CONTRACT_DURATION_NUMBER.getValue(),999);
@@ -122,7 +120,18 @@ public class RBVDR415Test {
 		when(pisdR012.executeGetASingleRow(
 				RBVDProperties.DYNAMIC_QUERY_FOR_INSURANCE_CONTRACT.getValue(),
 				Collections.singletonMap(RBVDProperties.FIELD_POLICY_QUOTA_INTERNAL_ID.getValue(),requestBody.getQuotationNumber())))
-				.thenReturn(responseQueryGetRequiredFields);
+				.thenReturn(responseQueryGetRequiredFields);*/
+
+		Map<String,Object> quotationInfo = new HashMap<>();
+		quotationInfo.put("INSURANCE_BUSINESS_NAME","VIDA");
+		quotationInfo.put("INSURANCE_PRODUCT_ID",13);
+		quotationInfo.put("INSURANCE_PRODUCT_DESC","Seguro Vida Ley");
+		quotationInfo.put("CONTRACT_DURATION_TYPE","");
+		quotationInfo.put("CONTRACT_DURATION_NUMBER",999);
+		quotationInfo.put("INSURANCE_MODALITY_NAME","PLAN PLATA");
+		quotationInfo.put("INSURANCE_COMPANY_QUOTA_ID","ba3c7d41-65ce-4582-bde2-08f21311fbc9");
+		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber()))
+				.thenReturn(quotationInfo);
 
 		icr2Response = new ICR2Response();
 		ICMRYS2 icmrys2 = new ICMRYS2();
@@ -248,9 +257,7 @@ public class RBVDR415Test {
 
 	@Test
 	public void executeLogicPreFormalization_TestQuotationNotExist(){
-		when(pisdR012.executeGetASingleRow(
-				RBVDProperties.DYNAMIC_QUERY_FOR_INSURANCE_CONTRACT.getValue(),
-				Collections.singletonMap(RBVDProperties.FIELD_POLICY_QUOTA_INTERNAL_ID.getValue(),requestBody.getQuotationNumber())))
+		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber()))
 				.thenReturn(Collections.emptyMap());
 
 		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);

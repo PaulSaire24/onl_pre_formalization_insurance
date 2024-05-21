@@ -55,17 +55,18 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 
 			evaluateIfPaymentIsRequired(requestBody);
 
-			IQuotationDAO quotationDAO = new QuotationDAOImpl(this.pisdR012);
+			IQuotationDAO quotationDAO = new QuotationDAOImpl(this.pisdR601);
 			QuotationDAO quotationDetail = quotationDAO.getQuotationDetails(requestBody.getQuotationNumber());
+			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - quotationDAO: {}", quotationDetail);
+
 			ValidationUtil.validateObjectIsNull(quotationDetail,
 					RBVDMessageError.QUOTATION_NOT_EXIST.getAdviceCode(),
 					RBVDMessageError.QUOTATION_NOT_EXIST.getMessage());
 
-			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - quotationDAO: {}", quotationDetail);
-
-			//Obtiene el periodo de pago
 			String frequencyType = this.applicationConfigurationService.getProperty(requestBody.getInstallmentPlan().getPeriod().getId());
 			PaymentPeriodEntity paymentPeriod = this.pisdR226.executeFindPaymentPeriodByType(frequencyType);
+			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - paymentPeriod: {}", paymentPeriod);
+
 			ValidationUtil.validateObjectIsNull(paymentPeriod,
 					RBVDMessageError.PAYMENT_PERIOD_NOT_EXIST.getAdviceCode(),
 					RBVDMessageError.PAYMENT_PERIOD_NOT_EXIST.getMessage());

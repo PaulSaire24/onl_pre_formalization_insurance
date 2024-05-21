@@ -5,6 +5,7 @@ import com.bbva.elara.library.AbstractLibrary;
 import com.bbva.pisd.lib.r012.PISDR012;
 import com.bbva.pisd.lib.r226.PISDR226;
 import com.bbva.pisd.lib.r401.PISDR401;
+import com.bbva.pisd.lib.r601.PISDR601;
 import com.bbva.rbvd.lib.r047.RBVDR047;
 import com.bbva.rbvd.lib.r415.RBVDR415;
 
@@ -22,6 +23,8 @@ public abstract class RBVDR415Abstract extends AbstractLibrary implements RBVDR4
 	protected RBVDR047 rbvdR047;
 
 	protected PISDR226 pisdR226;
+
+	protected PISDR601 pisdR601;
 
 
 	/**
@@ -57,6 +60,13 @@ public abstract class RBVDR415Abstract extends AbstractLibrary implements RBVDR4
 	*/
 	public void setPisdR226(PISDR226 pisdR226) {
 		this.pisdR226 = pisdR226;
+	}
+
+	/**
+	* @param pisdR601 the this.pisdR601 to set
+	*/
+	public void setPisdR601(PISDR601 pisdR601) {
+		this.pisdR601 = pisdR601;
 	}
 
 }
