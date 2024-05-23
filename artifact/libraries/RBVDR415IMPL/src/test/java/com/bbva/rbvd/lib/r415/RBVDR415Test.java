@@ -1,9 +1,9 @@
 package com.bbva.rbvd.lib.r415;
 
 import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
-
 import com.bbva.elara.domain.transaction.Context;
 import com.bbva.elara.domain.transaction.ThreadContext;
+import com.bbva.elara.utility.api.connector.APIConnector;
 import com.bbva.pisd.dto.insurance.utils.PISDProperties;
 import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.pisd.lib.r012.PISDR012;
@@ -13,26 +13,30 @@ import com.bbva.pisd.lib.r601.PISDR601;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
 import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
-import com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
-import com.bbva.rbvd.dto.insrncsale.dao.RequiredFieldsEmissionDAO;
+import com.bbva.rbvd.dto.insrncsale.commons.*;
 import com.bbva.rbvd.dto.insrncsale.mock.MockData;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantTypeDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.dto.insrncsale.utils.RBVDProperties;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import com.bbva.rbvd.lib.r047.RBVDR047;
+import com.bbva.rbvd.lib.r415.factory.ApiConnectorFactoryTest;
 import com.bbva.rbvd.lib.r415.impl.RBVDR415Impl;
-import com.bbva.rbvd.lib.r415.impl.business.ICR2Business;
+import com.bbva.rbvd.mock.MockBundleContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.client.RestClientException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -70,8 +74,9 @@ public class RBVDR415Test {
 
 	private ICR2Response icr2Response;
 
-
 	private MockData mockData;
+	private ApplicationConfigurationService applicationConfigurationService;
+	private APIConnector internalApiConnectorImpersonation;
 
 
 	@Before
@@ -85,7 +90,11 @@ public class RBVDR415Test {
 		pisdR401 = Mockito.mock(PISDR401.class);
 		rbvdR047 = Mockito.mock(RBVDR047.class);
 		pisdr601 = Mockito.mock(PISDR601.class);
-		ApplicationConfigurationService applicationConfigurationService = Mockito.mock(ApplicationConfigurationService.class);
+		applicationConfigurationService = Mockito.mock(ApplicationConfigurationService.class);
+
+		MockBundleContext mockBundleContext = mock(MockBundleContext.class);
+		ApiConnectorFactoryTest apiConnectorFactoryMock = new ApiConnectorFactoryTest();
+		internalApiConnectorImpersonation = apiConnectorFactoryMock.getAPIConnector(mockBundleContext, true, true);
 
 		rbvdr415.setPisdR226(pisdR226);
 		rbvdr415.setPisdR012(pisdR012);
@@ -93,6 +102,7 @@ public class RBVDR415Test {
 		rbvdr415.setPisdR401(pisdR401);
 		rbvdr415.setPisdR601(pisdr601);
 		rbvdr415.setApplicationConfigurationService(applicationConfigurationService);
+		rbvdr415.setInternalApiConnectorImpersonation(internalApiConnectorImpersonation);
 
 		mockData = MockData.getInstance();
 
@@ -104,6 +114,7 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_CONTACT_CENTER_CODE)).thenReturn("CC");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.CHANNEL_CONTACT_DETAIL)).thenReturn("13000013");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_AGENT_PROMOTER_CODE)).thenReturn("UCQGSPPP");
+		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("N");
 
 		when(pisdR226.executeFindQuotationIfExistInContract(Mockito.anyString())).thenReturn(false);
 
@@ -111,16 +122,6 @@ public class RBVDR415Test {
 		paymentPeriodEntity.setPaymentFrequencyId(new BigDecimal(3));
 		paymentPeriodEntity.setPaymentFrequencyName("ANUAL");
 		when(pisdR226.executeFindPaymentPeriodByType(Mockito.anyString())).thenReturn(paymentPeriodEntity);
-
-		/*Map<String, Object> responseQueryGetRequiredFields = new HashMap<>();
-		responseQueryGetRequiredFields.put(RBVDProperties.FIELD_INSURANCE_PRODUCT_ID.getValue(), new BigDecimal(13));
-		responseQueryGetRequiredFields.put(PISDProperties.FIELD_INSURANCE_PRODUCT_DESC.getValue(),"Insurance Product Description");
-		responseQueryGetRequiredFields.put(RBVDProperties.FIELD_CONTRACT_DURATION_NUMBER.getValue(),999);
-		responseQueryGetRequiredFields.put(RBVDProperties.FIELD_CONTRACT_DURATION_TYPE.getValue(),"");
-		when(pisdR012.executeGetASingleRow(
-				RBVDProperties.DYNAMIC_QUERY_FOR_INSURANCE_CONTRACT.getValue(),
-				Collections.singletonMap(RBVDProperties.FIELD_POLICY_QUOTA_INTERNAL_ID.getValue(),requestBody.getQuotationNumber())))
-				.thenReturn(responseQueryGetRequiredFields);*/
 
 		Map<String,Object> quotationInfo = new HashMap<>();
 		quotationInfo.put("INSURANCE_BUSINESS_NAME","VIDA");
@@ -137,6 +138,9 @@ public class RBVDR415Test {
 		ICMRYS2 icmrys2 = new ICMRYS2();
 		icmrys2.setOFICON("1234");
 		icmrys2.setNUMCON("00110482734000098127");
+		icmrys2.setFECCTR("2024-05-21 14:35:36");
+		icmrys2.setFECINI("2024-05-21");
+		icmrys2.setFECFIN("2025-05-21");
 		icr2Response.setIcmrys2(icmrys2);
 		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
 
@@ -232,6 +236,47 @@ public class RBVDR415Test {
 
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1});
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+	}
+
+	@Test
+	public void executeLogicPreFormalization_TestCallEventUpdateStatusDWP(){
+		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
+		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
+				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+
+		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
+
+		inspection.setIsRequired(true);
+		inspection.setFullName("Cristian Alexis Segovia Farfan");
+
+		List<ContactDetailDTO> contactDetails = new ArrayList<>();
+		ContactDetailDTO phone = new ContactDetailDTO();
+		phone.setContact(new ContactDTO());
+		phone.getContact().setContactDetailType("PHONE");
+		phone.getContact().setPhoneNumber("98736442");
+		contactDetails.add(phone);
+		ContactDetailDTO email = new ContactDetailDTO();
+		email.setContact(new ContactDTO());
+		email.getContact().setContactDetailType("EMAIL");
+		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
+		contactDetails.add(email);
+		inspection.setContactDetails(contactDetails);
+		requestBody.setInspection(inspection);
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+	}
+
+	@Test
+	public void executeLogicPreFormalization_TestCallEventUpdateStatusDWPWithError(){
+		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
+		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any())).
+				thenThrow(new RestClientException("CONNECTION ERROR"));
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 

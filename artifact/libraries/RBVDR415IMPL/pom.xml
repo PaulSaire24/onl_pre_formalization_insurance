@@ -102,7 +102,12 @@
 		<dependency>
 			<groupId>com.bbva.pisd</groupId>
 			<artifactId>PISDR601</artifactId>
-			<version>0.3.0-SNAPSHOT</version>
+			<version>0.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bbva.elara</groupId>
+			<artifactId>elara-utility-api-connector</artifactId>
+			<version>${apx.api.connector.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -115,16 +120,20 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>${project.artifactId}-${project.version}</Bundle-SymbolicName>
-						<Bundle-Category>library</Bundle-Category>
+						<Bundle-Category>library-intapiconnector</Bundle-Category>
 						<Export-Package>
 							!*;version="${osgi.version.manifest}"
 						</Export-Package>
 						<Import-Package>
 							com.bbva.elara.aspect;version="${osgi.version.manifest}",
+							javax.xml.transform;version="${osgi.version.manifest}",
 							org.aopalliance.aop;version="${osgi.version.manifest}",
 							org.osgi.framework;version="${osgi.version.manifest}",
 							org.springframework.aop;version="${osgi.version.manifest}",
 							org.springframework.aop.framework;version="${osgi.version.manifest}",
+							org.springframework.core;version="${osgi.version.manifest}",
+							org.springframework.http;version="${osgi.version.manifest}",
+							org.springframework.web.client;version="${osgi.version.manifest}",
 							spring;version="${osgi.version.manifest}",
 							*;version="${osgi.version.manifest}"
 						</Import-Package>

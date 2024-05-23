@@ -6,17 +6,21 @@ import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
+import com.bbva.rbvd.dto.insrncsale.events.CreatedInsrcEventDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
+import com.bbva.rbvd.lib.r415.impl.business.CreatedInsuranceEventBusiness;
 import com.bbva.rbvd.lib.r415.impl.business.ICR2Business;
+import com.bbva.rbvd.lib.r415.impl.service.api.ConsumeInternalService;
 import com.bbva.rbvd.lib.r415.impl.service.dao.IContractDAO;
 import com.bbva.rbvd.lib.r415.impl.service.dao.IParticipantDAO;
 import com.bbva.rbvd.lib.r415.impl.service.dao.IQuotationDAO;
 import com.bbva.rbvd.lib.r415.impl.service.dao.impl.ContractDAOImpl;
 import com.bbva.rbvd.lib.r415.impl.service.dao.impl.ParticipantDAOImpl;
 import com.bbva.rbvd.lib.r415.impl.service.dao.impl.QuotationDAOImpl;
+import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -100,8 +104,17 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 				participantDAO.insertInsuranceParticipants(requestBody, rolesFromDB, icr2Response.getIcmrys2().getNUMCON());
 			}
 
-			String contractId = getContractFrontIcr2Response(icr2Response.getIcmrys2());
-			filltOutputTrx(requestBody,contractId,quotationDetail);
+			filltOutputTrx(requestBody,icr2Response.getIcmrys2(),quotationDetail);
+
+			//llamar al evento para que avise a DWP que ya se contrató
+			String flagCallEvent = this.applicationConfigurationService.getDefaultProperty(
+					"flag.callevent.createinsured.for.preemision",ConstantsUtil.N_VALUE);
+			if(flagCallEvent.equalsIgnoreCase(ConstantsUtil.S_VALUE)){
+				ConsumeInternalService consumeInternalService = new ConsumeInternalService(this.internalApiConnectorImpersonation);
+				Integer httpStatusCode = consumeInternalService.callEventUpsilonToUpdateStatusInDWP(
+						CreatedInsuranceEventBusiness.createRequestCreatedInsuranceEvent(requestBody));
+				LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - callEventUpsilonToUpdateStatusInDWP - httpStatusCode: {}",httpStatusCode);
+			}
 
 			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - output: {}", requestBody);
 			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - Fin del proceso");
@@ -113,9 +126,11 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 		}
 	}
 
-	private void filltOutputTrx(PolicyDTO policyDTO,String contractId,QuotationDAO quotationDAO){
-		policyDTO.setId(contractId);
+	private void filltOutputTrx(PolicyDTO policyDTO,ICMRYS2 icmrys2,QuotationDAO quotationDAO){
+		policyDTO.setId(getContractFrontIcr2Response(icmrys2));
 		policyDTO.getProduct().setName(quotationDAO.getInsuranceProductDesc());
+		policyDTO.setOperationDate(ConvertUtil.convertStringDateWithTimeFormatToDate(icmrys2.getFECCTR()));
+		policyDTO.getValidityPeriod().setEndDate(ConvertUtil.convertStringDateWithDateFormatToDate(icmrys2.getFECFIN()));
 	}
 
 	private String getContractFrontIcr2Response(ICMRYS2 icmrys2) {

@@ -20,7 +20,7 @@ public class QuotationDAOImpl implements IQuotationDAO {
     public QuotationDAO getQuotationDetails(String quotationId) {
         QuotationDAO quotationDAO = null;
 
-        Map<String, Object> contractRequiredFields = pisdr601.executeFindQuotationDetailForPreEmision(quotationId);
+        Map<String, Object> contractRequiredFields = this.pisdr601.executeFindQuotationDetailForPreEmision(quotationId);
 
         if(!ValidationUtil.mapIsNullOrEmpty(contractRequiredFields)){
             quotationDAO = QuotationBean.transformQuotationMapToBean(contractRequiredFields);

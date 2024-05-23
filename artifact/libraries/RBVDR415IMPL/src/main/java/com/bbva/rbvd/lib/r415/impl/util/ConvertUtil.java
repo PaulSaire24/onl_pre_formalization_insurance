@@ -3,9 +3,14 @@ package com.bbva.rbvd.lib.r415.impl.util;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class ConvertUtil {
     private ConvertUtil(){}
@@ -19,6 +24,30 @@ public class ConvertUtil {
                 ? "0" + localDate.getMonthOfYear()
                 : String.valueOf(localDate.getMonthOfYear());
         return day + "/" + month + "/" + localDate.getYear();
+    }
+
+    public static Date convertStringDateWithTimeFormatToDate(String strDate){
+        if(StringUtils.isEmpty(strDate)){
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(strDate, formatter);
+        return Date.from(dateTime.atZone(TimeZone.getTimeZone("GMT").toZoneId()).toInstant());
+    }
+
+    public static Date convertStringDateWithDateFormatToDate(String strDate){
+        if(StringUtils.isEmpty(strDate)){
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        java.time.LocalDate localDate = java.time.LocalDate.parse(strDate, formatter);
+        return Date.from(localDate.atStartOfDay(TimeZone.getTimeZone("GMT").toZoneId()).toInstant());
+    }
+
+    public static Calendar convertDateToCalendar(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar;
     }
 
     public static LocalDate convertDateToLocalDate(Date date) {
@@ -42,6 +71,10 @@ public class ConvertUtil {
         }
 
         return ret;
+    }
+
+    public static String getRequestJsonFormat(final Object requestBody) {
+        return JsonUtil.getInstance().serialization(requestBody);
     }
 
 
