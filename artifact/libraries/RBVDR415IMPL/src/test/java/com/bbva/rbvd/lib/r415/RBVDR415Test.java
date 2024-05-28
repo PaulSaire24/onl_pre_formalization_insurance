@@ -59,7 +59,7 @@ public class RBVDR415Test {
 	@Spy
 	private Context context;
 
-	private RBVDR415Impl rbvdr415 = new RBVDR415Impl();;
+	private final RBVDR415Impl rbvdr415 = new RBVDR415Impl();;
 
 	private PISDR012 pisdR012;
 
@@ -77,6 +77,7 @@ public class RBVDR415Test {
 	private MockData mockData;
 	private ApplicationConfigurationService applicationConfigurationService;
 	private APIConnector internalApiConnectorImpersonation;
+	private Map<String,Object> quotationInfo;
 
 
 	@Before
@@ -115,6 +116,8 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.CHANNEL_CONTACT_DETAIL)).thenReturn("13000013");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_AGENT_PROMOTER_CODE)).thenReturn("UCQGSPPP");
 		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("N");
+		when(applicationConfigurationService.getProperty("DNI")).thenReturn("L");
+		when(applicationConfigurationService.getProperty("PASSPORT")).thenReturn("P");
 
 		when(pisdR226.executeFindQuotationIfExistInContract(Mockito.anyString())).thenReturn(false);
 
@@ -123,7 +126,7 @@ public class RBVDR415Test {
 		paymentPeriodEntity.setPaymentFrequencyName("ANUAL");
 		when(pisdR226.executeFindPaymentPeriodByType(Mockito.anyString())).thenReturn(paymentPeriodEntity);
 
-		Map<String,Object> quotationInfo = new HashMap<>();
+		quotationInfo = new HashMap<>();
 		quotationInfo.put("INSURANCE_BUSINESS_NAME","VIDA");
 		quotationInfo.put("INSURANCE_PRODUCT_ID",13);
 		quotationInfo.put("INSURANCE_PRODUCT_DESC","Seguro Vida Ley");
@@ -147,8 +150,11 @@ public class RBVDR415Test {
 		when(pisdR226.executeInsertInsuranceContract(Mockito.anyMap())).thenReturn(1);
 	}
 
+	/*
+	CASO 1: PRODUCTO VIDA LEY CON UNA CUENTA, CLIENTE RUC 20, PLAN 01, 1 REPRESENTANTE LEGAL
+	 */
 	@Test
-	public void executeLogicPreFormalization_TestSucessFlowVidaLey(){
+	public void executeTestFlowLifeLawCase1(){
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
@@ -156,94 +162,28 @@ public class RBVDR415Test {
 		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
 				.thenReturn(result);
 
-		//Responsable de pago empresa
+		//Responsable de pago empresa ruc 20
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
 		requestBody.getParticipants().get(0).setCustomerId("97165552");
 
-		//Se agrega 2 representantes legales
+		//Se agrega 1 representante legal
 		ParticipantDTO legal1 = mockCreateParticipant("DNI","37850934","78122201","LEGAL_REPRESENTATIVE");
 		requestBody.getParticipants().add(legal1);
-		ParticipantDTO legal2 = mockCreateParticipant("DNI","20009971","73399927","LEGAL_REPRESENTATIVE");
-		requestBody.getParticipants().add(legal2);
+
+		//producto vida ley
+		requestBody.getProduct().setId("842");
+
+		//plan 01
+		requestBody.getProduct().getPlan().setId("01");
+
+		//cuenta de cliente
+		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("ACCOUNT");
+		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("00110130260299972507");
 
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1,1});
 
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-	}
-
-	@Test
-	public void executeLogicPreFormalization_TestParticipantsWithBeneficiary() throws IOException {
-		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,6,7));
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		//Se agrega beneficiarios de otro mock
-		PolicyDTO request2WithBeneficiaries = mockData.getCreateInsuranceRequestBody();
-		requestBody.setParticipants(request2WithBeneficiaries.getParticipants());
-
-		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
-				.thenReturn(new int[]{1,1,1,1});
-
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-	}
-
-	@Test
-	public void executeLogicPreFormalization_TestParticipantsWithInsured(){
-		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		icr2Response.getIcmrys2().setOFICON("7794");
-		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
-
-		//Se agrega asegurado
-		ParticipantDTO insured = mockCreateParticipant("FOREIGNERS","97793201","69503241210","INSURED");
-		requestBody.getParticipants().add(insured);
-
-		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
-				.thenReturn(new int[]{1,1});
-
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-	}
-
-	@Test
-	public void executeLogicPreFormalization_TestParticipantsWithEndorsee(){
-		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		//Se agrega endosatario
-		ParticipantDTO endorsee = mockCreateParticipant("RUC","20224043","20628447889","ENDORSEE");
-		endorsee.setBenefitPercentage(100D);
-		requestBody.getParticipants().add(endorsee);
-
-		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
-				.thenReturn(new int[]{1,1});
-
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-	}
-
-	@Test
-	public void executeLogicPreFormalization_TestCallEventUpdateStatusDWP(){
 		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
@@ -272,27 +212,520 @@ public class RBVDR415Test {
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
 		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+		assertEquals(2,validation.getParticipants().size());
+
+		//Verifica que llame a las librerias externas y el internal api connector
+		verify(pisdR226, times(1)).executeFindQuotationIfExistInContract(any());
+		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
+		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
+		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
+		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
+		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
 
-	@Test
-	public void executeLogicPreFormalization_TestCallEventUpdateStatusDWPWithError(){
-		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
-		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any())).
-				thenThrow(new RestClientException("CONNECTION ERROR"));
 
+	/*
+	CASO 2: PRODUCTO VIDA LEY CON UNA CUENTA, CLIENTE RUC 20, PLAN 02, 4 REPRESENTANTES LEGALES
+	 */
+	@Test
+	public void executeTestFlowLifeLawCase2(){
+		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		//Responsable de pago empresa ruc 20
+		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
+		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
+		requestBody.getParticipants().get(0).setCustomerId("97165552");
+
+		//Se agrega 4 representantes legales
+		ParticipantDTO legal1 = mockCreateParticipant("DNI","37850934","78122201","LEGAL_REPRESENTATIVE");
+		ParticipantDTO legal2 = mockCreateParticipant("DNI","76110922","89001171","LEGAL_REPRESENTATIVE");
+		ParticipantDTO legal3 = mockCreateParticipant("PASSPORT","10008677","45553306","LEGAL_REPRESENTATIVE");
+		ParticipantDTO legal4 = mockCreateParticipant("DNI","38884932","50009182","LEGAL_REPRESENTATIVE");
+		requestBody.getParticipants().add(legal1);
+		requestBody.getParticipants().add(legal2);
+		requestBody.getParticipants().add(legal3);
+		requestBody.getParticipants().add(legal4);
+
+		//producto vida ley
+		requestBody.getProduct().setId("842");
+
+		//plan 01
+		requestBody.getProduct().getPlan().setId("02");
+
+		//cuenta de cliente
+		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("ACCOUNT");
+		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("00110130260299972507");
+
+		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
+				.thenReturn(new int[]{1,1,1,1,1,1});
+
+		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
+		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
+				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+
+		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
+
+		inspection.setIsRequired(true);
+		inspection.setFullName("Cristian Alexis Segovia Farfan");
+
+		List<ContactDetailDTO> contactDetails = new ArrayList<>();
+		ContactDetailDTO phone = new ContactDetailDTO();
+		phone.setContact(new ContactDTO());
+		phone.getContact().setContactDetailType("PHONE");
+		phone.getContact().setPhoneNumber("98736442");
+		contactDetails.add(phone);
+		ContactDetailDTO email = new ContactDetailDTO();
+		email.setContact(new ContactDTO());
+		email.getContact().setContactDetailType("EMAIL");
+		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
+		contactDetails.add(email);
+		inspection.setContactDetails(contactDetails);
+		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
 		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+		assertEquals(5,validation.getParticipants().size());
+
+		//Verifica que llame a las librerias externas y el internal api connector
+		verify(pisdR226, times(1)).executeFindQuotationIfExistInContract(any());
+		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
+		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
+		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
+		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
+		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
 
 
+	/*
+	CASO 3: PRODUCTO VIDA LEY CON UNA TARJETA, CLIENTE RUC 20, PLAN 03, 2 REPRESENTANTES LEGALES
+	 */
+
 	@Test
-	public void executeLogicPreFormalization_TestQuotationExistInContract(){
+	public void executeTestFlowLifeLawCase3(){
+		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		//Responsable de pago empresa ruc 20
+		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
+		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
+		requestBody.getParticipants().get(0).setCustomerId("97165552");
+
+		//Se agrega 4 representantes legales
+		ParticipantDTO legal1 = mockCreateParticipant("DNI","37850934","78122201","LEGAL_REPRESENTATIVE");
+		ParticipantDTO legal2 = mockCreateParticipant("DNI","76110922","89001171","LEGAL_REPRESENTATIVE");
+		requestBody.getParticipants().add(legal1);
+		requestBody.getParticipants().add(legal2);
+
+		//producto vida ley
+		requestBody.getProduct().setId("842");
+
+		//plan 01
+		requestBody.getProduct().getPlan().setId("03");
+
+		//tarjeta de cliente
+		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("CARD");
+		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("4919108221879862");
+
+		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
+				.thenReturn(new int[]{1,1,1,1});
+
+		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
+		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
+				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+
+		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
+
+		inspection.setIsRequired(true);
+		inspection.setFullName("Cristian Alexis Segovia Farfan");
+
+		List<ContactDetailDTO> contactDetails = new ArrayList<>();
+		ContactDetailDTO phone = new ContactDetailDTO();
+		phone.setContact(new ContactDTO());
+		phone.getContact().setContactDetailType("PHONE");
+		phone.getContact().setPhoneNumber("98736442");
+		contactDetails.add(phone);
+		ContactDetailDTO email = new ContactDetailDTO();
+		email.setContact(new ContactDTO());
+		email.getContact().setContactDetailType("EMAIL");
+		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
+		contactDetails.add(email);
+		inspection.setContactDetails(contactDetails);
+		requestBody.setInspection(inspection);
+		requestBody.setHeaderOperationDate("2024-05-21");
+		requestBody.setHeaderOperationTime("14:35:36");
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+		assertEquals(3,validation.getParticipants().size());
+
+		//Verifica que llame a las librerias externas y el internal api connector
+		verify(pisdR226, times(1)).executeFindQuotationIfExistInContract(any());
+		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
+		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
+		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
+		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
+		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+	}
+
+
+	/*
+	CASO 4: PRODUCTO VIDA LEY CON UNA TARJETA, CLIENTE RUC 20, PLAN 01, 5 REPRESENTANTES LEGALES
+	 */
+
+	@Test
+	public void executeTestFlowLifeLawCase4(){
+		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		//Responsable de pago empresa ruc 20
+		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
+		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
+		requestBody.getParticipants().get(0).setCustomerId("97165552");
+
+		//Se agrega 4 representantes legales
+		ParticipantDTO legal1 = mockCreateParticipant("DNI","37850934","78122201","LEGAL_REPRESENTATIVE");
+		ParticipantDTO legal2 = mockCreateParticipant("DNI","76110922","89001171","LEGAL_REPRESENTATIVE");
+		ParticipantDTO legal3 = mockCreateParticipant("DNI","80009125","67009815","LEGAL_REPRESENTATIVE");
+		ParticipantDTO legal4 = mockCreateParticipant("DNI","10977833","72000822","LEGAL_REPRESENTATIVE");
+		ParticipantDTO legal5 = mockCreateParticipant("DNI","10998361","70009818","LEGAL_REPRESENTATIVE");
+		requestBody.getParticipants().add(legal1);
+		requestBody.getParticipants().add(legal2);
+		requestBody.getParticipants().add(legal3);
+		requestBody.getParticipants().add(legal4);
+		requestBody.getParticipants().add(legal5);
+
+		//producto vida ley
+		requestBody.getProduct().setId("842");
+
+		//plan 01
+		requestBody.getProduct().getPlan().setId("01");
+
+		//tarjeta de cliente
+		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("CARD");
+		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("4919108221879862");
+
+		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
+				.thenReturn(new int[]{1,1,1,1});
+
+		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
+		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
+				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+
+		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
+
+		inspection.setIsRequired(true);
+		inspection.setFullName("Cristian Alexis Segovia Farfan");
+
+		List<ContactDetailDTO> contactDetails = new ArrayList<>();
+		ContactDetailDTO phone = new ContactDetailDTO();
+		phone.setContact(new ContactDTO());
+		phone.getContact().setContactDetailType("PHONE");
+		phone.getContact().setPhoneNumber("98736442");
+		contactDetails.add(phone);
+		ContactDetailDTO email = new ContactDetailDTO();
+		email.setContact(new ContactDTO());
+		email.getContact().setContactDetailType("EMAIL");
+		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
+		contactDetails.add(email);
+		inspection.setContactDetails(contactDetails);
+		requestBody.setInspection(inspection);
+		requestBody.setHeaderOperationDate("2024-05-21");
+		requestBody.setHeaderOperationTime("14:35:36");
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+		assertEquals(6,validation.getParticipants().size());
+
+		//Verifica que llame a las librerias externas y el internal api connector
+		verify(pisdR226, times(1)).executeFindQuotationIfExistInContract(any());
+		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
+		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
+		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
+		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
+		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+	}
+
+
+	/*
+	CASO 5: PRODUCTO VEHICULAR CON UNA CUENTA, CLIENTE DNI, PLAN 01, CON RESPONSABLE DE PAGO DNI
+	 */
+	@Test
+	public void executeTestFlowVehicularCase5(){
+		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		//producto vehicular
+		requestBody.getProduct().setId("830");
+
+		quotationInfo.put("INSURANCE_BUSINESS_NAME","VEHICULAR");
+		quotationInfo.put("INSURANCE_PRODUCT_ID",1);
+		quotationInfo.put("INSURANCE_PRODUCT_DESC","Seguro VEHICULAR");
+		quotationInfo.put("CONTRACT_DURATION_TYPE","");
+		quotationInfo.put("CONTRACT_DURATION_NUMBER",1);
+		quotationInfo.put("INSURANCE_MODALITY_NAME","PLAN BASICO");
+		quotationInfo.put("INSURANCE_COMPANY_QUOTA_ID","ba3c7d41-65ce-4582-bde2-08f21311fbc9");
+		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber()))
+				.thenReturn(quotationInfo);
+
+		//plan 01
+		requestBody.getProduct().getPlan().setId("01");
+
+		//cuenta de cliente
+		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("ACCOUNT");
+		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("00110130290299972582");
+
+		requestBody.getFirstInstallment().setIsPaymentRequired(true);
+		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
+		inspection.setIsRequired(true);
+		inspection.setFullName("Jose Artica");
+		inspection.setContactDetails(requestBody.getHolder().getContactDetails());
+		requestBody.setInspection(inspection);
+
+		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
+				.thenReturn(new int[]{1,1});
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+		assertEquals(1,validation.getParticipants().size());
+
+		//Verifica que llame a las librerias externas y no al internal api connector
+		verify(pisdR226, times(1)).executeFindQuotationIfExistInContract(any());
+		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
+		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
+		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
+		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
+		verify(internalApiConnectorImpersonation, times(0)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+	}
+
+
+	/*
+	CASO 6: PRODUCTO VEHICULAR CON UNA TARJETA, CLIENTE PASAPORTE, PLAN 02, CON RESPONSABLE DE PAGO PASAPORTE
+	 */
+	@Test
+	public void executeTestFlowVehicularCase6(){
+		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		//CLIENTE PASAPORTE
+		requestBody.getHolder().getIdentityDocument().getDocumentType().setId("PASSPORT");
+		requestBody.getHolder().getIdentityDocument().setNumber("1000867709");
+		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("PASSPORT");
+		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("1000867709");
+
+		//producto vehicular
+		requestBody.getProduct().setId("830");
+
+		quotationInfo.put("INSURANCE_BUSINESS_NAME","VEHICULAR");
+		quotationInfo.put("INSURANCE_PRODUCT_ID",1);
+		quotationInfo.put("INSURANCE_PRODUCT_DESC","Seguro VEHICULAR");
+		quotationInfo.put("CONTRACT_DURATION_TYPE","A");
+		quotationInfo.put("CONTRACT_DURATION_NUMBER",1);
+		quotationInfo.put("INSURANCE_MODALITY_NAME","PLAN FULL");
+		quotationInfo.put("INSURANCE_COMPANY_QUOTA_ID","ba3c7d41-65ce-4582-bde2-08f21311fbc9");
+		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber()))
+				.thenReturn(quotationInfo);
+
+		//plan 02
+		requestBody.getProduct().getPlan().setId("02");
+
+		//tarjeta de cliente
+		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("CARD");
+		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("4919108221879326");
+
+		requestBody.getFirstInstallment().setIsPaymentRequired(true);
+		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
+		inspection.setIsRequired(true);
+		inspection.setFullName("Jose Artica");
+		inspection.setContactDetails(requestBody.getHolder().getContactDetails());
+		requestBody.setInspection(inspection);
+
+		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
+				.thenReturn(new int[]{1,1});
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+		assertEquals(1,validation.getParticipants().size());
+
+		//Verifica que llame a las librerias externas y no al internal api connector
+		verify(pisdR226, times(1)).executeFindQuotationIfExistInContract(any());
+		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
+		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
+		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
+		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
+		verify(internalApiConnectorImpersonation, times(0)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+	}
+
+
+	/*
+	CASO 7: OTRO PRODUCTO QUE TIENE PARTICIPANTES BENEFICIARIOS
+	 */
+	@Test
+	public void executeTestCase7() throws IOException {
+		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,6,7));
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		//Se agrega beneficiarios de otro mock
+		PolicyDTO request2WithBeneficiaries = mockData.getCreateInsuranceRequestBody();
+		requestBody.setParticipants(request2WithBeneficiaries.getParticipants());
+
+		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
+				.thenReturn(new int[]{1,1,1,1});
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+		assertEquals(3,validation.getParticipants().size());
+	}
+
+
+	/*
+	CASO 8: OTRO PRODUCTO QUE TIENE PARTICIPANTES ASEGURADOS
+	 */
+
+	@Test
+	public void executeTestCase8(){
+		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		icr2Response.getIcmrys2().setOFICON("7794");
+		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
+
+		//Se agrega asegurado
+		ParticipantDTO insured = mockCreateParticipant("FOREIGNERS","97793201","69503241210","INSURED");
+		requestBody.getParticipants().add(insured);
+
+		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
+				.thenReturn(new int[]{1,1,1});
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+		assertEquals(2,validation.getParticipants().size());
+	}
+
+
+	/*
+	CASO 9: OTRO PRODUCTO QUE TIENE PARTICIPANTE ENDOSATARIO
+	 */
+
+	@Test
+	public void executeTestCase9(){
+		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		//Se agrega endosatario
+		ParticipantDTO endorsee = mockCreateParticipant("RUC","20224043","20628447889","ENDORSEE");
+		endorsee.setBenefitPercentage(100D);
+		requestBody.getParticipants().add(endorsee);
+
+		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
+				.thenReturn(new int[]{1,1});
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+		assertEquals(2,validation.getParticipants().size());
+	}
+
+
+	//CASOS DE ERROR
+
+
+	/*
+	CASO 10: CASO DE ERROR AL LLAMAR AL EVENTO
+	 */
+
+	@Test
+	public void executeTestErrorCallEventCase10(){
+		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
+		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any())).
+				thenThrow(new RestClientException("CONNECTION ERROR"));
+
+		requestBody.getProduct().setId("842");
+		requestBody.setHeaderOperationDate("2024-05-21");
+		requestBody.setHeaderOperationTime("14:35:36");
+
+		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(validation);
+		assertNotNull(validation.getProduct());
+		assertNotNull(validation.getParticipants());
+	}
+
+
+	/*
+	CASO 11: CASO DE ERROR CUANDO LA COTIZACIÓN YA EXISTE EN LA TABLA DE CONTRATO
+	 */
+
+	@Test
+	public void executeTestQuotationExistInContractCase11(){
 
 		when(pisdR226.executeFindQuotationIfExistInContract(requestBody.getQuotationNumber())).thenReturn(true);
+		requestBody.getProduct().setId("842");
 
 		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -305,8 +738,13 @@ public class RBVDR415Test {
 		verify(rbvdR047, never()).executePreFormalizationContract(any());
 	}
 
+
+	/*
+	CASO 12: CASO DE ERROR CUANDO LA COTIZACIÓN NO EXISTE EN LA TABLA DE COTIZACIONES
+	 */
+
 	@Test
-	public void executeLogicPreFormalization_TestQuotationNotExist(){
+	public void executeTestQuotationNotExistCase12(){
 		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber()))
 				.thenReturn(Collections.emptyMap());
 
@@ -321,8 +759,13 @@ public class RBVDR415Test {
 		verify(rbvdR047, never()).executePreFormalizationContract(any());
 	}
 
+
+	/*
+	CASO 13: CASO DE ERROR CUANDO SE LLAMA A LA ICR2 Y ESTE DEVUELVE UN ERROR DE HOST ADVICE
+	 */
+
 	@Test
-	public void executeLogicPreFormalization_TestIcr2ResponseWithHostAdviceError(){
+	public void executeTestResponseWithHostAdviceErrorCase13(){
 		icr2Response.setHostAdviceCode(Collections.singletonList(new HostAdvice("ICER024", "FECHA DE INICIO DE COBERT VACIO")));
 		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
 
@@ -337,9 +780,15 @@ public class RBVDR415Test {
 		verify(pisdR012, never()).executeMultipleInsertionOrUpdate(any(),any());
 	}
 
+
+	/*
+	CASO 14: CASO DE ERROR AL INSERTAR EN LA TABLA DE CONTRATO
+	 */
+
 	@Test
-	public void executeLogicPreFormalization_TestErrorInsertContract(){
+	public void executeTestErrorInsertContractCase14(){
 		when(pisdR226.executeInsertInsuranceContract(Mockito.anyMap())).thenReturn(0);
+		requestBody.getProduct().setId("842");
 
 		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -351,24 +800,12 @@ public class RBVDR415Test {
 		verify(pisdR012, never()).executeMultipleInsertionOrUpdate(any(),any());
 	}
 
+
+	/*
+	CASO 15: CASO DE ERROR AL INSERTAR EN LA TABLA DE PARTICIPANTES
+	 */
 	@Test
-	public void executeLogicPreFormalization_TestRolesByProductIsEmpty(){
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), Collections.emptyList());
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(response);
-
-		// Verificar que no inserte participantes
-		verify(pisdR012, never()).executeMultipleInsertionOrUpdate(any(),any());
-	}
-
-	@Test
-	public void executeLogicPreFormalization_TestErrorInsertParticipants(){
+	public void executeTestErrorInsertParticipantsCase15(){
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
@@ -384,6 +821,29 @@ public class RBVDR415Test {
 		assertEquals(1,this.context.getAdviceList().size());
 		assertEquals(RBVDMessageError.ERROR_INSERT_PARTICIPANTS.getAdviceCode(),this.context.getAdviceList().get(0).getCode());
 	}
+
+
+	/*
+	CASO 16: CASO DONDE NO SE REGISTRARON ROLES POR PRODUCTO Y NO REGISTRA EN LA TABLA DE PARTICIPANTES
+	 */
+	@Test
+	public void executeTestRolesByProductIsEmptyCase16(){
+		Map<String, Object> result = new HashMap<>();
+		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), Collections.emptyList());
+
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
+				.thenReturn(result);
+
+		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
+
+		assertNotNull(response);
+
+		// Verificar que no inserte participantes
+		verify(pisdR012, never()).executeMultipleInsertionOrUpdate(any(),any());
+	}
+
+
+
 
 	private ParticipantDTO mockCreateParticipant(String document,String customerId, String documentNumber,
 												 String rol){

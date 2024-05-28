@@ -1,13 +1,9 @@
 package com.bbva.rbvd.lib.r415.impl.service.dao;
 
-import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
+import com.bbva.rbvd.lib.r415.impl.transfer.PayloadStore;
 
 public interface IContractDAO {
 
-    void insertInsuranceContract(PolicyDTO input, QuotationDAO quotationDAO, ICR2Response icr2Response,
-                                 boolean isEndorsement, PaymentPeriodEntity paymentPeriod);
+    void insertInsuranceContract(PayloadStore payloadStore);
 
 }

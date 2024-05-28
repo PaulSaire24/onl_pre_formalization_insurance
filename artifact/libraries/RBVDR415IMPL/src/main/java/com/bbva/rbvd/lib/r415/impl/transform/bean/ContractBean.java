@@ -1,13 +1,12 @@
 package com.bbva.rbvd.lib.r415.impl.transform.bean;
 
-import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import com.bbva.rbvd.dto.preformalization.dao.ContractDAO;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
+import com.bbva.rbvd.lib.r415.impl.transfer.PayloadStore;
 import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 import org.joda.time.LocalDate;
 import org.springframework.util.CollectionUtils;
@@ -22,65 +21,66 @@ public class ContractBean {
     private ContractBean(){}
 
 
-    public static ContractDAO buildInsuranceContract(PolicyDTO input, QuotationDAO quotationDAO,
-                                                     ICR2Response icr2Response, boolean isEndorsement, PaymentPeriodEntity paymentPeriod) {
+    public static ContractDAO buildInsuranceContract(PayloadStore payloadStore) {
 
         ContractDAO contractDao = new ContractDAO();
-        ICMRYS2 icmrys2 = icr2Response.getIcmrys2();
+        ICMRYS2 icmrys2 = payloadStore.getIcr2Response().getIcmrys2();
         String currentDate = ConvertUtil.generateCorrectDateFormat(new LocalDate());
+        PolicyDTO response = payloadStore.getResposeBody();
+        QuotationDAO quotationDAO = payloadStore.getQuotationDAO();
 
         contractDao.setEntityId(icmrys2.getNUMCON().substring(0, 4));
         contractDao.setBranchId(icmrys2.getNUMCON().substring(4, 8));
         contractDao.setIntAccountId(icmrys2.getNUMCON().substring(10));
         contractDao.setFirstVerfnDigitId(icmrys2.getNUMCON().substring(8, 9));
         contractDao.setSecondVerfnDigitId(icmrys2.getNUMCON().substring(9, 10));
-        contractDao.setPolicyQuotaInternalId(input.getQuotationNumber());
+        contractDao.setPolicyQuotaInternalId(response.getQuotationNumber());
         contractDao.setInsuranceProductId(quotationDAO.getInsuranceProductId());
-        contractDao.setInsuranceModalityType(input.getProduct().getPlan().getId());
-        contractDao.setInsuranceCompanyId(ConvertUtil.getBigDecimalValue(input.getInsuranceCompany().getId()));
-        contractDao.setCustomerId(input.getHolder().getId());
-        contractDao.setDomicileContractId(getDomicileContractId(input.getRelatedContracts()));
-        contractDao.setIssuedReceiptNumber(ConvertUtil.getBigDecimalValue(input.getInstallmentPlan().getTotalNumberInstallments()));
-        contractDao.setPaymentFrequencyId(paymentPeriod.getPaymentFrequencyId());
-        contractDao.setPremiumAmount(ConvertUtil.getBigDecimalValue(input.getFirstInstallment().getPaymentAmount().getAmount()));
-        contractDao.setSettlePendingPremiumAmount(ConvertUtil.getBigDecimalValue(input.getTotalAmount().getAmount()));
-        contractDao.setCurrencyId(input.getInstallmentPlan().getPaymentAmount().getCurrency());
+        contractDao.setInsuranceModalityType(response.getProduct().getPlan().getId());
+        contractDao.setInsuranceCompanyId(ConvertUtil.getBigDecimalValue(response.getInsuranceCompany().getId()));
+        contractDao.setCustomerId(response.getHolder().getId());
+        contractDao.setDomicileContractId(getDomicileContractId(response.getRelatedContracts()));
+        contractDao.setIssuedReceiptNumber(ConvertUtil.getBigDecimalValue(response.getInstallmentPlan().getTotalNumberInstallments()));
+        contractDao.setPaymentFrequencyId(payloadStore.getPaymentFrequencyId());
+        contractDao.setPremiumAmount(ConvertUtil.getBigDecimalValue(response.getFirstInstallment().getPaymentAmount().getAmount()));
+        contractDao.setSettlePendingPremiumAmount(ConvertUtil.getBigDecimalValue(response.getTotalAmount().getAmount()));
+        contractDao.setCurrencyId(response.getInstallmentPlan().getPaymentAmount().getCurrency());
         contractDao.setInstallmentPeriodFinalDate(currentDate);
-        contractDao.setInsuredAmount(ConvertUtil.getBigDecimalValue(input.getInsuredAmount().getAmount()));
-        contractDao.setCtrctDisputeStatusType(input.getSaleChannelId());
-        contractDao.setEndorsementPolicyIndType((isEndorsement) ? ConstantsUtil.S_VALUE : ConstantsUtil.N_VALUE);
+        contractDao.setInsuredAmount(ConvertUtil.getBigDecimalValue(response.getInsuredAmount().getAmount()));
+        contractDao.setCtrctDisputeStatusType(response.getSaleChannelId());
+        contractDao.setEndorsementPolicyIndType((payloadStore.getIsEndorsement()) ? ConstantsUtil.S_VALUE : ConstantsUtil.N_VALUE);
         contractDao.setInsrncCoContractStatusType(ConstantsUtil.StatusContract.PENDIENTE.getValue());
         contractDao.setContractStatusId(ConstantsUtil.StatusContract.PENDIENTE.getValue());
-        contractDao.setCreationUserId(input.getCreationUser());
-        contractDao.setUserAuditId(input.getUserAudit());
-        contractDao.setInsurPendingDebtIndType((input.getFirstInstallment().getIsPaymentRequired())
+        contractDao.setCreationUserId(response.getCreationUser());
+        contractDao.setUserAuditId(response.getUserAudit());
+        contractDao.setInsurPendingDebtIndType((response.getFirstInstallment().getIsPaymentRequired())
                 ? ConstantsUtil.N_VALUE : ConstantsUtil.S_VALUE);
-        contractDao.setContractManagerBranchId(input.getBank().getBranch().getId());
+        contractDao.setContractManagerBranchId(response.getBank().getBranch().getId());
         contractDao.setContractInceptionDate(currentDate);
-        contractDao.setSettlementFixPremiumAmount(ConvertUtil.getBigDecimalValue(input.getTotalAmount().getAmount()));
-        contractDao.setBiometryTransactionId(input.getIdentityVerificationCode());
+        contractDao.setSettlementFixPremiumAmount(ConvertUtil.getBigDecimalValue(response.getTotalAmount().getAmount()));
+        contractDao.setBiometryTransactionId(response.getIdentityVerificationCode());
         contractDao.setEndLinkageDate(ConvertUtil.generateCorrectDateFormat(
-                ConvertUtil.convertDateToLocalDate(input.getInstallmentPlan().getMaturityDate())));
+                ConvertUtil.convertDateToLocalDate(response.getInstallmentPlan().getMaturityDate())));
         contractDao.setInsuranceContractStartDate(ConvertUtil.generateCorrectDateFormat(
-                ConvertUtil.convertDateToLocalDate(input.getValidityPeriod().getStartDate())));
+                ConvertUtil.convertDateToLocalDate(response.getValidityPeriod().getStartDate())));
         contractDao.setValidityMonthsNumber(quotationDAO.getContractDurationType().equals("A")
                 ? quotationDAO.getContractDurationNumber().multiply(BigDecimal.valueOf(12))
                 : quotationDAO.getContractDurationNumber());
-        contractDao.setTotalDebtAmount((input.getFirstInstallment().getIsPaymentRequired())
-                ? BigDecimal.ZERO : ConvertUtil.getBigDecimalValue(input.getFirstInstallment().getPaymentAmount().getAmount()));
-        contractDao.setAutomaticDebitIndicatorType((input.getPaymentMethod().getPaymentType().equals(ConstantsUtil.PAYMENT_METHOD_VALUE))
+        contractDao.setTotalDebtAmount((response.getFirstInstallment().getIsPaymentRequired())
+                ? BigDecimal.ZERO : ConvertUtil.getBigDecimalValue(response.getFirstInstallment().getPaymentAmount().getAmount()));
+        contractDao.setAutomaticDebitIndicatorType((response.getPaymentMethod().getPaymentType().equals(ConstantsUtil.PAYMENT_METHOD_VALUE))
                 ? ConstantsUtil.S_VALUE : ConstantsUtil.N_VALUE);
 
 
-        if (nonNull(input.getBusinessAgent())) {
-            contractDao.setInsuranceManagerId(input.getBusinessAgent().getId());
+        if (nonNull(response.getBusinessAgent())) {
+            contractDao.setInsuranceManagerId(response.getBusinessAgent().getId());
         }
 
-        if (nonNull(input.getPromoter())) {
-            contractDao.setInsurancePromoterId(input.getPromoter().getId());
+        if (nonNull(response.getPromoter())) {
+            contractDao.setInsurancePromoterId(response.getPromoter().getId());
         }
 
-        contractDao.setPrevPendBillRcptsNumber(getPrevPendBillRcptsNumber(input, quotationDAO));
+        contractDao.setPrevPendBillRcptsNumber(getPrevPendBillRcptsNumber(response, quotationDAO));
 
         return contractDao;
     }

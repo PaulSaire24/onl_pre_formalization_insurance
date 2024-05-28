@@ -1,13 +1,10 @@
 package com.bbva.rbvd.lib.r415.impl.service.dao.impl;
 
-import com.bbva.pisd.dto.insurancedao.entities.PaymentPeriodEntity;
 import com.bbva.pisd.lib.r226.PISDR226;
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.preformalization.dao.ContractDAO;
-import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import com.bbva.rbvd.lib.r415.impl.service.dao.IContractDAO;
+import com.bbva.rbvd.lib.r415.impl.transfer.PayloadStore;
 import com.bbva.rbvd.lib.r415.impl.transform.bean.ContractBean;
 import com.bbva.rbvd.lib.r415.impl.transform.map.ContractMap;
 import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
@@ -27,10 +24,8 @@ public class ContractDAOImpl implements IContractDAO {
 
 
     @Override
-    public void insertInsuranceContract(PolicyDTO input, QuotationDAO quotationDAO,
-                                        ICR2Response icr2Response, boolean isEndorsement, PaymentPeriodEntity paymentPeriod) {
-        ContractDAO contractDao = ContractBean.buildInsuranceContract(input, quotationDAO,
-                icr2Response, isEndorsement, paymentPeriod);
+    public void insertInsuranceContract(PayloadStore payloadStore) {
+        ContractDAO contractDao = ContractBean.buildInsuranceContract(payloadStore);
         LOGGER.info("***** ContractDAOImpl - insertInsuranceContract() | contractDao: {} *****",contractDao);
 
         Map<String, Object> argumentsForSaveContract = ContractMap.createSaveContractArguments(contractDao);
