@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.bbva.rbvd</groupId>
 		<artifactId>TRANSACTIONS-onl_pre_formalization_insurance</artifactId>
-		<version>0.2.0-SNAPSHOT</version>
+		<version>0.2.1-SNAPSHOT</version>
 	</parent>
 	<groupId>com.bbva.rbvd</groupId>
 	<artifactId>RBVDT118-01-PE</artifactId>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.2.1-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<description>Trx to pre-formalizate a contract</description>
 	<properties>
@@ -43,25 +43,18 @@
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>com.bbva.rbvd</groupId>
-            <artifactId>RBVDR118</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
 		<dependency>
 			<groupId>com.bbva.rbvd.dto.insrncsale</groupId>
 			<artifactId>RBVDC201</artifactId>
-			<version>0.21.0</version>
+			<version>0.24.0</version>
 			<scope>compile</scope>
 		</dependency>
-        <dependency>
-            <groupId>com.bbva.rbvd.dto.preformalization</groupId>
-            <artifactId>RBVDC118</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- End test dependencies -->
+		<!-- End test dependencies -->
+		<dependency>
+			<groupId>com.bbva.rbvd</groupId>
+			<artifactId>RBVDR415</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>
@@ -94,7 +87,7 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<copy file="./target/${project.artifactId}.jar" todir="${outputDirectoryTransactions}" />
+								<copy file="./target/${project.artifactId}.jar" todir="${outputDirectoryTransactions}"/>
 							</tasks>
 						</configuration>
 					</execution>

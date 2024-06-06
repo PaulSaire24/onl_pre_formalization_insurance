@@ -4,16 +4,16 @@
 	<parent>
 		<artifactId>elara-project</artifactId>
 		<groupId>com.bbva.elara</groupId>
-		<version>7.11.8</version>
+		<version>7.12.9</version>
 	</parent>
 	<artifactId>onl_pre_formalization_insurance</artifactId>
 	<groupId>com.bbva.rbvd</groupId>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.2.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>onl_pre_formalization_insurance</name>
 	<description>Deployment unit onl_pre_formalization_insurance of uuaa rbvd</description>
 	<properties>
-		<apx.core.online.version>7.11.8</apx.core.online.version>
+		<apx.core.online.version>7.12.9</apx.core.online.version>
 		<outputDirectoryDTOs>../../../target/dtos</outputDirectoryDTOs>
 		<outputDirectoryLibraries>../../../target/libraries</outputDirectoryLibraries>
 		<outputDirectoryTransactions>../../../target/transactions</outputDirectoryTransactions>
