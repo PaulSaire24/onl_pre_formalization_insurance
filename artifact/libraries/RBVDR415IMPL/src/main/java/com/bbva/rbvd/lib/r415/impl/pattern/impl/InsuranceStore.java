@@ -53,7 +53,7 @@ public class InsuranceStore implements PostInsuranceProduct {
 
         if(!isEmpty(rolesFromDB) && !isEmpty(payloadStore.getResposeBody().getParticipants())){
             //Registra participantes
-            participantDAO.insertInsuranceParticipants(payloadStore.getResposeBody(), rolesFromDB, payloadStore.getIcr2Response().getIcmrys2().getNUMCON());
+            participantDAO.insertInsuranceParticipants(payloadStore.getResposeBody(), rolesFromDB, payloadStore.getIcr3Response().getIcmrys3().getNUMCON());
         }
         LOGGER.info("InsuranceStore - saveParticipants() end");
     }

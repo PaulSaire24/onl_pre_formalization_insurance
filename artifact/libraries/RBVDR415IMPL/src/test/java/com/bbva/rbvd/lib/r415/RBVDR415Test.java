@@ -10,8 +10,8 @@ import com.bbva.pisd.lib.r012.PISDR012;
 import com.bbva.pisd.lib.r226.PISDR226;
 import com.bbva.pisd.lib.r401.PISDR401;
 import com.bbva.pisd.lib.r601.PISDR601;
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
+import com.bbva.rbvd.dto.cicsconnection.icr3.ICMRYS3;
+import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
 import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
 import com.bbva.rbvd.dto.insrncsale.commons.*;
 import com.bbva.rbvd.dto.insrncsale.mock.MockData;
@@ -20,9 +20,9 @@ import com.bbva.rbvd.dto.insrncsale.policy.ParticipantTypeDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
-import com.bbva.rbvd.lib.r047.RBVDR047;
 import com.bbva.rbvd.lib.r415.factory.ApiConnectorFactoryTest;
 import com.bbva.rbvd.lib.r415.impl.RBVDR415Impl;
+import com.bbva.rbvd.lib.r602.RBVDR602;
 import com.bbva.rbvd.mock.MockBundleContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,14 +65,15 @@ public class RBVDR415Test {
 
 	private PISDR401 pisdR401;
 
-	private RBVDR047 rbvdR047;
+
 	private PISDR601 pisdr601;
 
 	private PISDR226 pisdR226;
+	private RBVDR602 rbvdR602;
 
 	private PolicyDTO requestBody;
 
-	private ICR2Response icr2Response;
+	private ICR3Response icr3Response;
 
 	private MockData mockData;
 	private ApplicationConfigurationService applicationConfigurationService;
@@ -89,8 +90,8 @@ public class RBVDR415Test {
 		pisdR012 = Mockito.mock(PISDR012.class);
 		pisdR226 = Mockito.mock(PISDR226.class);
 		pisdR401 = Mockito.mock(PISDR401.class);
-		rbvdR047 = Mockito.mock(RBVDR047.class);
 		pisdr601 = Mockito.mock(PISDR601.class);
+		rbvdR602 = Mockito.mock(RBVDR602.class);
 		applicationConfigurationService = Mockito.mock(ApplicationConfigurationService.class);
 
 		MockBundleContext mockBundleContext = mock(MockBundleContext.class);
@@ -99,9 +100,9 @@ public class RBVDR415Test {
 
 		rbvdr415.setPisdR226(pisdR226);
 		rbvdr415.setPisdR012(pisdR012);
-		rbvdr415.setRbvdR047(rbvdR047);
 		rbvdr415.setPisdR401(pisdR401);
 		rbvdr415.setPisdR601(pisdr601);
+		rbvdr415.setRbvdR602(rbvdR602);
 		rbvdr415.setApplicationConfigurationService(applicationConfigurationService);
 		rbvdr415.setInternalApiConnectorImpersonation(internalApiConnectorImpersonation);
 
@@ -137,15 +138,15 @@ public class RBVDR415Test {
 		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber()))
 				.thenReturn(quotationInfo);
 
-		icr2Response = new ICR2Response();
-		ICMRYS2 icmrys2 = new ICMRYS2();
-		icmrys2.setOFICON("1234");
-		icmrys2.setNUMCON("00110482734000098127");
-		icmrys2.setFECCTR("2024-05-21 14:35:36");
-		icmrys2.setFECINI("2024-05-21");
-		icmrys2.setFECFIN("2025-05-21");
-		icr2Response.setIcmrys2(icmrys2);
-		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
+		icr3Response = new ICR3Response();
+		ICMRYS3 icmrys3 = new ICMRYS3();
+		icmrys3.setOFICON("1234");
+		icmrys3.setNUMCON("00110482734000098127");
+		icmrys3.setFECCTR("2024-05-21 14:35:36");
+		icmrys3.setFECINI("2024-05-21");
+		icmrys3.setFECFIN("2025-05-21");
+		icr3Response.setIcmrys3(icmrys3);
+		when(rbvdR602.executePreFormalizationInsurance(Mockito.anyObject())).thenReturn(icr3Response);
 
 		when(pisdR226.executeInsertInsuranceContract(Mockito.anyMap())).thenReturn(1);
 	}
@@ -221,7 +222,7 @@ public class RBVDR415Test {
 		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
 		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
 		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
@@ -304,7 +305,7 @@ public class RBVDR415Test {
 		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
 		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
 		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
@@ -384,7 +385,7 @@ public class RBVDR415Test {
 		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
 		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
 		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
@@ -470,7 +471,7 @@ public class RBVDR415Test {
 		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
 		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
 		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
@@ -530,7 +531,7 @@ public class RBVDR415Test {
 		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
 		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
 		verify(internalApiConnectorImpersonation, times(0)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
@@ -596,7 +597,7 @@ public class RBVDR415Test {
 		verify(pisdr601, times(1)).executeFindQuotationDetailForPreEmision(any());
 		verify(pisdR012, times(1)).executeGetRolesByProductAndModality(any(),any());
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, times(1)).executePreFormalizationContract(any());
+		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
 		verify(internalApiConnectorImpersonation, times(0)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
@@ -643,8 +644,8 @@ public class RBVDR415Test {
 		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
 				.thenReturn(result);
 
-		icr2Response.getIcmrys2().setOFICON("7794");
-		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
+		icr3Response.getIcmrys3().setOFICON("7794");
+		when(rbvdR602.executePreFormalizationInsurance(Mockito.anyObject())).thenReturn(icr3Response);
 
 		//Se agrega asegurado
 		ParticipantDTO insured = mockCreateParticipant("FOREIGNERS","97793201","69503241210","INSURED");
@@ -735,7 +736,7 @@ public class RBVDR415Test {
 
 		// Verificar que los métodos posteriores no se ejecutan
 		verify(pisdR226, never()).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, never()).executePreFormalizationContract(any());
+		verify(rbvdR602, never()).executePreFormalizationInsurance(any());
 	}
 
 
@@ -756,18 +757,18 @@ public class RBVDR415Test {
 
 		// Verificar que los métodos posteriores no se ejecutan
 		verify(pisdR226, never()).executeFindPaymentPeriodByType(any());
-		verify(rbvdR047, never()).executePreFormalizationContract(any());
+		verify(rbvdR602, never()).executePreFormalizationInsurance(any());
 	}
 
 
 	/*
-	CASO 13: CASO DE ERROR CUANDO SE LLAMA A LA ICR2 Y ESTE DEVUELVE UN ERROR DE HOST ADVICE
+	CASO 13: CASO DE ERROR CUANDO SE LLAMA A LA ICR3 Y ESTE DEVUELVE UN ERROR DE HOST ADVICE
 	 */
 
 	@Test
 	public void executeTestResponseWithHostAdviceErrorCase13(){
-		icr2Response.setHostAdviceCode(Collections.singletonList(new HostAdvice("ICER024", "FECHA DE INICIO DE COBERT VACIO")));
-		when(rbvdR047.executePreFormalizationContract(Mockito.anyObject())).thenReturn(icr2Response);
+		icr3Response.setHostAdviceCode(Collections.singletonList(new HostAdvice("ICER024", "FECHA DE INICIO DE COBERT VACIO")));
+		when(rbvdR602.executePreFormalizationInsurance(Mockito.anyObject())).thenReturn(icr3Response);
 
 		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
 

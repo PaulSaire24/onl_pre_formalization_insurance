@@ -1,6 +1,6 @@
 package com.bbva.rbvd.lib.r415.impl.transfer;
 
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
+import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 
@@ -11,7 +11,7 @@ public class PayloadStore {
     private PolicyDTO resposeBody;
     private QuotationDAO quotationDAO;
     private boolean isEndorsement;
-    private ICR2Response icr2Response;
+    private ICR3Response icr3Response;
     private BigDecimal paymentFrequencyId;
     private String paymentFrequencyName;
 
@@ -39,12 +39,12 @@ public class PayloadStore {
         isEndorsement = endorsement;
     }
 
-    public ICR2Response getIcr2Response() {
-        return icr2Response;
+    public ICR3Response getIcr3Response() {
+        return icr3Response;
     }
 
-    public void setIcr2Response(ICR2Response icr2Response) {
-        this.icr2Response = icr2Response;
+    public void setIcr3Response(ICR3Response icr3Response) {
+        this.icr3Response = icr3Response;
     }
 
     public BigDecimal getPaymentFrequencyId() {
@@ -61,5 +61,17 @@ public class PayloadStore {
 
     public void setPaymentFrequencyName(String paymentFrequencyName) {
         this.paymentFrequencyName = paymentFrequencyName;
+    }
+
+    @Override
+    public String toString() {
+        return "PayloadStore{" +
+                "resposeBody=" + resposeBody +
+                ", quotationDAO=" + quotationDAO +
+                ", isEndorsement=" + isEndorsement +
+                ", icr3Response=" + icr3Response +
+                ", paymentFrequencyId=" + paymentFrequencyId +
+                ", paymentFrequencyName='" + paymentFrequencyName + '\'' +
+                '}';
     }
 }

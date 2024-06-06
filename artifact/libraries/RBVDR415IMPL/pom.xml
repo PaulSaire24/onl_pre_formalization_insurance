@@ -90,11 +90,6 @@
 			<version>0.32.1</version>
 		</dependency>
 		<dependency>
-			<groupId>com.bbva.rbvd</groupId>
-			<artifactId>RBVDR047</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>com.bbva.pisd</groupId>
 			<artifactId>PISDR226</artifactId>
 			<version>0.3.1</version>
@@ -108,6 +103,11 @@
 			<groupId>com.bbva.elara</groupId>
 			<artifactId>elara-utility-api-connector</artifactId>
 			<version>${apx.api.connector.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bbva.rbvd</groupId>
+			<artifactId>RBVDR602</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<build>

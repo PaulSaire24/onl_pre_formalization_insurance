@@ -32,7 +32,7 @@ public class ConsumeInternalService {
 
         LOGGER.info("***** ConsumeInternalService - callEventUpsilonToUpdateStatusInDWP() - Request body: {}", jsonString);
 
-        HttpEntity<String> entity = new HttpEntity<>(jsonString, createHttpHeaders(false));
+        HttpEntity<String> entity = new HttpEntity<>(jsonString, createHttpHeaders());
 
         try {
             ResponseEntity<Void> responseEntity = this.internalApiConnectorImpersonation.
@@ -48,13 +48,11 @@ public class ConsumeInternalService {
         }
     }
 
-    private HttpHeaders createHttpHeaders(boolean isBcsHeaderRequired) {
+    private HttpHeaders createHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
         MediaType mediaType = new MediaType("application","json", StandardCharsets.UTF_8);
         headers.setContentType(mediaType);
-        if(isBcsHeaderRequired) {
-            headers.set("BCS-Operation-Tracer", "1");
-        }
+
         return headers;
     }
 

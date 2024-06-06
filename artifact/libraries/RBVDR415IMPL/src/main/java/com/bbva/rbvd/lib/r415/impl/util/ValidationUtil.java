@@ -2,7 +2,7 @@ package com.bbva.rbvd.lib.r415.impl.util;
 
 
 import com.bbva.apx.exception.business.BusinessException;
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
+import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
 import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
@@ -83,9 +83,9 @@ public class ValidationUtil {
         }
     }
 
-    public static void checkHostAdviceErrors(ICR2Response icr2Response) {
-        if(!CollectionUtils.isEmpty(icr2Response.getHostAdviceCode())){
-            HostAdvice firstAdviceError = icr2Response.getHostAdviceCode().get(0);
+    public static void checkHostAdviceErrors(ICR3Response icr3Response) {
+        if(!CollectionUtils.isEmpty(icr3Response.getHostAdviceCode())){
+            HostAdvice firstAdviceError = icr3Response.getHostAdviceCode().get(0);
             throw new BusinessException(firstAdviceError.getCode(),false,firstAdviceError.getDescription());
         }
     }

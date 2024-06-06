@@ -8,8 +8,8 @@ import com.bbva.pisd.lib.r012.PISDR012;
 import com.bbva.pisd.lib.r226.PISDR226;
 import com.bbva.pisd.lib.r401.PISDR401;
 import com.bbva.pisd.lib.r601.PISDR601;
-import com.bbva.rbvd.lib.r047.RBVDR047;
 import com.bbva.rbvd.lib.r415.RBVDR415;
+import com.bbva.rbvd.lib.r602.RBVDR602;
 
 /**
  * This class automatically defines the libraries and utilities that it will use.
@@ -27,11 +27,11 @@ public abstract class RBVDR415Abstract extends AbstractLibrary implements RBVDR4
 
 	protected PISDR012 pisdR012;
 
-	protected RBVDR047 rbvdR047;
-
 	protected PISDR226 pisdR226;
 
 	protected PISDR601 pisdR601;
+
+	protected RBVDR602 rbvdR602;
 
 
 	/**
@@ -70,13 +70,6 @@ public abstract class RBVDR415Abstract extends AbstractLibrary implements RBVDR4
 	}
 
 	/**
-	* @param rbvdR047 the this.rbvdR047 to set
-	*/
-	public void setRbvdR047(RBVDR047 rbvdR047) {
-		this.rbvdR047 = rbvdR047;
-	}
-
-	/**
 	* @param pisdR226 the this.pisdR226 to set
 	*/
 	public void setPisdR226(PISDR226 pisdR226) {
@@ -88,6 +81,13 @@ public abstract class RBVDR415Abstract extends AbstractLibrary implements RBVDR4
 	*/
 	public void setPisdR601(PISDR601 pisdR601) {
 		this.pisdR601 = pisdR601;
+	}
+
+	/**
+	* @param rbvdR602 the this.rbvdR602 to set
+	*/
+	public void setRbvdR602(RBVDR602 rbvdR602) {
+		this.rbvdR602 = rbvdR602;
 	}
 
 	public void setInternalApiConnectorImpersonation(APIConnector internalApiConnectorImpersonation) {
