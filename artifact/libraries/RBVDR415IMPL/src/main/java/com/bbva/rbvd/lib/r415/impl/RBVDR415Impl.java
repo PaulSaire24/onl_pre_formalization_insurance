@@ -38,13 +38,13 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 						.withInternalApiConnectorImpersonation(this.internalApiConnectorImpersonation)
 						.build();
 
-				response = preInsuranceProduct.start(requestBody,this.rbvdR047,this.applicationConfigurationService);
+				response = preInsuranceProduct.start(requestBody,this.rbvdR602,this.applicationConfigurationService);
 			}else{
 				preInsuranceProduct = InsuranceProductGeneric.Builder.an()
 						.withPreInsuranceProduct(InsuranceParameter.Builder.an().withPisdr226(this.pisdR226).withPisdr601(this.pisdR601).withApplicationConfigurationService(this.applicationConfigurationService).build())
 						.withPostInsuranceProduct(InsuranceStore.Builder.an().withPisdr012(this.pisdR012).withPisdr226(this.pisdR226).withApplicationConfigurationService(this.applicationConfigurationService).build())
 						.build();
-				response = preInsuranceProduct.start(requestBody,this.rbvdR047,this.applicationConfigurationService);
+				response = preInsuranceProduct.start(requestBody,this.rbvdR602,this.applicationConfigurationService);
 			}
 			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - output: {}", requestBody);
 			LOGGER.info("RBVDR415Impl - executeLogicPreFormalization() - Fin del proceso");

@@ -1,6 +1,6 @@
 package com.bbva.rbvd.lib.r415.impl.transform.bean;
 
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
+import com.bbva.rbvd.dto.cicsconnection.icr3.ICMRYS3;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import com.bbva.rbvd.dto.preformalization.dao.ContractDAO;
@@ -24,23 +24,23 @@ public class ContractBean {
     public static ContractDAO buildInsuranceContract(PayloadStore payloadStore) {
 
         ContractDAO contractDao = new ContractDAO();
-        ICMRYS2 icmrys2 = payloadStore.getIcr2Response().getIcmrys2();
+        ICMRYS3 icmrys3 = payloadStore.getIcr3Response().getIcmrys3();
         String currentDate = ConvertUtil.generateCorrectDateFormat(new LocalDate());
         PolicyDTO response = payloadStore.getResposeBody();
         QuotationDAO quotationDAO = payloadStore.getQuotationDAO();
 
-        contractDao.setEntityId(icmrys2.getNUMCON().substring(0, 4));
-        contractDao.setBranchId(icmrys2.getNUMCON().substring(4, 8));
-        contractDao.setIntAccountId(icmrys2.getNUMCON().substring(10));
-        contractDao.setFirstVerfnDigitId(icmrys2.getNUMCON().substring(8, 9));
-        contractDao.setSecondVerfnDigitId(icmrys2.getNUMCON().substring(9, 10));
+        contractDao.setEntityId(icmrys3.getNUMCON().substring(0, 4));
+        contractDao.setBranchId(icmrys3.getNUMCON().substring(4, 8));
+        contractDao.setIntAccountId(icmrys3.getNUMCON().substring(10));
+        contractDao.setFirstVerfnDigitId(icmrys3.getNUMCON().substring(8, 9));
+        contractDao.setSecondVerfnDigitId(icmrys3.getNUMCON().substring(9, 10));
         contractDao.setPolicyQuotaInternalId(response.getQuotationNumber());
         contractDao.setInsuranceProductId(quotationDAO.getInsuranceProductId());
         contractDao.setInsuranceModalityType(response.getProduct().getPlan().getId());
         contractDao.setInsuranceCompanyId(ConvertUtil.getBigDecimalValue(response.getInsuranceCompany().getId()));
         contractDao.setCustomerId(response.getHolder().getId());
         contractDao.setDomicileContractId(getDomicileContractId(response.getRelatedContracts()));
-        contractDao.setIssuedReceiptNumber(ConvertUtil.getBigDecimalValue(response.getInstallmentPlan().getTotalNumberInstallments()));
+        contractDao.setIssuedReceiptNumber(BigDecimal.ZERO);
         contractDao.setPaymentFrequencyId(payloadStore.getPaymentFrequencyId());
         contractDao.setPremiumAmount(ConvertUtil.getBigDecimalValue(response.getFirstInstallment().getPaymentAmount().getAmount()));
         contractDao.setSettlePendingPremiumAmount(ConvertUtil.getBigDecimalValue(response.getTotalAmount().getAmount()));

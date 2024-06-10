@@ -1,21 +1,21 @@
 package com.bbva.rbvd.lib.r415.impl.pattern.product;
 
 import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICMRYS2;
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Request;
-import com.bbva.rbvd.dto.cicsconnection.icr2.ICR2Response;
+import com.bbva.rbvd.dto.cicsconnection.icr3.ICMRYS3;
+import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Request;
+import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 import com.bbva.rbvd.dto.preformalization.transfer.PayloadConfig;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
-import com.bbva.rbvd.lib.r047.RBVDR047;
-import com.bbva.rbvd.lib.r415.impl.business.ICR2Business;
+import com.bbva.rbvd.lib.r415.impl.business.ICR3Business;
 import com.bbva.rbvd.lib.r415.impl.pattern.PostInsuranceProduct;
 import com.bbva.rbvd.lib.r415.impl.pattern.PreInsuranceProduct;
 import com.bbva.rbvd.lib.r415.impl.pattern.impl.PreFormalizationDecorator;
 import com.bbva.rbvd.lib.r415.impl.transfer.PayloadStore;
 import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
+import com.bbva.rbvd.lib.r602.RBVDR602;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,26 +29,26 @@ public class InsuranceProductGeneric extends PreFormalizationDecorator {
     }
 
     @Override
-    public PolicyDTO start(PolicyDTO input, RBVDR047 rbvdr047, ApplicationConfigurationService applicationConfigurationService) {
+    public PolicyDTO start(PolicyDTO input, RBVDR602 rbvdr602, ApplicationConfigurationService applicationConfigurationService) {
         PayloadConfig payloadConfig = this.getPreInsuranceProduct().getConfig(input);
 
-        ICR2Request icr2Request = ICR2Business.mapRequestFromPreformalizationBody(input);
-        ICR2Response icr2Response = rbvdr047.executePreFormalizationContract(icr2Request);
-        LOGGER.info("InsuranceProductGeneric - start() - icr2Response: {}", icr2Response);
-        ValidationUtil.checkHostAdviceErrors(icr2Response);
+        ICR3Request icr3Request = ICR3Business.mapRequestFromPreformalizationBody(input);
+        ICR3Response icr3Response = rbvdr602.executePreFormalizationInsurance(icr3Request);
+        LOGGER.info("InsuranceProductGeneric - start() - icr3Response: {}", icr3Response);
+        ValidationUtil.checkHostAdviceErrors(icr3Response);
 
-        String hostBranchId = icr2Response.getIcmrys2().getOFICON();
+        String hostBranchId = icr3Response.getIcmrys3().getOFICON();
         input.getBank().getBranch().setId(hostBranchId);
         setSaleChannelIdFromBranchId(input, hostBranchId,applicationConfigurationService);
 
         boolean isEndorsement = ValidationUtil.validateEndorsement(input);
 
-        filltOutputTrx(input,icr2Response.getIcmrys2(),payloadConfig.getQuotation());
+        filltOutputTrx(input,icr3Response.getIcmrys3(),payloadConfig.getQuotation());
 
         PayloadStore payloadStore = new PayloadStore();
         payloadStore.setResposeBody(input);
         payloadStore.setEndorsement(isEndorsement);
-        payloadStore.setIcr2Response(icr2Response);
+        payloadStore.setIcr3Response(icr3Response);
         payloadStore.setQuotationDAO(payloadConfig.getQuotation());
         payloadStore.setPaymentFrequencyId(payloadConfig.getPaymentFrequencyId());
         payloadStore.setPaymentFrequencyName(payloadConfig.getPaymentFrequencyName());
@@ -65,19 +65,19 @@ public class InsuranceProductGeneric extends PreFormalizationDecorator {
             requestBody.setSaleChannelId("TM");
         }
     }
-    private void filltOutputTrx(PolicyDTO policyDTO, ICMRYS2 icmrys2, QuotationDAO quotationDAO){
-        policyDTO.setId(getContractFrontIcr2Response(icmrys2));
+    private void filltOutputTrx(PolicyDTO policyDTO, ICMRYS3 icmrys3, QuotationDAO quotationDAO){
+        policyDTO.setId(getContractFrontIcr3Response(icmrys3));
         policyDTO.getProduct().setName(quotationDAO.getInsuranceProductDesc());
-        policyDTO.setOperationDate(ConvertUtil.convertStringDateWithTimeFormatToDate(icmrys2.getFECCTR()));
-        policyDTO.getValidityPeriod().setEndDate(ConvertUtil.convertStringDateWithDateFormatToDate(icmrys2.getFECFIN()));
+        policyDTO.setOperationDate(ConvertUtil.convertStringDateWithTimeFormatToDate(icmrys3.getFECCTR()));
+        policyDTO.getValidityPeriod().setEndDate(ConvertUtil.convertStringDateWithDateFormatToDate(icmrys3.getFECFIN()));
     }
 
-    private String getContractFrontIcr2Response(ICMRYS2 icmrys2) {
-        return icmrys2.getNUMCON().substring(0, 4) +
-                icmrys2.getNUMCON().substring(4, 8) +
-                icmrys2.getNUMCON().charAt(8) +
-                icmrys2.getNUMCON().charAt(9) +
-                icmrys2.getNUMCON().substring(10);
+    private String getContractFrontIcr3Response(ICMRYS3 icmrys3) {
+        return icmrys3.getNUMCON().substring(0, 4) +
+                icmrys3.getNUMCON().substring(4, 8) +
+                icmrys3.getNUMCON().charAt(8) +
+                icmrys3.getNUMCON().charAt(9) +
+                icmrys3.getNUMCON().substring(10);
     }
 
     public static final class Builder {
