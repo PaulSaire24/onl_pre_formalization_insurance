@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>com.bbva.rbvd</groupId>
 		<artifactId>DTOS-onl_pre_formalization_insurance</artifactId>
-		<version>0.2.0</version>
+		<version>0.2.1</version>
 	</parent>
 	<groupId>com.bbva.rbvd.dto.preformalization</groupId>
 	<artifactId>RBVDC118</artifactId>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<packaging>bundle</packaging>
 	<description>Pre formalization DTO</description>
 	<properties>
