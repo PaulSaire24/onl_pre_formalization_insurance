@@ -4,12 +4,12 @@
 	<parent>
 		<groupId>com.bbva.rbvd</groupId>
 		<artifactId>LIBRARIES-onl_pre_formalization_insurance</artifactId>
-		<version>0.2.1</version>
+		<version>0.3.0-SNAPSHOT</version>
 	</parent>
 	<groupId>com.bbva.rbvd</groupId>
 	<artifactId>RBVDR415IMPL</artifactId>
 	<name>RBVDR415IMPL</name>
-	<version>0.2.1</version>
+	<version>0.3.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<description>Internal lib to contain logic insurance pre formalization</description>
 	<properties>
@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>com.bbva.rbvd</groupId>
 			<artifactId>RBVDR415</artifactId>
-			<version>0.2.1</version>
+			<version>0.3.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bbva.elara</groupId>
