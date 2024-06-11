@@ -22,7 +22,8 @@ public class ConstantsUtil {
     public enum StatusContract{
 
         PENDIENTE("PEN"),
-        CONTRATADA("CONTRATADA");
+        CONTRATADA("CONTRATADA"),
+        PREFORMALIZADA("PREFORMALIZADA");
 
         private final String value;
 

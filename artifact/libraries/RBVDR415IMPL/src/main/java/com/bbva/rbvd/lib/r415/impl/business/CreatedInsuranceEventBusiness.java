@@ -88,7 +88,8 @@ public class CreatedInsuranceEventBusiness {
     private static StatusDTO getStatus(){
         StatusDTO status = new StatusDTO();
 
-        status.setId(ConstantsUtil.StatusContract.CONTRATADA.getValue());
+        status.setId(ConstantsUtil.StatusContract.PREFORMALIZADA.getValue());
+        status.setName(ConstantsUtil.StatusContract.PREFORMALIZADA.getValue());
 
         return status;
     }
@@ -183,10 +184,10 @@ public class CreatedInsuranceEventBusiness {
         ContactDetailDTO contactDetailForHolderEvent = new ContactDetailDTO();
         ContactDTO contact = new ContactDTO();
         if(ConstantsUtil.ContactDetailsType.EMAIL.equals(contactDetailDTO.getContact().getContactDetailType())) {
-            contact.setContactType(ConstantsUtil.ContactDetailsType.EMAIL);
+            contact.setContactDetailType(ConstantsUtil.ContactDetailsType.EMAIL);
             contact.setValue(contactDetailDTO.getContact().getAddress());
         } else {
-            contact.setContactType(ConstantsUtil.ContactDetailsType.MOBILE);
+            contact.setContactDetailType(ConstantsUtil.ContactDetailsType.MOBILE);
             contact.setValue(contactDetailDTO.getContact().getPhoneNumber());
         }
         contactDetailForHolderEvent.setContact(contact);
