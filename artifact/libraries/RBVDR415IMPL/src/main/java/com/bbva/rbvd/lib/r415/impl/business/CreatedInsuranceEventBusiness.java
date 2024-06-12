@@ -1,11 +1,13 @@
 package com.bbva.rbvd.lib.r415.impl.business;
 
-import com.bbva.rbvd.dto.insrncsale.commons.PolicyInspectionDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO;
+
 import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.ContactDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
 import com.bbva.rbvd.dto.insrncsale.events.CreatedInsrcEventDTO;
 import com.bbva.rbvd.dto.insrncsale.events.CreatedInsuranceDTO;
 import com.bbva.rbvd.dto.insrncsale.events.StatusDTO;
@@ -29,7 +31,6 @@ import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class CreatedInsuranceEventBusiness {
@@ -42,11 +43,10 @@ public class CreatedInsuranceEventBusiness {
         CreatedInsuranceDTO body = new CreatedInsuranceDTO();
         body.setQuotationId(requestBody.getQuotationNumber());
         body.setOperationDate(ConvertUtil.convertDateToCalendar(requestBody.getOperationDate()));
-        body.setValidityPeriod(getValidityPeriodFromInput(requestBody));
-        body.setHolder(getHolderFronInput(requestBody));
-        body.setProduct(getProductFromInput(requestBody));
-        body.setPaymentMethod(getPaymentMethodFromInput(requestBody));
-        body.setInspection(getInspectionFromInput(requestBody));
+        body.setValidityPeriod(getValidityPeriodFromResponse(requestBody));
+        body.setHolder(getHolderFromResponse(requestBody));
+        body.setProduct(getProductFromResponse(requestBody));
+        body.setPaymentMethod(getPaymentMethodFromResponse(requestBody));
         body.setStatus(getStatus());
 
         createdInsrcEventDTO.setCreatedInsurance(body);
@@ -94,42 +94,29 @@ public class CreatedInsuranceEventBusiness {
         return status;
     }
 
-    private static PolicyInspectionDTO getInspectionFromInput(PolicyDTO requestBody){
-        if(requestBody.getInspection() != null){
-            PolicyInspectionDTO inspectionDTO = new PolicyInspectionDTO();
-            inspectionDTO.setIsRequired(requestBody.getInspection().getIsRequired());
-            inspectionDTO.setFullName(requestBody.getInspection().getFullName());
-            List<ContactDetailDTO> contactDetailsForInspection = requestBody.getInspection().getContactDetails().
-                    stream().map(CreatedInsuranceEventBusiness::getContactDetailForInspection).collect(Collectors.toList());
-            inspectionDTO.setContactDetails(contactDetailsForInspection);
-        }
-
-        return null;
-    }
-
-    private static PolicyPaymentMethodDTO getPaymentMethodFromInput(PolicyDTO requestBody) {
+    private static PolicyPaymentMethodDTO getPaymentMethodFromResponse(PolicyDTO requestBody) {
         PolicyPaymentMethodDTO paymentMethod = new PolicyPaymentMethodDTO();
 
         paymentMethod.setPaymentType(requestBody.getPaymentMethod().getPaymentType());
 
         RelatedContractDTO relatedContract = new RelatedContractDTO();
-        relatedContract.setContractId(requestBody.getRelatedContracts().get(0).getContractId());
-        relatedContract.setNumber(requestBody.getRelatedContracts().get(0).getNumber());
+        relatedContract.setContractId(requestBody.getRelatedContracts().get(0).getContractDetails().getContractId());
+        relatedContract.setNumber(requestBody.getRelatedContracts().get(0).getContractDetails().getNumber());
         paymentMethod.setRelatedContracts(Collections.singletonList(relatedContract));
 
         return paymentMethod;
     }
 
-    private static ProductCreatedInsrcEventDTO getProductFromInput(PolicyDTO requestBody){
+    private static ProductCreatedInsrcEventDTO getProductFromResponse(PolicyDTO requestBody){
         ProductCreatedInsrcEventDTO product = new ProductCreatedInsrcEventDTO();
 
         product.setId(requestBody.getProduct().getId());
-        product.setPlan(getPlanFromInput(requestBody));
+        product.setPlan(getPlanFromResponse(requestBody));
 
         return product;
     }
 
-    private static PlanCreatedInsrcEventDTO getPlanFromInput(PolicyDTO requestBody){
+    private static PlanCreatedInsrcEventDTO getPlanFromResponse(PolicyDTO requestBody){
         PlanCreatedInsrcEventDTO plan = new PlanCreatedInsrcEventDTO();
 
         plan.setId(requestBody.getProduct().getPlan().getId());
@@ -153,41 +140,41 @@ public class CreatedInsuranceEventBusiness {
         return plan;
     }
 
-    private static ValidityPeriodDTO getValidityPeriodFromInput(PolicyDTO requestBody) {
-        ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
-        validityPeriodDTO.setStartDate(requestBody.getValidityPeriod().getStartDate());
-        validityPeriodDTO.setEndDate(requestBody.getValidityPeriod().getEndDate());
-        return validityPeriodDTO;
+    private static ValidityPeriodDTO getValidityPeriodFromResponse(PolicyDTO requestBody) {
+        if(requestBody.getValidityPeriod() != null){
+            ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
+            validityPeriodDTO.setStartDate(requestBody.getValidityPeriod().getStartDate());
+            validityPeriodDTO.setEndDate(requestBody.getValidityPeriod().getEndDate());
+            return validityPeriodDTO;
+        }
+        return null;
     }
 
-    private static HolderDTO getHolderFronInput(PolicyDTO requestBody){
-        HolderDTO holderDTO = requestBody.getHolder();
-        holderDTO.setContactDetails(requestBody.getHolder().getContactDetails()
-                .stream().map(CreatedInsuranceEventBusiness::getContactDetailDTO).collect(Collectors.toList()));
+    private static HolderDTO getHolderFromResponse(PolicyDTO requestBody){
+        HolderDTO holderDTO = new HolderDTO();
+
+        holderDTO.setId(requestBody.getHolder().getId());
+
+        IdentityDocumentDTO identityDocument = new IdentityDocumentDTO();
+        identityDocument.setDocumentNumber(requestBody.getHolder().getIdentityDocument().getNumber());
+        DocumentTypeDTO documentType = new DocumentTypeDTO();
+        documentType.setId(requestBody.getHolder().getIdentityDocument().getDocumentType().getId());
+        identityDocument.setDocumentType(documentType);
+        holderDTO.setIdentityDocument(identityDocument);
+
+        holderDTO.setContactDetails(requestBody.getHolder().getContactDetails().stream().map(CreatedInsuranceEventBusiness::getContactDetailToHolder).collect(Collectors.toList()));
 
         return holderDTO;
     }
 
-    private static ContactDetailDTO getContactDetailForInspection(ContactDetailDTO contactDetailDTO) {
-        ContactDetailDTO contact = new ContactDetailDTO();
+    private static ContactDetailDTO getContactDetailToHolder(ContactDetailDTO contactDetailDTO) {
+        ContactDetailDTO contactDetailForHolderEvent = new ContactDetailDTO();
+        ContactDTO contact = new ContactDTO();
         if(ConstantsUtil.ContactDetailsType.EMAIL.equals(contactDetailDTO.getContact().getContactDetailType())) {
             contact.setContactType(ConstantsUtil.ContactDetailsType.EMAIL);
             contact.setValue(contactDetailDTO.getContact().getAddress());
         } else {
             contact.setContactType(ConstantsUtil.ContactDetailsType.MOBILE);
-            contact.setValue(contactDetailDTO.getContact().getPhoneNumber());
-        }
-        return contact;
-    }
-
-    private static ContactDetailDTO getContactDetailDTO(ContactDetailDTO contactDetailDTO) {
-        ContactDetailDTO contactDetailForHolderEvent = new ContactDetailDTO();
-        ContactDTO contact = new ContactDTO();
-        if(ConstantsUtil.ContactDetailsType.EMAIL.equals(contactDetailDTO.getContact().getContactDetailType())) {
-            contact.setContactDetailType(ConstantsUtil.ContactDetailsType.EMAIL);
-            contact.setValue(contactDetailDTO.getContact().getAddress());
-        } else {
-            contact.setContactDetailType(ConstantsUtil.ContactDetailsType.MOBILE);
             contact.setValue(contactDetailDTO.getContact().getPhoneNumber());
         }
         contactDetailForHolderEvent.setContact(contact);
