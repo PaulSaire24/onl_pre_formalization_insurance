@@ -7,9 +7,11 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class ConvertUtil {
@@ -52,6 +54,10 @@ public class ConvertUtil {
 
     public static LocalDate convertDateToLocalDate(Date date) {
         return new LocalDate(date, DateTimeZone.forID("GMT"));
+    }
+
+    public static Date convertLocalDateToDate(LocalDate localDate) {
+        return localDate.toDateTimeAtStartOfDay(DateTimeZone.getDefault()).toDate();
     }
 
     public static BigDecimal getBigDecimalValue(Object value){

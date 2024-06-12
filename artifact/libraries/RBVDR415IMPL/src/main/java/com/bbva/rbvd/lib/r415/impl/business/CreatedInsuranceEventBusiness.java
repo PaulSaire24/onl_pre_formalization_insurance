@@ -143,8 +143,8 @@ public class CreatedInsuranceEventBusiness {
     private static ValidityPeriodDTO getValidityPeriodFromResponse(PolicyDTO requestBody) {
         if(requestBody.getValidityPeriod() != null){
             ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
-            validityPeriodDTO.setStartDate(requestBody.getValidityPeriod().getStartDate());
-            validityPeriodDTO.setEndDate(requestBody.getValidityPeriod().getEndDate());
+            validityPeriodDTO.setStartDate(ConvertUtil.convertLocalDateToDate(ConvertUtil.convertDateToLocalDate(requestBody.getValidityPeriod().getStartDate())));
+            validityPeriodDTO.setEndDate(ConvertUtil.convertLocalDateToDate(ConvertUtil.convertDateToLocalDate(requestBody.getValidityPeriod().getEndDate())));
             return validityPeriodDTO;
         }
         return null;

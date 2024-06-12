@@ -843,9 +843,6 @@ public class RBVDR415Test {
 		verify(pisdR012, never()).executeMultipleInsertionOrUpdate(any(),any());
 	}
 
-
-
-
 	private ParticipantDTO mockCreateParticipant(String document,String customerId, String documentNumber,
 												 String rol){
 		ParticipantDTO participant = new ParticipantDTO();
