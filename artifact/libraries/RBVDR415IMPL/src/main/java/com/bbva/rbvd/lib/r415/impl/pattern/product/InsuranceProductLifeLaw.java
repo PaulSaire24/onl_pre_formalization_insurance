@@ -65,7 +65,7 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
         if(flagCallEvent.equalsIgnoreCase(ConstantsUtil.S_VALUE)){
             ConsumeInternalService consumeInternalService = new ConsumeInternalService(this.internalApiConnectorImpersonation);
             Integer httpStatusCode = consumeInternalService.callEventUpsilonToUpdateStatusInDWP(
-                    CreatedInsuranceEventBusiness.createRequestCreatedInsuranceEvent(input));
+                    CreatedInsuranceEventBusiness.createRequestCreatedInsuranceEvent(payloadStore.getResposeBody()));
             LOGGER.info("InsuranceProductLifeLaw - start() - callEventUpsilonToUpdateStatusInDWP - httpStatusCode: {}",httpStatusCode);
         }
 
