@@ -29,6 +29,7 @@ public class ConsumeInternalService {
         LOGGER.info("***** ConsumeInternalService - callEventUpsilonToUpdateStatusInDWP() START *****");
 
         String jsonString = ConvertUtil.getRequestJsonFormat(createdInsuranceEvent);
+        System.out.println(jsonString);
 
         LOGGER.info("***** ConsumeInternalService - callEventUpsilonToUpdateStatusInDWP() - Request body: {}", jsonString);
 
