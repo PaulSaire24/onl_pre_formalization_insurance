@@ -1,27 +1,27 @@
 package com.bbva.rbvd;
 
 import com.bbva.elara.transaction.AbstractTransaction;
+import com.bbva.rbvd.dto.insrncsale.commons.BankDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.PolicyInspectionDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.QuotationStatusDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.BankDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.ProductDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.InsuredAmountDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.FirstInstallmentDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.InsuranceCompanyDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PaymentConfigurationDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.BusinessAgentDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PromoterDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.CurrentInstallmentDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.RenewalPolicyDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.FirstInstallmentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.InstallmentPlansDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.InsuranceCompanyDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.InsuredAmountDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.NonRenewalPolicyDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PaymentConfigurationDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.ProductDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.PromoterDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.RenewalPolicyDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.TotalAmountDTO;
 import java.util.Date;
 import java.util.List;
 
@@ -33,13 +33,6 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	public AbstractRBVDT11801PETransaction(){
 	}
 
-
-	/**
-	 * Return value for input parameter alias
-	 */
-	protected String getAlias(){
-		return (String)this.getParameter("alias");
-	}
 
 	/**
 	 * Return value for input parameter quotationNumber
@@ -175,6 +168,13 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	}
 
 	/**
+	 * Return value for input parameter identityVerificationCode
+	 */
+	protected String getIdentityverificationcode(){
+		return (String)this.getParameter("identityVerificationCode");
+	}
+
+	/**
 	 * Set value for String output parameter id
 	 */
 	protected void setId(final String field){
@@ -266,7 +266,7 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	}
 
 	/**
-	 * Set value for List<RelatedContract> output parameter relatedContracts
+	 * Set value for List<RelatedContractDTO> output parameter relatedContracts
 	 */
 	protected void setRelatedcontracts(final List<RelatedContractDTO> field){
 		this.addParameter("relatedContracts", field);
@@ -308,7 +308,7 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	}
 
 	/**
-	 * Set value for InsuranceStatus output parameter status
+	 * Set value for QuotationStatusDTO output parameter status
 	 */
 	protected void setStatus(final QuotationStatusDTO field){
 		this.addParameter("status", field);
@@ -343,14 +343,14 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	}
 
 	/**
-	 * Set value for ValidityPeriod output parameter validityPeriod
+	 * Set value for ValidityPeriodDTO output parameter validityPeriod
 	 */
 	protected void setValidityperiod(final ValidityPeriodDTO field){
 		this.addParameter("validityPeriod", field);
 	}
 
 	/**
-	 * Set value for Installment output parameter currentInstallment
+	 * Set value for CurrentInstallmentDTO output parameter currentInstallment
 	 */
 	protected void setCurrentinstallment(final CurrentInstallmentDTO field){
 		this.addParameter("currentInstallment", field);
@@ -364,7 +364,7 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	}
 
 	/**
-	 * Set value for RenewalPolicy output parameter renewalPolicy
+	 * Set value for RenewalPolicyDTO output parameter renewalPolicy
 	 */
 	protected void setRenewalpolicy(final RenewalPolicyDTO field){
 		this.addParameter("renewalPolicy", field);
@@ -399,7 +399,7 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	}
 
 	/**
-	 * Set value for Installment output parameter lastInstallment
+	 * Set value for InstallmentPlansDTO output parameter lastInstallment
 	 */
 	protected void setLastinstallment(final InstallmentPlansDTO field){
 		this.addParameter("lastInstallment", field);
@@ -413,7 +413,7 @@ public abstract class AbstractRBVDT11801PETransaction extends AbstractTransactio
 	}
 
 	/**
-	 * Set value for RenewalPolicy output parameter nonRenewalPolicy
+	 * Set value for NonRenewalPolicyDTO output parameter nonRenewalPolicy
 	 */
 	protected void setNonrenewalpolicy(final NonRenewalPolicyDTO field){
 		this.addParameter("nonRenewalPolicy", field);

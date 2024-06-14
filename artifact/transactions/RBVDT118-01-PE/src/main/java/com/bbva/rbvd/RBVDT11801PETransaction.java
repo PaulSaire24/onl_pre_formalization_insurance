@@ -87,7 +87,7 @@ public class RBVDT11801PETransaction extends AbstractRBVDT11801PETransaction {
         String headerOperationDate = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.OPERATIONDATE);
         String operationTime = (String) this.getRequestHeader().getHeaderParameter(RequestHeaderParamsName.OPERATIONTIME);
 
-        requestBody.setAlias(this.getAlias());
+
         requestBody.setQuotationNumber(this.getQuotationnumber());
         requestBody.setProduct(this.getProduct());
         requestBody.setHolder(this.getHolder());
