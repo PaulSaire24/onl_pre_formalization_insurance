@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>com.bbva.rbvd</groupId>
 		<artifactId>TRANSACTIONS-onl_pre_formalization_insurance</artifactId>
-		<version>0.2.2</version>
+		<version>0.2.3</version>
 	</parent>
 	<groupId>com.bbva.rbvd</groupId>
 	<artifactId>RBVDT118-01-PE</artifactId>
-	<version>0.2.2</version>
+	<version>0.2.3</version>
 	<packaging>bundle</packaging>
 	<description>Trx to pre-formalizate a contract</description>
 	<properties>
@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>com.bbva.rbvd</groupId>
 			<artifactId>RBVDR415</artifactId>
-			<version>0.2.2</version>
+			<version>0.2.3</version>
 		</dependency>
 	</dependencies>
 	<build>
