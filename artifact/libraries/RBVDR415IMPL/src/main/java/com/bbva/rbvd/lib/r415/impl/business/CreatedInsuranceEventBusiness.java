@@ -28,8 +28,8 @@ import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.TotalInstallmentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PaymentPeriodDTO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
-import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -42,7 +42,10 @@ public class CreatedInsuranceEventBusiness {
 
         CreatedInsuranceDTO body = new CreatedInsuranceDTO();
         body.setQuotationId(requestBody.getQuotationNumber());
-        body.setOperationDate(ConvertUtil.convertDateToCalendar(requestBody.getOperationDate()));
+        body.setContractId(requestBody.getId());
+        Calendar operationDate = Calendar.getInstance();
+        operationDate.setTime(requestBody.getOperationDate());
+        body.setOperationDate(operationDate);
         body.setValidityPeriod(getValidityPeriodFromResponse(requestBody));
         body.setHolder(getHolderFromResponse(requestBody));
         body.setProduct(getProductFromResponse(requestBody));
@@ -143,8 +146,8 @@ public class CreatedInsuranceEventBusiness {
     private static ValidityPeriodDTO getValidityPeriodFromResponse(PolicyDTO requestBody) {
         if(requestBody.getValidityPeriod() != null){
             ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
-            validityPeriodDTO.setStartDate(ConvertUtil.convertLocalDateToDate(ConvertUtil.convertDateToLocalDate(requestBody.getValidityPeriod().getStartDate())));
-            validityPeriodDTO.setEndDate(ConvertUtil.convertLocalDateToDate(ConvertUtil.convertDateToLocalDate(requestBody.getValidityPeriod().getEndDate())));
+            validityPeriodDTO.setStartDate(requestBody.getValidityPeriod().getStartDate());
+            validityPeriodDTO.setEndDate(requestBody.getValidityPeriod().getEndDate());
             return validityPeriodDTO;
         }
         return null;
