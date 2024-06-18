@@ -138,7 +138,7 @@ public class RBVDR415Test {
 
 		quotationInfo = new HashMap<>();
 		quotationInfo.put("INSURANCE_BUSINESS_NAME","VIDA");
-		quotationInfo.put("INSURANCE_PRODUCT_ID",13);
+		quotationInfo.put("INSURANCE_PRODUCT_ID",new BigDecimal("13"));
 		quotationInfo.put("INSURANCE_PRODUCT_DESC","Seguro Vida Ley");
 		quotationInfo.put("CONTRACT_DURATION_TYPE","");
 		quotationInfo.put("CONTRACT_DURATION_NUMBER",999);
@@ -257,6 +257,8 @@ public class RBVDR415Test {
 		//cuenta de cliente
 		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("ACCOUNT");
 		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("00110130260299972507");
+
+		requestBody.getInstallmentPlan().setTotalNumberInstallments(1L);
 
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1,1,1,1,1});

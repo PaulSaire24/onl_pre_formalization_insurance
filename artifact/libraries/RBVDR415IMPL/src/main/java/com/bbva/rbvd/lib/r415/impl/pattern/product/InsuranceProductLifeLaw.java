@@ -72,7 +72,6 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
         return input;
     }
 
-
     private void filltOutputTrx(PolicyDTO policyDTO, ICMRYS3 icmrys3, QuotationDAO quotationDAO){
         policyDTO.setId(getContractFrontIcr3Response(icmrys3));
         policyDTO.getProduct().setName(quotationDAO.getInsuranceProductDesc());

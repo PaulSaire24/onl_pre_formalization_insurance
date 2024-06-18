@@ -1,7 +1,6 @@
 package com.bbva.rbvd.lib.r415.impl.business;
 
 import com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.ContactDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO;
@@ -45,7 +44,7 @@ public class CreatedInsuranceEventBusiness {
         Calendar operationDate = Calendar.getInstance();
         operationDate.setTime(requestBody.getOperationDate());
         body.setOperationDate(operationDate);
-        body.setValidityPeriod(getValidityPeriodFromResponse(requestBody));
+        body.setValidityPeriod(requestBody.getValidityPeriod());
         body.setHolder(getHolderFromResponse(requestBody));
         body.setProduct(getProductFromResponse(requestBody));
         body.setPaymentMethod(getPaymentMethodFromResponse(requestBody));
@@ -148,17 +147,6 @@ public class CreatedInsuranceEventBusiness {
         }
         return 1;
     }
-
-    private static ValidityPeriodDTO getValidityPeriodFromResponse(PolicyDTO requestBody) {
-        if(requestBody.getValidityPeriod() != null){
-            ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
-            validityPeriodDTO.setStartDate(requestBody.getValidityPeriod().getStartDate());
-            validityPeriodDTO.setEndDate(requestBody.getValidityPeriod().getEndDate());
-            return validityPeriodDTO;
-        }
-        return null;
-    }
-
 
     private static HolderDTO getHolderFromResponse(PolicyDTO requestBody){
         HolderDTO holderDTO = new HolderDTO();
