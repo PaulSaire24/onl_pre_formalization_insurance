@@ -48,13 +48,10 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
         String hostBranchId = icr3Response.getIcmrys3().getOFICON();
         input.getBank().getBranch().setId(hostBranchId);
 
-        boolean isEndorsement = ValidationUtil.validateEndorsement(input);
-
         filltOutputTrx(input,icr3Response.getIcmrys3(),payloadConfig.getQuotation());
 
         PayloadStore payloadStore = new PayloadStore();
         payloadStore.setResposeBody(input);
-        payloadStore.setEndorsement(isEndorsement);
         payloadStore.setIcr3Response(icr3Response);
         payloadStore.setQuotationDAO(payloadConfig.getQuotation());
         payloadStore.setPaymentFrequencyId(payloadConfig.getPaymentFrequencyId());
@@ -65,8 +62,7 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
         //llamar al evento para que avise a DWP que ya se contrató. Solo las cotizaciones que se generaron en dwp hacen este llamado
         String flagCallEvent = applicationConfigurationService.getDefaultProperty(
                 "flag.callevent.createinsured.for.preemision",ConstantsUtil.N_VALUE);
-        String channelCode = applicationConfigurationService.getProperty(ConstantsUtil.EVENT_CHANNEL);
-        if(channelCode.contains(payloadStore.getResposeBody().getSaleChannelId()) && flagCallEvent.equalsIgnoreCase(ConstantsUtil.S_VALUE)){
+        if(flagCallEvent.equalsIgnoreCase(ConstantsUtil.S_VALUE)){
             ConsumeInternalService consumeInternalService = new ConsumeInternalService(this.internalApiConnectorImpersonation);
             Integer httpStatusCode = consumeInternalService.callEventUpsilonToUpdateStatusInDWP(
                     CreatedInsuranceEventBusiness.createRequestCreatedInsuranceEvent(payloadStore.getResposeBody()));

@@ -41,13 +41,10 @@ public class InsuranceProductGeneric extends PreFormalizationDecorator {
         input.getBank().getBranch().setId(hostBranchId);
         setSaleChannelIdFromBranchId(input, hostBranchId,applicationConfigurationService);
 
-        boolean isEndorsement = ValidationUtil.validateEndorsement(input);
-
         filltOutputTrx(input,icr3Response.getIcmrys3(),payloadConfig.getQuotation());
 
         PayloadStore payloadStore = new PayloadStore();
         payloadStore.setResposeBody(input);
-        payloadStore.setEndorsement(isEndorsement);
         payloadStore.setIcr3Response(icr3Response);
         payloadStore.setQuotationDAO(payloadConfig.getQuotation());
         payloadStore.setPaymentFrequencyId(payloadConfig.getPaymentFrequencyId());

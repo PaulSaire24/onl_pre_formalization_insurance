@@ -13,11 +13,10 @@ import com.bbva.pisd.lib.r601.PISDR601;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICMRYS3;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
 import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
-import com.bbva.rbvd.dto.insrncsale.commons.ContactDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.PolicyInspectionDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.PolicyInspectionDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.mock.MockData;
 import com.bbva.rbvd.dto.insrncsale.policy.FirstInstallmentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
@@ -45,13 +44,7 @@ import org.springframework.web.client.RestClientException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Arrays;
-
+import java.util.*;
 
 import static com.bbva.pisd.dto.insurance.utils.PISDConstants.CHANNEL_GLOMO;
 import static org.junit.Assert.*;
@@ -124,6 +117,7 @@ public class RBVDR415Test {
 		requestBody.getInstallmentPlan().setTotalNumberInstallments(null);
 		requestBody.setFirstInstallment(null);
 		requestBody.setIdentityVerificationCode(null);
+		requestBody.setValidityPeriod(null);
 
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_TLMKT_CODE)).thenReturn("7794");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_PIC_CODE)).thenReturn("PC");
@@ -467,6 +461,8 @@ public class RBVDR415Test {
 		inspection.setFullName("Jose Artica");
 		inspection.setContactDetails(requestBody.getHolder().getContactDetails());
 		requestBody.setInspection(inspection);
+		requestBody.setValidityPeriod(new ValidityPeriodDTO());
+		requestBody.getValidityPeriod().setStartDate(new Date());
 
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1});
@@ -506,6 +502,9 @@ public class RBVDR415Test {
 		requestBody.getHolder().getIdentityDocument().setNumber("1000867709");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("PASSPORT");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("1000867709");
+
+		requestBody.setValidityPeriod(new ValidityPeriodDTO());
+		requestBody.getValidityPeriod().setStartDate(new Date());
 
 		//producto vehicular
 		requestBody.getProduct().setId("830");
@@ -556,94 +555,6 @@ public class RBVDR415Test {
 	}
 
 
-	/*
-	CASO 7: OTRO PRODUCTO QUE TIENE PARTICIPANTES BENEFICIARIOS
-	 */
-	@Test
-	public void executeTestCase7() throws IOException {
-		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,6,7));
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		//Se agrega beneficiarios de otro mock
-		PolicyDTO request2WithBeneficiaries = mockData.getCreateInsuranceRequestBody();
-		requestBody.setParticipants(request2WithBeneficiaries.getParticipants());
-
-		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
-				.thenReturn(new int[]{1,1,1,1});
-
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-		assertNotNull(validation.getProduct());
-		assertNotNull(validation.getParticipants());
-		assertEquals(3,validation.getParticipants().size());
-	}
-
-
-	/*
-	CASO 8: OTRO PRODUCTO QUE TIENE PARTICIPANTES ASEGURADOS
-	 */
-
-	@Test
-	public void executeTestCase8(){
-		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		icr3Response.getIcmrys3().setOFICON("7794");
-		when(rbvdR602.executePreFormalizationInsurance(Mockito.anyObject())).thenReturn(icr3Response);
-
-		//Se agrega asegurado
-		ParticipantDTO insured = mockCreateParticipant("FOREIGNERS","97793201","69503241210","INSURED");
-		requestBody.getParticipants().add(insured);
-
-		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
-				.thenReturn(new int[]{1,1,1});
-
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-		assertNotNull(validation.getProduct());
-		assertNotNull(validation.getParticipants());
-		assertEquals(2,validation.getParticipants().size());
-	}
-
-
-	/*
-	CASO 9: OTRO PRODUCTO QUE TIENE PARTICIPANTE ENDOSATARIO
-	 */
-
-	@Test
-	public void executeTestCase9(){
-		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		//Se agrega endosatario
-		ParticipantDTO endorsee = mockCreateParticipant("RUC","20224043","20628447889","ENDORSEE");
-		endorsee.setBenefitPercentage(100D);
-		requestBody.getParticipants().add(endorsee);
-
-		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
-				.thenReturn(new int[]{1,1});
-
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-		assertNotNull(validation.getProduct());
-		assertNotNull(validation.getParticipants());
-		assertEquals(2,validation.getParticipants().size());
-	}
 
 
 	//CASOS DE ERROR
@@ -772,6 +683,8 @@ public class RBVDR415Test {
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,0,1});
 
+		requestBody.getProduct().setId("842");
+
 		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
 
 		assertNull(response);
@@ -790,6 +703,8 @@ public class RBVDR415Test {
 
 		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
 				.thenReturn(result);
+
+		requestBody.getProduct().setId("842");
 
 		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
 

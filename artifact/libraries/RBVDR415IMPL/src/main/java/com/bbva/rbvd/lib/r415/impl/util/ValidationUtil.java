@@ -5,8 +5,6 @@ import com.bbva.apx.exception.business.BusinessException;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
 import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import org.springframework.util.CollectionUtils;
 
@@ -59,16 +57,6 @@ public class ValidationUtil {
         }
     }
 
-    public static boolean validateEndorsement(PolicyDTO requestBody) {
-
-        ParticipantDTO participantDTO = ValidationUtil.filterOneParticipantByType(
-                requestBody.getParticipants(), ConstantsUtil.Participant.ENDORSEE);
-
-        return participantDTO != null && participantDTO.getIdentityDocument() != null
-                && participantDTO.getIdentityDocument().getDocumentType().getId() != null
-                && ConstantsUtil.DocumentType.RUC.equals(participantDTO.getIdentityDocument().getDocumentType().getId())
-                && participantDTO.getBenefitPercentage() != null;
-    }
 
     public static boolean mapIsNullOrEmpty(Map<?,?> map){
         return map == null || map.isEmpty();

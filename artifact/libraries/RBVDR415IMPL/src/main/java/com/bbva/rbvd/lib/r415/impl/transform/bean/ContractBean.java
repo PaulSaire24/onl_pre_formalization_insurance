@@ -50,7 +50,7 @@ public class ContractBean {
         contractDao.setInstallmentPeriodFinalDate(currentDate);
         contractDao.setInsuredAmount(ConvertUtil.getBigDecimalValue(response.getInsuredAmount().getAmount()));
         contractDao.setCtrctDisputeStatusType(response.getSaleChannelId());
-        contractDao.setEndorsementPolicyIndType((payloadStore.getIsEndorsement()) ? ConstantsUtil.S_VALUE : ConstantsUtil.N_VALUE);
+        contractDao.setEndorsementPolicyIndType(ConstantsUtil.N_VALUE);
         contractDao.setInsrncCoContractStatusType(ConstantsUtil.StatusContract.PENDIENTE.getValue());
         contractDao.setContractStatusId(ConstantsUtil.StatusContract.PENDIENTE.getValue());
         contractDao.setCreationUserId(response.getCreationUser());
