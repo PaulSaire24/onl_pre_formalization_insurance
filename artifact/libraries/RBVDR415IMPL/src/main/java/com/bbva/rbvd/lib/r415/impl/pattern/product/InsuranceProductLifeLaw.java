@@ -62,7 +62,8 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
         //llamar al evento para que avise a DWP que ya se contrató
         String flagCallEvent = applicationConfigurationService.getDefaultProperty(
                 "flag.callevent.createinsured.for.preemision",ConstantsUtil.N_VALUE);
-        if(flagCallEvent.equalsIgnoreCase(ConstantsUtil.S_VALUE)){
+        String channelCode = applicationConfigurationService.getProperty(ConstantsUtil.EVENT_CHANNEL);
+        if(flagCallEvent.equalsIgnoreCase(ConstantsUtil.S_VALUE) && channelCode.equals(input.getSaleChannelId())){
             ConsumeInternalService consumeInternalService = new ConsumeInternalService(this.internalApiConnectorImpersonation);
             Integer httpStatusCode = consumeInternalService.callEventUpsilonToUpdateStatusInDWP(
                     CreatedInsuranceEventBusiness.createRequestCreatedInsuranceEvent(payloadStore.getResposeBody()));
