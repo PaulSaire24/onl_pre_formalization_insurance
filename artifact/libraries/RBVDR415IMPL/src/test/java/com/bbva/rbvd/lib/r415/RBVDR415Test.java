@@ -172,6 +172,7 @@ public class RBVDR415Test {
 
 		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
 				.thenReturn(result);
+		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
 		//Responsable de pago empresa ruc 20
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
@@ -219,6 +220,7 @@ public class RBVDR415Test {
 		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
+		requestBody.setSaleChannelId("DW");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -281,6 +283,7 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
 		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
 
@@ -302,6 +305,7 @@ public class RBVDR415Test {
 		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
+		requestBody.setSaleChannelId("DW");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -361,6 +365,7 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
 		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
 
@@ -382,6 +387,7 @@ public class RBVDR415Test {
 		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
+		requestBody.setSaleChannelId("DW");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -447,6 +453,7 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
+		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
 		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
 
@@ -468,6 +475,7 @@ public class RBVDR415Test {
 		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
+		requestBody.setSaleChannelId("DW");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -715,10 +723,13 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any())).
 				thenThrow(new RestClientException("CONNECTION ERROR"));
+		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
+
 
 		requestBody.getProduct().setId("842");
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
+		requestBody.setSaleChannelId("DW");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
