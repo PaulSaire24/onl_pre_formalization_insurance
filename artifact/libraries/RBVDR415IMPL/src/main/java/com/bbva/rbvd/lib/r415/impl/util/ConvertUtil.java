@@ -8,7 +8,6 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -44,11 +43,6 @@ public class ConvertUtil {
         return Date.from(localDate.atStartOfDay(TimeZone.getTimeZone("GMT").toZoneId()).toInstant());
     }
 
-    public static Calendar convertDateToCalendar(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar;
-    }
 
     public static LocalDate convertDateToLocalDate(Date date) {
         return new LocalDate(date, DateTimeZone.forID("GMT"));
@@ -62,7 +56,7 @@ public class ConvertUtil {
             }else if(value instanceof String){
                 ret = new BigDecimal((String) value);
             }else if(value instanceof Double){
-                ret = BigDecimal.valueOf(((Double) value).doubleValue());
+                ret = BigDecimal.valueOf(((Double) value));
             }else if(value instanceof Integer){
                 ret = BigDecimal.valueOf((Integer) value);
             }else if(value instanceof Long){
