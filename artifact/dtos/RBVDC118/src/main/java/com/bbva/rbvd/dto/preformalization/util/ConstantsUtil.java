@@ -72,5 +72,6 @@ public class ConstantsUtil {
     public static final String N_VALUE = "N";
     public static final String PAYMENT_METHOD_VALUE = "DIRECT_DEBIT";
     public static final String ID_PUT_EVENT_UPSILON_SERVICE = "createdInsurancePutEvent";
+    public static final String EVENT_CHANNEL = "event.channel.key";
 
 }
