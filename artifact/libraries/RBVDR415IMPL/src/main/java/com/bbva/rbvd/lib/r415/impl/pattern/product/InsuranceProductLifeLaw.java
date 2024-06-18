@@ -5,6 +5,7 @@ import com.bbva.elara.utility.api.connector.APIConnector;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICMRYS3;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Request;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 import com.bbva.rbvd.dto.preformalization.transfer.PayloadConfig;
@@ -21,6 +22,8 @@ import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
 import com.bbva.rbvd.lib.r602.RBVDR602;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
 
@@ -59,7 +62,7 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
 
         this.getPostInsuranceProduct().end(payloadStore);
 
-        //llamar al evento para que avise a DWP que ya se contrató
+        //llamar al evento para que avise a DWP que ya se contrató. Solo las cotizaciones que se generaron en dwp hacen este llamado
         String flagCallEvent = applicationConfigurationService.getDefaultProperty(
                 "flag.callevent.createinsured.for.preemision",ConstantsUtil.N_VALUE);
         if(flagCallEvent.equalsIgnoreCase(ConstantsUtil.S_VALUE)){
@@ -77,7 +80,20 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
         policyDTO.setId(getContractFrontIcr3Response(icmrys3));
         policyDTO.getProduct().setName(quotationDAO.getInsuranceProductDesc());
         policyDTO.setOperationDate(ConvertUtil.convertStringDateWithTimeFormatToDate(icmrys3.getFECCTR()));
-        policyDTO.getValidityPeriod().setEndDate(ConvertUtil.convertStringDateWithDateFormatToDate(icmrys3.getFECFIN()));
+        fillValidityPeriod(policyDTO,icmrys3);
+    }
+
+    private void fillValidityPeriod(PolicyDTO response,ICMRYS3 icmrys3){
+        if(response.getValidityPeriod() != null){
+            response.getValidityPeriod().setEndDate(icmrys3.getFECFIN() != null ? ConvertUtil.convertStringDateWithDateFormatToDate(icmrys3.getFECFIN()) : null);
+        }else{
+            if(ValidationUtil.allValuesNotNullOrEmpty(Arrays.asList(icmrys3.getFECINI(),icmrys3.getFECFIN()))){
+                ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
+                validityPeriodDTO.setStartDate(ConvertUtil.convertStringDateWithDateFormatToDate(icmrys3.getFECINI()));
+                validityPeriodDTO.setEndDate(ConvertUtil.convertStringDateWithDateFormatToDate(icmrys3.getFECFIN()));
+                response.setValidityPeriod(validityPeriodDTO);
+            }
+        }
     }
 
     private String getContractFrontIcr3Response(ICMRYS3 icmrys3) {

@@ -3,6 +3,7 @@ package com.bbva.rbvd.lib.r415.impl.business;
 import com.bbva.rbvd.dto.cicsconnection.icr2.enums.YesNoIndicator;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Request;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.InsuredAmountDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyInstallmentPlanDTO;
@@ -15,6 +16,7 @@ import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Date;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
@@ -40,7 +42,7 @@ public class ICR3Business {
     public static void setBasicDetails(ICR3Request icr3Request, PolicyDTO requestBody) {
         icr3Request.setNUMPOL(requestBody.getPolicyNumber());
         icr3Request.setCODPRO(requestBody.getProduct().getId());
-        icr3Request.setFECINI(ConvertUtil.convertDateToLocalDate(requestBody.getValidityPeriod().getStartDate()).toString());
+        icr3Request.setFECINI(getStartDate(requestBody.getValidityPeriod()));
         icr3Request.setCODMOD(requestBody.getProduct().getPlan().getId());
         icr3Request.setCOBRO(YesNoIndicator.NO);
         icr3Request.setGESTOR(requestBody.getBusinessAgent().getId());
@@ -49,6 +51,13 @@ public class ICR3Business {
         icr3Request.setOFICON(requestBody.getBank().getBranch().getId());
         icr3Request.setCODCIA(requestBody.getInsuranceCompany().getId());
         icr3Request.setINDPREF("S");
+    }
+
+    private static String getStartDate(ValidityPeriodDTO validityPeriod){
+        if(validityPeriod != null){
+            return ConvertUtil.convertDateToLocalDate(validityPeriod.getStartDate()).toString();
+        }
+        return null;
     }
 
     public static void setPaymentMethodDetails(ICR3Request icr3Request, PolicyPaymentMethodDTO paymentMethod) {
@@ -80,11 +89,18 @@ public class ICR3Business {
 
     public static void setInstallmentPlanDetails(ICR3Request icr3Request, PolicyInstallmentPlanDTO installmentPlan) {
         if (nonNull(installmentPlan)) {
-            icr3Request.setFECPAG(ConvertUtil.convertDateToLocalDate(installmentPlan.getStartDate()).toString());
+            icr3Request.setFECPAG(getPaymentDate(installmentPlan.getStartDate()));
             icr3Request.setNUMCUO(installmentPlan.getTotalNumberInstallments());
             icr3Request.setMTOCUO(ConvertUtil.getBigDecimalValue(installmentPlan.getPaymentAmount().getAmount()));
             icr3Request.setDIVCUO(installmentPlan.getPaymentAmount().getCurrency());
         }
+    }
+
+    private static String getPaymentDate(Date startDate){
+        if(startDate != null){
+            return ConvertUtil.convertDateToLocalDate(startDate).toString();
+        }
+        return null;
     }
 
     public static void setInsuredAmountDetails(ICR3Request icr3Request, InsuredAmountDTO insuredAmount) {

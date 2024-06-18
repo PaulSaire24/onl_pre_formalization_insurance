@@ -90,4 +90,17 @@ public class ValidationUtil {
         }
     }
 
+    public static boolean allValuesNotNullOrEmpty(List<Object> values) {
+        for (Object value : values) {
+            if (value == null) {
+                return false;
+            }
+
+            if (value instanceof String && ((String) value).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

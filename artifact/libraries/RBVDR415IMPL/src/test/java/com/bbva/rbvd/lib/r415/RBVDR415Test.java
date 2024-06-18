@@ -15,6 +15,7 @@ import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
 import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
 import com.bbva.rbvd.dto.insrncsale.commons.*;
 import com.bbva.rbvd.dto.insrncsale.mock.MockData;
+import com.bbva.rbvd.dto.insrncsale.policy.FirstInstallmentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantTypeDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
@@ -109,6 +110,10 @@ public class RBVDR415Test {
 		mockData = MockData.getInstance();
 
 		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getInstallmentPlan().setStartDate(null);
+		requestBody.getInstallmentPlan().setTotalNumberInstallments(null);
+		requestBody.setFirstInstallment(null);
+		requestBody.setIdentityVerificationCode(null);
 
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_TLMKT_CODE)).thenReturn("7794");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_PIC_CODE)).thenReturn("PC");
@@ -189,24 +194,6 @@ public class RBVDR415Test {
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 
-		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
-
-		inspection.setIsRequired(true);
-		inspection.setFullName("Cristian Alexis Segovia Farfan");
-
-		List<ContactDetailDTO> contactDetails = new ArrayList<>();
-		ContactDetailDTO phone = new ContactDetailDTO();
-		phone.setContact(new ContactDTO());
-		phone.getContact().setContactDetailType("PHONE");
-		phone.getContact().setPhoneNumber("98736442");
-		contactDetails.add(phone);
-		ContactDetailDTO email = new ContactDetailDTO();
-		email.setContact(new ContactDTO());
-		email.getContact().setContactDetailType("EMAIL");
-		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
-		contactDetails.add(email);
-		inspection.setContactDetails(contactDetails);
-		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
 
@@ -258,7 +245,7 @@ public class RBVDR415Test {
 		//producto vida ley
 		requestBody.getProduct().setId("842");
 
-		//plan 01
+		//plan 02
 		requestBody.getProduct().getPlan().setId("02");
 
 		//cuenta de cliente
@@ -272,24 +259,6 @@ public class RBVDR415Test {
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 
-		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
-
-		inspection.setIsRequired(true);
-		inspection.setFullName("Cristian Alexis Segovia Farfan");
-
-		List<ContactDetailDTO> contactDetails = new ArrayList<>();
-		ContactDetailDTO phone = new ContactDetailDTO();
-		phone.setContact(new ContactDTO());
-		phone.getContact().setContactDetailType("PHONE");
-		phone.getContact().setPhoneNumber("98736442");
-		contactDetails.add(phone);
-		ContactDetailDTO email = new ContactDetailDTO();
-		email.setContact(new ContactDTO());
-		email.getContact().setContactDetailType("EMAIL");
-		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
-		contactDetails.add(email);
-		inspection.setContactDetails(contactDetails);
-		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
 
@@ -352,24 +321,6 @@ public class RBVDR415Test {
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 
-		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
-
-		inspection.setIsRequired(true);
-		inspection.setFullName("Cristian Alexis Segovia Farfan");
-
-		List<ContactDetailDTO> contactDetails = new ArrayList<>();
-		ContactDetailDTO phone = new ContactDetailDTO();
-		phone.setContact(new ContactDTO());
-		phone.getContact().setContactDetailType("PHONE");
-		phone.getContact().setPhoneNumber("98736442");
-		contactDetails.add(phone);
-		ContactDetailDTO email = new ContactDetailDTO();
-		email.setContact(new ContactDTO());
-		email.getContact().setContactDetailType("EMAIL");
-		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
-		contactDetails.add(email);
-		inspection.setContactDetails(contactDetails);
-		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
 
@@ -438,24 +389,6 @@ public class RBVDR415Test {
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 
-		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
-
-		inspection.setIsRequired(true);
-		inspection.setFullName("Cristian Alexis Segovia Farfan");
-
-		List<ContactDetailDTO> contactDetails = new ArrayList<>();
-		ContactDetailDTO phone = new ContactDetailDTO();
-		phone.setContact(new ContactDTO());
-		phone.getContact().setContactDetailType("PHONE");
-		phone.getContact().setPhoneNumber("98736442");
-		contactDetails.add(phone);
-		ContactDetailDTO email = new ContactDetailDTO();
-		email.setContact(new ContactDTO());
-		email.getContact().setContactDetailType("EMAIL");
-		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
-		contactDetails.add(email);
-		inspection.setContactDetails(contactDetails);
-		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
 
@@ -509,6 +442,7 @@ public class RBVDR415Test {
 		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("ACCOUNT");
 		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("00110130290299972582");
 
+		requestBody.setFirstInstallment(new FirstInstallmentDTO());
 		requestBody.getFirstInstallment().setIsPaymentRequired(true);
 		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
 		inspection.setIsRequired(true);
@@ -575,6 +509,7 @@ public class RBVDR415Test {
 		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("CARD");
 		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("4919108221879326");
 
+		requestBody.setFirstInstallment(new FirstInstallmentDTO());
 		requestBody.getFirstInstallment().setIsPaymentRequired(true);
 		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
 		inspection.setIsRequired(true);

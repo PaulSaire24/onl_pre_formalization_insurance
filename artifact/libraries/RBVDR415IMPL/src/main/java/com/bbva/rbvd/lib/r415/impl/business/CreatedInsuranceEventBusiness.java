@@ -142,7 +142,7 @@ public class CreatedInsuranceEventBusiness {
         plan.setTotalInstallment(totalInstallment);
 
         InstallmentPlansCreatedInsrcEvent installmentPlans = new InstallmentPlansCreatedInsrcEvent();
-        installmentPlans.setPaymentsTotalNumber(requestBody.getInstallmentPlan().getTotalNumberInstallments().intValue());
+        installmentPlans.setPaymentsTotalNumber(getPaymentsTotalNumber(requestBody.getInstallmentPlan().getTotalNumberInstallments()));
         installmentPlans.setPaymentAmount(new PaymentAmountDTO());
         installmentPlans.getPaymentAmount().setAmount(requestBody.getInstallmentPlan().getPaymentAmount().getAmount());
         installmentPlans.getPaymentAmount().setCurrency(requestBody.getInstallmentPlan().getPaymentAmount().getCurrency());
@@ -153,11 +153,21 @@ public class CreatedInsuranceEventBusiness {
         return plan;
     }
 
+    private static int getPaymentsTotalNumber(Long number){
+        if(number != null){
+            return number.intValue();
+        }
+        return 1;
+    }
+
     private static ValidityPeriodDTO getValidityPeriodFromInput(PolicyDTO requestBody) {
-        ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
-        validityPeriodDTO.setStartDate(requestBody.getValidityPeriod().getStartDate());
-        validityPeriodDTO.setEndDate(requestBody.getValidityPeriod().getEndDate());
-        return validityPeriodDTO;
+        if(requestBody.getValidityPeriod() != null){
+            ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
+            validityPeriodDTO.setStartDate(requestBody.getValidityPeriod().getStartDate());
+            validityPeriodDTO.setEndDate(requestBody.getValidityPeriod().getEndDate());
+            return validityPeriodDTO;
+        }
+        return null;
     }
 
     private static HolderDTO getHolderFronInput(PolicyDTO requestBody){

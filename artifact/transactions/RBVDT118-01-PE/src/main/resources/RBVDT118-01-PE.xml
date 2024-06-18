@@ -152,7 +152,7 @@
 					<dto order="1" name="Type" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.policy.CoverageDTO" artifactId="RBVDC201">
 						<parameter order="1" name="id" mandatory="1" type="String" size="10"/>
 						<parameter order="2" name="name" mandatory="1" type="String" size="60"/>
-						<dto order="4" name="insuranceBranch" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.DescriptionDTO" artifactId="RBVDC201">
+						<dto order="3" name="insuranceBranch" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.DescriptionDTO" artifactId="RBVDC201">
 							<parameter order="1" name="id" mandatory="1" type="String" size="10"/>
 							<parameter order="2" name="name" mandatory="1" type="String" size="60"/>
 						</dto>
