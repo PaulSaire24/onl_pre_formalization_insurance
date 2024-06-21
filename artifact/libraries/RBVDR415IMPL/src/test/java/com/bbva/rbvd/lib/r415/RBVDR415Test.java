@@ -18,10 +18,7 @@ import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.PolicyInspectionDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.mock.MockData;
-import com.bbva.rbvd.dto.insrncsale.policy.FirstInstallmentDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.ParticipantTypeDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.*;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import com.bbva.rbvd.lib.r415.factory.ApiConnectorFactoryTest;
@@ -42,6 +39,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestClientException;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -82,8 +80,6 @@ public class RBVDR415Test {
 	private APIConnector internalApiConnectorImpersonation;
 	private Map<String,Object> quotationInfo;
 
-
-
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -117,6 +113,8 @@ public class RBVDR415Test {
 		requestBody.setFirstInstallment(null);
 		requestBody.setIdentityVerificationCode(null);
 		requestBody.setValidityPeriod(null);
+		requestBody.getRelatedContracts().get(0).getContractDetails().setContractType(ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT);
+		requestBody.getRelatedContracts().get(0).getContractDetails().setContractId("00110486000195020403");
 
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_TLMKT_CODE)).thenReturn("7794");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_PIC_CODE)).thenReturn("PC");
@@ -129,6 +127,8 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.EVENT_CHANNEL)).thenReturn("DW");
 		when(applicationConfigurationService.getProperty("DNI")).thenReturn("L");
 		when(applicationConfigurationService.getProperty("PASSPORT")).thenReturn("P");
+		when(applicationConfigurationService.getProperty("list.paymenttype.card")).thenReturn("CREDIT_CARD,DEBIT_CARD,PREPAID_CARD");
+		when(applicationConfigurationService.getProperty("list.paymenttype.account")).thenReturn("SAVINGS_ACCOUNT,CURRENT_ACCOUNT,CTS_ACCOUNT");
 
 		when(pisdR226.executeFindQuotationIfExistInContract(Mockito.anyString())).thenReturn(false);
 
@@ -167,7 +167,7 @@ public class RBVDR415Test {
 	CASO 1: PRODUCTO VIDA LEY CON UNA CUENTA, CLIENTE RUC 20, PLAN 01, 1 REPRESENTANTE LEGAL
 	 */
 	@Test
-	public void executeTestFlowLifeLawCase1(){
+	public void executeTestFlowLifeLawCase1() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
@@ -177,6 +177,8 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
 		//Responsable de pago empresa ruc 20
+		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getPaymentMethod().setPaymentType("SAVINGS_ACCOUNT");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
 		requestBody.getParticipants().get(0).setCustomerId("97165552");
@@ -228,7 +230,7 @@ public class RBVDR415Test {
 	CASO 2: PRODUCTO VIDA LEY CON UNA CUENTA, CLIENTE RUC 20, PLAN 02, 4 REPRESENTANTES LEGALES
 	 */
 	@Test
-	public void executeTestFlowLifeLawCase2(){
+	public void executeTestFlowLifeLawCase2() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
@@ -237,6 +239,8 @@ public class RBVDR415Test {
 				.thenReturn(result);
 
 		//Responsable de pago empresa ruc 20
+		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getPaymentMethod().setPaymentType("SAVINGS_ACCOUNT");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
 		requestBody.getParticipants().get(0).setCustomerId("97165552");
@@ -303,15 +307,16 @@ public class RBVDR415Test {
 	 */
 
 	@Test
-	public void executeTestFlowLifeLawCase3(){
+	public void executeTestFlowLifeLawCase3() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
 
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString())).thenReturn(result);
 
 		//Responsable de pago empresa ruc 20
+		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getPaymentMethod().setPaymentType("CREDIT_CARD");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
 		requestBody.getParticipants().get(0).setCustomerId("97165552");
@@ -321,6 +326,8 @@ public class RBVDR415Test {
 		ParticipantDTO legal2 = mockCreateParticipant("DNI","76110922","89001171","LEGAL_REPRESENTATIVE");
 		requestBody.getParticipants().add(legal1);
 		requestBody.getParticipants().add(legal2);
+
+		requestBody.getRelatedContracts().get(0).getContractDetails().setContractId("4147918224830934");
 
 		//producto vida ley
 		requestBody.getProduct().setId("842");
@@ -363,15 +370,16 @@ public class RBVDR415Test {
 	 */
 
 	@Test
-	public void executeTestFlowLifeLawCase4(){
+	public void executeTestFlowLifeLawCase4() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
 
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString())).thenReturn(result);
 
 		//Responsable de pago empresa ruc 20
+		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getPaymentMethod().setPaymentType("CREDIT_CARD");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
 		requestBody.getParticipants().get(0).setCustomerId("97165552");
@@ -388,6 +396,8 @@ public class RBVDR415Test {
 		requestBody.getParticipants().add(legal4);
 		requestBody.getParticipants().add(legal5);
 
+		requestBody.getRelatedContracts().get(0).getContractDetails().setContractId("4147918224830934");
+
 		//producto vida ley
 		requestBody.getProduct().setId("842");
 
@@ -400,7 +410,6 @@ public class RBVDR415Test {
 
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1,1,1});
-
 
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
@@ -428,7 +437,7 @@ public class RBVDR415Test {
 	CASO 5: PRODUCTO VEHICULAR CON UNA CUENTA, CLIENTE DNI, PLAN 01, CON RESPONSABLE DE PAGO DNI
 	 */
 	@Test
-	public void executeTestFlowVehicularCase5(){
+	public void executeTestFlowVehicularCase5() throws IOException {
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
@@ -437,6 +446,7 @@ public class RBVDR415Test {
 				.thenReturn(result);
 
 		//producto vehicular
+		requestBody = mockData.createRequestPreFormalizationTrx();
 		requestBody.getProduct().setId("830");
 
 		quotationInfo.put("INSURANCE_BUSINESS_NAME","VEHICULAR");
@@ -451,10 +461,6 @@ public class RBVDR415Test {
 
 		//plan 01
 		requestBody.getProduct().getPlan().setId("01");
-
-		//cuenta de cliente
-		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("ACCOUNT");
-		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("00110130290299972582");
 
 		requestBody.setFirstInstallment(new FirstInstallmentDTO());
 		requestBody.getFirstInstallment().setIsPaymentRequired(true);
@@ -491,15 +497,15 @@ public class RBVDR415Test {
 	CASO 6: PRODUCTO VEHICULAR CON UNA TARJETA, CLIENTE PASAPORTE, PLAN 02, CON RESPONSABLE DE PAGO PASAPORTE
 	 */
 	@Test
-	public void executeTestFlowVehicularCase6(){
+	public void executeTestFlowVehicularCase6() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
 
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString())).thenReturn(result);
 
 		//CLIENTE PASAPORTE
+		requestBody = mockData.createRequestPreFormalizationTrx();
 		requestBody.getHolder().getIdentityDocument().getDocumentType().setId("PASSPORT");
 		requestBody.getHolder().getIdentityDocument().setNumber("1000867709");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("PASSPORT");

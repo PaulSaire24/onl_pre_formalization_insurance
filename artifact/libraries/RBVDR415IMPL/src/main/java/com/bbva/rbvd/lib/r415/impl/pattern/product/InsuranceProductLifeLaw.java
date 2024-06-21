@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
 
@@ -41,7 +40,8 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
     public PolicyDTO start(PolicyDTO input, RBVDR602 rbvdr602, ApplicationConfigurationService applicationConfigurationService) {
         PayloadConfig payloadConfig = this.getPreInsuranceProduct().getConfig(input);
 
-        ICR3Request icr3Request = ICR3Business.mapRequestFromPreformalizationBody(input);
+        ICR3Business icr3Business = new ICR3Business(applicationConfigurationService);
+        ICR3Request icr3Request = icr3Business.mapRequestFromPreformalizationBody(input);
         ICR3Response icr3Response = rbvdr602.executePreFormalizationInsurance(icr3Request);
         LOGGER.info("InsuranceProductLifeLaw - start() - icr3Response: {}", icr3Response);
         ValidationUtil.checkHostAdviceErrors(icr3Response);
@@ -83,12 +83,7 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
     }
 
     private boolean filterChannelQuotation(String active, String channels, String channelQuotation){
-        return active.equalsIgnoreCase(ConstantsUtil.S_VALUE) && isListContainsValue(channels, channelQuotation);
-    }
-
-    private boolean isListContainsValue(String propertyInConsole,String value){
-        List<String> listValues = Arrays.asList(propertyInConsole.split(","));
-        return listValues.contains(value);
+        return active.equalsIgnoreCase(ConstantsUtil.S_VALUE) && ValidationUtil.isListContainsValue(channels, channelQuotation);
     }
 
     private void filltOutputTrx(PolicyDTO policyDTO, ICMRYS3 icmrys3, QuotationDAO quotationDAO){

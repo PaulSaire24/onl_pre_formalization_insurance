@@ -1,5 +1,6 @@
 package com.bbva.rbvd.lib.r415.impl.business;
 
+import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
 import com.bbva.rbvd.dto.cicsconnection.icr2.enums.YesNoIndicator;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Request;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
@@ -17,19 +18,23 @@ import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
-import java.util.List;
 
 import static java.util.Objects.nonNull;
 
 public class ICR3Business {
-    private ICR3Business(){}
 
-    public static ICR3Request mapRequestFromPreformalizationBody(PolicyDTO requestBody) {
+    private final ApplicationConfigurationService applicationConfigurationService;
+
+    public ICR3Business(ApplicationConfigurationService applicationConfigurationService) {
+        this.applicationConfigurationService = applicationConfigurationService;
+    }
+
+    public ICR3Request mapRequestFromPreformalizationBody(PolicyDTO requestBody) {
         ICR3Request icr3Request = new ICR3Request();
 
         setBasicDetails(icr3Request, requestBody);
         setPaymentMethodDetails(icr3Request, requestBody.getPaymentMethod());
-        setRelatedContractDetails(icr3Request, requestBody.getRelatedContracts());
+        setRelatedContractDetails(icr3Request, requestBody);
         setHolderDetails(icr3Request, requestBody.getHolder());
         setInstallmentPlanDetails(icr3Request, requestBody.getInstallmentPlan());
         setInsuredAmountDetails(icr3Request, requestBody.getInsuredAmount());
@@ -39,7 +44,7 @@ public class ICR3Business {
         return icr3Request;
     }
 
-    public static void setBasicDetails(ICR3Request icr3Request, PolicyDTO requestBody) {
+    private void setBasicDetails(ICR3Request icr3Request, PolicyDTO requestBody) {
         icr3Request.setNUMPOL(requestBody.getPolicyNumber());
         icr3Request.setCODPRO(requestBody.getProduct().getId());
         icr3Request.setFECINI(getStartDate(requestBody.getValidityPeriod()));
@@ -53,33 +58,46 @@ public class ICR3Business {
         icr3Request.setINDPREF("S");
     }
 
-    private static String getStartDate(ValidityPeriodDTO validityPeriod){
+    private String getStartDate(ValidityPeriodDTO validityPeriod){
         if(validityPeriod != null){
             return ConvertUtil.convertDateToLocalDate(validityPeriod.getStartDate()).toString();
         }
         return null;
     }
 
-    public static void setPaymentMethodDetails(ICR3Request icr3Request, PolicyPaymentMethodDTO paymentMethod) {
+    private void setPaymentMethodDetails(ICR3Request icr3Request, PolicyPaymentMethodDTO paymentMethod) {
         if (nonNull(paymentMethod)) {
             icr3Request.setMTDPGO(paymentMethod.getPaymentType());
             icr3Request.setTFOPAG(paymentMethod.getInstallmentFrequency());
         }
     }
 
-    public static void setRelatedContractDetails(ICR3Request icr3Request, List<RelatedContractDTO> listRelatedContract) {
-        if (!CollectionUtils.isEmpty(listRelatedContract)) {
-            RelatedContractDTO relatedContract = listRelatedContract.get(0);
-            String contractType = relatedContract.getContractDetails().getContractType();
-            icr3Request.setNROCTA(relatedContract.getContractDetails().getNumber());
-            icr3Request.setMEDPAG(relatedContract.getContractDetails().getProductType().getId());
-            icr3Request.setTCONVIN(contractType);
-            icr3Request.setCONVIN(contractType.equals(ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT)
-                    ? relatedContract.getContractDetails().getContractId() : relatedContract.getContractDetails().getNumber());
+    private void setRelatedContractDetails(ICR3Request icr3Request, PolicyDTO requestBody) {
+        if (!CollectionUtils.isEmpty(requestBody.getRelatedContracts())) {
+            RelatedContractDTO relatedContract = ConvertUtil.getRelatedContractByTye(requestBody.getRelatedContracts(), ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT);
+
+            if(relatedContract != null){
+                icr3Request.setNROCTA(relatedContract.getContractDetails().getContractId());
+                icr3Request.setTCONVIN(relatedContract.getContractDetails().getContractType());
+            }
+
+            String listTypeCards = this.applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.LIST_PAYMENT_TYPE_CARD);
+            String listTypeAccounts = this.applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.LIST_PAYMENT_TYPE_ACCOUNT);
+            icr3Request.setMEDPAG(getPaymentMethod(listTypeCards,listTypeAccounts,requestBody.getPaymentMethod().getPaymentType()));
         }
     }
 
-    public static void setHolderDetails(ICR3Request icr3Request, HolderDTO holder) {
+    private String getPaymentMethod(String listTypeCards,String listTypeAccounts,String paymentType){
+        if(ValidationUtil.isListContainsValue(listTypeAccounts,paymentType)) {
+            return ConstantsUtil.RelatedContractType.PRODUCT_TYPE_ID_ACCOUNT;
+        }else if(ValidationUtil.isListContainsValue(listTypeCards,paymentType)){
+            return ConstantsUtil.RelatedContractType.PRODUCT_TYPE_ID_CARD;
+        }else{
+            return null;
+        }
+    }
+
+    private void setHolderDetails(ICR3Request icr3Request, HolderDTO holder) {
         if (nonNull(holder)) {
             icr3Request.setCODASE(holder.getId());
             icr3Request.setTIPDOC(holder.getIdentityDocument().getDocumentType().getId());
@@ -87,7 +105,7 @@ public class ICR3Business {
         }
     }
 
-    public static void setInstallmentPlanDetails(ICR3Request icr3Request, PolicyInstallmentPlanDTO installmentPlan) {
+    private void setInstallmentPlanDetails(ICR3Request icr3Request, PolicyInstallmentPlanDTO installmentPlan) {
         if (nonNull(installmentPlan)) {
             icr3Request.setFECPAG(getPaymentDate(installmentPlan.getStartDate()));
             icr3Request.setNUMCUO(installmentPlan.getTotalNumberInstallments());
@@ -96,21 +114,21 @@ public class ICR3Business {
         }
     }
 
-    private static String getPaymentDate(Date startDate){
+    private String getPaymentDate(Date startDate){
         if(startDate != null){
             return ConvertUtil.convertDateToLocalDate(startDate).toString();
         }
         return null;
     }
 
-    public static void setInsuredAmountDetails(ICR3Request icr3Request, InsuredAmountDTO insuredAmount) {
+    private void setInsuredAmountDetails(ICR3Request icr3Request, InsuredAmountDTO insuredAmount) {
         if (nonNull(insuredAmount)) {
             icr3Request.setSUMASE(ConvertUtil.getBigDecimalValue(insuredAmount.getAmount()));
             icr3Request.setDIVSUM(insuredAmount.getCurrency());
         }
     }
 
-    public static void setParticipantDetails(ICR3Request icr3Request, PolicyDTO requestBody, String role) {
+    private void setParticipantDetails(ICR3Request icr3Request, PolicyDTO requestBody, String role) {
         ParticipantDTO participant = ValidationUtil.filterOneParticipantByType(requestBody.getParticipants(), role);
         if (nonNull(participant)) {
             icr3Request.setPARTIC(role);
@@ -122,7 +140,7 @@ public class ICR3Business {
         }
     }
 
-    public static void setTotalAmountDetails(ICR3Request icr3Request, TotalAmountDTO totalAmount) {
+    private void setTotalAmountDetails(ICR3Request icr3Request, TotalAmountDTO totalAmount) {
         if (nonNull(totalAmount)) {
             icr3Request.setPRITOT(ConvertUtil.getBigDecimalValue(totalAmount.getAmount()));
             icr3Request.setDIVPRI(totalAmount.getCurrency());

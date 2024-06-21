@@ -26,6 +26,7 @@ import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.TotalInstallmentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PaymentPeriodDTO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
+import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -100,10 +101,14 @@ public class CreatedInsuranceEventBusiness {
 
         paymentMethod.setPaymentType(requestBody.getPaymentMethod().getPaymentType());
 
-        RelatedContractDTO relatedContract = new RelatedContractDTO();
-        relatedContract.setContractId(requestBody.getRelatedContracts().get(0).getContractDetails().getContractId());
-        relatedContract.setNumber(requestBody.getRelatedContracts().get(0).getContractDetails().getNumber());
-        paymentMethod.setRelatedContracts(Collections.singletonList(relatedContract));
+        RelatedContractDTO relatedContractBody = ConvertUtil.getRelatedContractByTye(requestBody.getRelatedContracts(), ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT);
+
+        if(relatedContractBody != null){
+            RelatedContractDTO relatedContract = new RelatedContractDTO();
+            relatedContract.setContractId(relatedContract.getContractDetails().getContractId());
+            relatedContract.setNumber(relatedContract.getContractDetails().getContractId());
+            paymentMethod.setRelatedContracts(Collections.singletonList(relatedContract));
+        }
 
         return paymentMethod;
     }

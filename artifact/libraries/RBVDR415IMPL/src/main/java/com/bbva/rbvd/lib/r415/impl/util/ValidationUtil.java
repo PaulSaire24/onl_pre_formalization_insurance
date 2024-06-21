@@ -51,10 +51,15 @@ public class ValidationUtil {
         }
     }
 
-    public static void validateObjectIsNull(Object object, String advideCode, String message) {
+    public static void validateObjectIsNull(Object object, String adviceCode, String message) {
         if (isNull(object)) {
-            throw new BusinessException(advideCode,false,message);
+            throw new BusinessException(adviceCode,false,message);
         }
+
+        if (object instanceof Map && ((Map<?, ?>) object).isEmpty()) {
+            throw new BusinessException(adviceCode, false, message);
+        }
+
     }
 
 
@@ -69,6 +74,11 @@ public class ValidationUtil {
                     RBVDMessageError.QUOTATION_EXIST_IN_CONTRACT.isRollback(),
                     RBVDMessageError.QUOTATION_EXIST_IN_CONTRACT.getMessage());
         }
+    }
+
+    public static boolean isListContainsValue(String propertyInConsole,String value){
+        List<String> listValues = Arrays.asList(propertyInConsole.split(","));
+        return listValues.contains(value);
     }
 
     public static void checkHostAdviceErrors(ICR3Response icr3Response) {

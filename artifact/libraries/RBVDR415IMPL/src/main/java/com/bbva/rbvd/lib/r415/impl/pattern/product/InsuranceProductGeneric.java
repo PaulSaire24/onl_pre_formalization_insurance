@@ -32,7 +32,8 @@ public class InsuranceProductGeneric extends PreFormalizationDecorator {
     public PolicyDTO start(PolicyDTO input, RBVDR602 rbvdr602, ApplicationConfigurationService applicationConfigurationService) {
         PayloadConfig payloadConfig = this.getPreInsuranceProduct().getConfig(input);
 
-        ICR3Request icr3Request = ICR3Business.mapRequestFromPreformalizationBody(input);
+        ICR3Business icr3Business = new ICR3Business(applicationConfigurationService);
+        ICR3Request icr3Request = icr3Business.mapRequestFromPreformalizationBody(input);
         ICR3Response icr3Response = rbvdr602.executePreFormalizationInsurance(icr3Request);
         LOGGER.info("InsuranceProductGeneric - start() - icr3Response: {}", icr3Response);
         ValidationUtil.checkHostAdviceErrors(icr3Response);

@@ -51,6 +51,8 @@ public class ConstantsUtil {
     public static final class RelatedContractType {
         public static final String INTERNAL_CONTRACT = "INTERNAL_CONTRACT";
         public static final String EXTERNAL_CONTRACT = "EXTERNAL_CONTRACT";
+        public static final String PRODUCT_TYPE_ID_ACCOUNT = "ACCOUNT";
+        public static final String PRODUCT_TYPE_ID_CARD = "CARD";
     }
 
     public static final class ApxConsole{
@@ -63,6 +65,8 @@ public class ConstantsUtil {
         public static final String EVENT_CHANNEL = "event.channel.key";
         public static final String FLAG_CALL_EVENT = "flag.callevent.createinsured.for.preemision";
         public static final String FLAG_FILTER_CHANNEL = "flag.filter.channel.quotation.for.preemision";
+        public static final String LIST_PAYMENT_TYPE_ACCOUNT = "list.paymenttype.account";
+        public static final String LIST_PAYMENT_TYPE_CARD = "list.paymenttype.card";
     }
 
     public static final class ContactDetailsType{

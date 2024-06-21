@@ -1,14 +1,18 @@
 
 package com.bbva.rbvd.lib.r415.impl.util;
 
+import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
+import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 public class ConvertUtil {
@@ -65,6 +69,16 @@ public class ConvertUtil {
         }
 
         return ret;
+    }
+
+    public static RelatedContractDTO getRelatedContractByTye(List<RelatedContractDTO> relatedContracts, String contractType){
+        if(!CollectionUtils.isEmpty(relatedContracts)){
+            return relatedContracts.stream()
+                    .filter(relatedContract -> contractType.equals(relatedContract.getContractDetails().getContractType()))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
     }
 
     public static String getRequestJsonFormat(final Object requestBody) {
