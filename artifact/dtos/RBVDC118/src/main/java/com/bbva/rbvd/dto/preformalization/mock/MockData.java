@@ -1,7 +1,6 @@
 package com.bbva.rbvd.dto.preformalization.mock;
 
 
-
 public class MockData {
 
     private static final MockData INSTANCE = new MockData();

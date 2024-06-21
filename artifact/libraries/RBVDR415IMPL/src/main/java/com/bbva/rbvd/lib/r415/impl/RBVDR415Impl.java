@@ -18,7 +18,6 @@ public class RBVDR415Impl extends RBVDR415Abstract {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RBVDR415Impl.class);
 
-
 	@Override
 	public PolicyDTO executeLogicPreFormalization(PolicyDTO requestBody) {
 		try {

@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
 
@@ -59,22 +60,41 @@ public class InsuranceProductLifeLaw extends PreFormalizationDecorator {
 
         this.getPostInsuranceProduct().end(payloadStore);
 
-        //llamar al evento para que avise a DWP que ya se contrató. Solo las cotizaciones que se generaron en dwp hacen este llamado
-        String flagCallEvent = applicationConfigurationService.getDefaultProperty(
-                "flag.callevent.createinsured.for.preemision",ConstantsUtil.N_VALUE);
-        if(flagCallEvent.equalsIgnoreCase(ConstantsUtil.S_VALUE)){
+        /*
+            - Llamar al evento para que avise a DWP que ya se contrató.
+            - Las cotizaciones que se generaron en dwp hacen este llamado (Controlado con flag en consola apx)
+            - flagFilterChannelQuotation = S -> Para activar el filtro de canal desde donde se cotizó
+            - flagCallEvent = S -> Llama al evento
+            - channelCallEvent -> Devuelve los canales que se deben filtrar la cotizacion
+         */
+        String flagFilterChannelQuotation = applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_FILTER_CHANNEL,ConstantsUtil.S_VALUE);
+        String flagCallEvent = applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_CALL_EVENT,ConstantsUtil.N_VALUE);
+        String channelEvent = applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.EVENT_CHANNEL);
+
+        if(filterChannelQuotation(flagFilterChannelQuotation,channelEvent,payloadStore.getQuotationDAO().getSaleChannelId())
+                && flagCallEvent.equalsIgnoreCase(ConstantsUtil.S_VALUE)){
             ConsumeInternalService consumeInternalService = new ConsumeInternalService(this.internalApiConnectorImpersonation);
             Integer httpStatusCode = consumeInternalService.callEventUpsilonToUpdateStatusInDWP(
                     CreatedInsuranceEventBusiness.createRequestCreatedInsuranceEvent(payloadStore.getResposeBody()));
             LOGGER.info("InsuranceProductLifeLaw - start() - callEventUpsilonToUpdateStatusInDWP - httpStatusCode: {}",httpStatusCode);
         }
 
-        return input;
+        return payloadStore.getResposeBody();
+    }
+
+    private boolean filterChannelQuotation(String active, String channels, String channelQuotation){
+        return active.equalsIgnoreCase(ConstantsUtil.S_VALUE) && isListContainsValue(channels, channelQuotation);
+    }
+
+    private boolean isListContainsValue(String propertyInConsole,String value){
+        List<String> listValues = Arrays.asList(propertyInConsole.split(","));
+        return listValues.contains(value);
     }
 
     private void filltOutputTrx(PolicyDTO policyDTO, ICMRYS3 icmrys3, QuotationDAO quotationDAO){
         policyDTO.setId(getContractFrontIcr3Response(icmrys3));
         policyDTO.getProduct().setName(quotationDAO.getInsuranceProductDesc());
+        policyDTO.getProduct().getPlan().setDescription(quotationDAO.getInsuranceModalityName());
         policyDTO.setOperationDate(ConvertUtil.convertStringDateWithTimeFormatToDate(icmrys3.getFECCTR()));
         fillValidityPeriod(policyDTO,icmrys3);
     }

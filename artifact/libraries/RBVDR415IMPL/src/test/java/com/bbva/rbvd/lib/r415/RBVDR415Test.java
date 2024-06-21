@@ -42,7 +42,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestClientException;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -69,7 +68,6 @@ public class RBVDR415Test {
 
 	private PISDR401 pisdR401;
 
-
 	private PISDR601 pisdr601;
 
 	private PISDR226 pisdR226;
@@ -83,6 +81,7 @@ public class RBVDR415Test {
 	private ApplicationConfigurationService applicationConfigurationService;
 	private APIConnector internalApiConnectorImpersonation;
 	private Map<String,Object> quotationInfo;
+
 
 
 	@Before
@@ -125,7 +124,9 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_CONTACT_CENTER_CODE)).thenReturn("CC");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.CHANNEL_CONTACT_DETAIL)).thenReturn("13000013");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_AGENT_PROMOTER_CODE)).thenReturn("UCQGSPPP");
-		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("N");
+		when(applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_FILTER_CHANNEL,ConstantsUtil.S_VALUE)).thenReturn(ConstantsUtil.S_VALUE);
+		when(applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_CALL_EVENT,ConstantsUtil.N_VALUE)).thenReturn(ConstantsUtil.S_VALUE);
+		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.EVENT_CHANNEL)).thenReturn("DW");
 		when(applicationConfigurationService.getProperty("DNI")).thenReturn("L");
 		when(applicationConfigurationService.getProperty("PASSPORT")).thenReturn("P");
 
@@ -139,11 +140,12 @@ public class RBVDR415Test {
 		quotationInfo = new HashMap<>();
 		quotationInfo.put("INSURANCE_BUSINESS_NAME","VIDA");
 		quotationInfo.put("INSURANCE_PRODUCT_ID",new BigDecimal("13"));
-		quotationInfo.put("INSURANCE_PRODUCT_DESC","Seguro Vida Ley");
+		quotationInfo.put("INSURANCE_PRODUCT_DESC","SEGURO VIDA LEY");
 		quotationInfo.put("CONTRACT_DURATION_TYPE","");
 		quotationInfo.put("CONTRACT_DURATION_NUMBER",999);
 		quotationInfo.put("INSURANCE_MODALITY_NAME","PLAN PLATA");
 		quotationInfo.put("INSURANCE_COMPANY_QUOTA_ID","ba3c7d41-65ce-4582-bde2-08f21311fbc9");
+		quotationInfo.put("SALE_CHANNEL_ID","PC");
 		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber()))
 				.thenReturn(quotationInfo);
 
@@ -159,6 +161,7 @@ public class RBVDR415Test {
 
 		when(pisdR226.executeInsertInsuranceContract(Mockito.anyMap())).thenReturn(1);
 	}
+
 
 	/*
 	CASO 1: PRODUCTO VIDA LEY CON UNA CUENTA, CLIENTE RUC 20, PLAN 01, 1 REPRESENTANTE LEGAL
@@ -217,7 +220,7 @@ public class RBVDR415Test {
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
 		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
-		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+		verify(internalApiConnectorImpersonation, never()).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
 
 
@@ -263,7 +266,12 @@ public class RBVDR415Test {
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1,1,1,1,1});
 
-		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
+		quotationInfo.put("SALE_CHANNEL_ID","DW");
+		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber())).thenReturn(quotationInfo);
+
+		when(applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_FILTER_CHANNEL,ConstantsUtil.S_VALUE)).thenReturn(ConstantsUtil.S_VALUE);
+		when(applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_CALL_EVENT,ConstantsUtil.N_VALUE)).thenReturn(ConstantsUtil.S_VALUE);
+		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.EVENT_CHANNEL)).thenReturn("DW");
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
@@ -327,14 +335,10 @@ public class RBVDR415Test {
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1,1,1});
 
-		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
-		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
-				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
-		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
-		requestBody.setSaleChannelId("DW");
+		requestBody.setSaleChannelId("PC");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -350,7 +354,7 @@ public class RBVDR415Test {
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
 		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
-		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+		verify(internalApiConnectorImpersonation, never()).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
 
 
@@ -397,14 +401,10 @@ public class RBVDR415Test {
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1,1,1});
 
-		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
-		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
-				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
-		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
-		requestBody.setSaleChannelId("DW");
+		requestBody.setSaleChannelId("PC");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -420,7 +420,7 @@ public class RBVDR415Test {
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
 		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
-		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+		verify(internalApiConnectorImpersonation, never()).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
 
 
@@ -555,8 +555,6 @@ public class RBVDR415Test {
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
 		verify(internalApiConnectorImpersonation, times(0)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
-
-
 
 
 	//CASOS DE ERROR
