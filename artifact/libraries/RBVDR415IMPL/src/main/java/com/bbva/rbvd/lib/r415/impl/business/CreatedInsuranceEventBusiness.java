@@ -105,8 +105,8 @@ public class CreatedInsuranceEventBusiness {
 
         if(relatedContractBody != null){
             RelatedContractDTO relatedContract = new RelatedContractDTO();
-            relatedContract.setContractId(relatedContract.getContractDetails().getContractId());
-            relatedContract.setNumber(relatedContract.getContractDetails().getContractId());
+            relatedContract.setContractId(relatedContractBody.getContractDetails().getContractId());
+            relatedContract.setNumber(relatedContractBody.getContractDetails().getContractId());
             paymentMethod.setRelatedContracts(Collections.singletonList(relatedContract));
         }
 
