@@ -5,8 +5,6 @@ import com.bbva.apx.exception.business.BusinessException;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
 import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import org.springframework.util.CollectionUtils;
 
@@ -53,22 +51,17 @@ public class ValidationUtil {
         }
     }
 
-    public static void validateObjectIsNull(Object object, String advideCode, String message) {
+    public static void validateObjectIsNull(Object object, String adviceCode, String message) {
         if (isNull(object)) {
-            throw new BusinessException(advideCode,false,message);
+            throw new BusinessException(adviceCode,false,message);
         }
+
+        if (object instanceof Map && ((Map<?, ?>) object).isEmpty()) {
+            throw new BusinessException(adviceCode, false, message);
+        }
+
     }
 
-    public static boolean validateEndorsement(PolicyDTO requestBody) {
-
-        ParticipantDTO participantDTO = ValidationUtil.filterOneParticipantByType(
-                requestBody.getParticipants(), ConstantsUtil.Participant.ENDORSEE);
-
-        return participantDTO != null && participantDTO.getIdentityDocument() != null
-                && participantDTO.getIdentityDocument().getDocumentType().getId() != null
-                && ConstantsUtil.DocumentType.RUC.equals(participantDTO.getIdentityDocument().getDocumentType().getId())
-                && participantDTO.getBenefitPercentage() != null;
-    }
 
     public static boolean mapIsNullOrEmpty(Map<?,?> map){
         return map == null || map.isEmpty();
@@ -83,11 +76,29 @@ public class ValidationUtil {
         }
     }
 
+    public static boolean isListContainsValue(String propertyInConsole,String value){
+        List<String> listValues = Arrays.asList(propertyInConsole.split(","));
+        return listValues.contains(value);
+    }
+
     public static void checkHostAdviceErrors(ICR3Response icr3Response) {
         if(!CollectionUtils.isEmpty(icr3Response.getHostAdviceCode())){
             HostAdvice firstAdviceError = icr3Response.getHostAdviceCode().get(0);
             throw new BusinessException(firstAdviceError.getCode(),false,firstAdviceError.getDescription());
         }
+    }
+
+    public static boolean allValuesNotNullOrEmpty(List<Object> values) {
+        for (Object value : values) {
+            if (value == null) {
+                return false;
+            }
+
+            if (value instanceof String && ((String) value).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

@@ -11,6 +11,7 @@ public class QuotationDAO {
     private BigDecimal contractDurationNumber;
     private String insuranceModalityName;
     private String insuranceCompanyQuotaId;
+    private String saleChannelId;
 
 
     public String getInsuranceBusinessName() {
@@ -69,6 +70,14 @@ public class QuotationDAO {
         this.insuranceCompanyQuotaId = insuranceCompanyQuotaId;
     }
 
+    public String getSaleChannelId() {
+        return saleChannelId;
+    }
+
+    public void setSaleChannelId(String saleChannelId) {
+        this.saleChannelId = saleChannelId;
+    }
+
     @Override
     public String toString() {
         return "QuotationDAO{" +
@@ -79,6 +88,7 @@ public class QuotationDAO {
                 ", contractDurationNumber=" + contractDurationNumber +
                 ", insuranceModalityName='" + insuranceModalityName + '\'' +
                 ", insuranceCompanyQuotaId='" + insuranceCompanyQuotaId + '\'' +
+                ", saleChannelId='" + saleChannelId + '\'' +
                 '}';
     }
 }

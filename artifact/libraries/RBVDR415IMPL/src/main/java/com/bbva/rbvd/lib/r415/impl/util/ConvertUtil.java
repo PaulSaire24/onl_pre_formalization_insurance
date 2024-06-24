@@ -1,15 +1,18 @@
 
 package com.bbva.rbvd.lib.r415.impl.util;
 
+import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
+import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 public class ConvertUtil {
@@ -44,16 +47,10 @@ public class ConvertUtil {
         return Date.from(localDate.atStartOfDay(TimeZone.getTimeZone("GMT").toZoneId()).toInstant());
     }
 
-    public static Calendar convertDateToCalendar(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar;
-    }
 
     public static LocalDate convertDateToLocalDate(Date date) {
         return new LocalDate(date, DateTimeZone.forID("GMT"));
     }
-
 
     public static BigDecimal getBigDecimalValue(Object value){
         BigDecimal ret = null;
@@ -63,7 +60,7 @@ public class ConvertUtil {
             }else if(value instanceof String){
                 ret = new BigDecimal((String) value);
             }else if(value instanceof Double){
-                ret = BigDecimal.valueOf(((Double) value).doubleValue());
+                ret = BigDecimal.valueOf(((Double) value));
             }else if(value instanceof Integer){
                 ret = BigDecimal.valueOf((Integer) value);
             }else if(value instanceof Long){
@@ -72,6 +69,16 @@ public class ConvertUtil {
         }
 
         return ret;
+    }
+
+    public static RelatedContractDTO getRelatedContractByTye(List<RelatedContractDTO> relatedContracts, String contractType){
+        if(!CollectionUtils.isEmpty(relatedContracts)){
+            return relatedContracts.stream()
+                    .filter(relatedContract -> contractType.equals(relatedContract.getContractDetails().getContractType()))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
     }
 
     public static String getRequestJsonFormat(final Object requestBody) {

@@ -10,7 +10,6 @@ public class PayloadStore {
 
     private PolicyDTO resposeBody;
     private QuotationDAO quotationDAO;
-    private boolean isEndorsement;
     private ICR3Response icr3Response;
     private BigDecimal paymentFrequencyId;
     private String paymentFrequencyName;
@@ -29,14 +28,6 @@ public class PayloadStore {
 
     public void setQuotationDAO(QuotationDAO quotationDAO) {
         this.quotationDAO = quotationDAO;
-    }
-
-    public boolean getIsEndorsement() {
-        return isEndorsement;
-    }
-
-    public void setEndorsement(boolean endorsement) {
-        isEndorsement = endorsement;
     }
 
     public ICR3Response getIcr3Response() {
@@ -68,7 +59,6 @@ public class PayloadStore {
         return "PayloadStore{" +
                 "resposeBody=" + resposeBody +
                 ", quotationDAO=" + quotationDAO +
-                ", isEndorsement=" + isEndorsement +
                 ", icr3Response=" + icr3Response +
                 ", paymentFrequencyId=" + paymentFrequencyId +
                 ", paymentFrequencyName='" + paymentFrequencyName + '\'' +

@@ -1,7 +1,6 @@
 package com.bbva.rbvd.lib.r415.impl.transform.bean;
 
 import com.bbva.elara.configuration.manager.application.ApplicationConfigurationService;
-import com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO;
 import com.bbva.rbvd.dto.insrncsale.dao.IsrcContractParticipantDAO;
 import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
@@ -14,7 +13,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -30,10 +28,6 @@ public class ParticipantBean {
         ParticipantDTO paymentManager = requestBody.getParticipants().get(0);
         List<ParticipantDTO> legalRepre = ValidationUtil.filterListParticipantsByType(requestBody.getParticipants(),
                 ConstantsUtil.Participant.LEGAL_REPRESENTATIVE);
-        List<ParticipantDTO> beneficiary = ValidationUtil.filterListParticipantsByType(requestBody.getParticipants(),
-                ConstantsUtil.Participant.BENEFICIARY);
-        List<ParticipantDTO> insured = ValidationUtil.filterListParticipantsByType(requestBody.getParticipants(),
-                ConstantsUtil.Participant.INSURED);
 
         List<BigDecimal> participantRoles = rolesFromDB.stream()
                         .map(rol -> ConvertUtil.getBigDecimalValue(rol.get(RBVDProperties.FIELD_PARTICIPANT_ROLE_ID.getValue())))
@@ -41,7 +35,6 @@ public class ParticipantBean {
         BigDecimal partyOrderNumber = BigDecimal.valueOf(1L);
 
         removeRolesIfPresent(participantRoles, legalRepre, ConstantsUtil.Number.TRES);
-        removeRolesIfPresent(participantRoles, insured, ConstantsUtil.Number.DOS);
 
         BigDecimal finalPartyOrderNumber = partyOrderNumber;
         List<IsrcContractParticipantDAO> listParticipants = participantRoles.stream()
@@ -58,25 +51,6 @@ public class ParticipantBean {
             }
         }
 
-        if(insured != null){
-            for (ParticipantDTO ins : insured) {
-                listParticipants.add(
-                        createBasicParticipantDao(contractId,
-                                ConvertUtil.getBigDecimalValue(ConstantsUtil.Number.DOS),partyOrderNumber,
-                                ins,requestBody));
-                partyOrderNumber = partyOrderNumber.add(BigDecimal.valueOf(1L));
-            }
-        }
-
-        if(!CollectionUtils.isEmpty(beneficiary)){
-            for(ParticipantDTO benef : beneficiary){
-                listParticipants.add(createParticipantBeneficiaryDao(contractId,
-                        ConvertUtil.getBigDecimalValue(ConstantsUtil.Number.DOS),
-                        benef,requestBody,partyOrderNumber));
-                partyOrderNumber = partyOrderNumber.add(BigDecimal.valueOf(1L));
-            }
-        }
-
         return listParticipants;
     }
 
@@ -86,30 +60,6 @@ public class ParticipantBean {
         }
     }
 
-    private IsrcContractParticipantDAO createParticipantBeneficiaryDao(String id, BigDecimal rol,
-                                                                             ParticipantDTO participant,
-                                                                              PolicyDTO requestBody,
-                                                                             BigDecimal partyOrderNumber) {
-
-        IsrcContractParticipantDAO participantDao = createBasicParticipantDao(id,rol,partyOrderNumber,participant,requestBody);
-
-        participantDao.setCustomerRelationshipType(participant.getRelationship().getId());
-        participantDao.setRefundPer(participant.getBenefitPercentage());
-        participantDao.setInsuredCustomerName(participant.getFullName());
-        participantDao.setFirstLastName(participant.getLastName());
-        participantDao.setSecondLastName(participant.getSecondLastName());
-
-        Optional<ContactDetailDTO> phoneContact = participant.getContactDetails().stream()
-                .filter(phone -> "PHONE".equals(phone.getContact().getContactDetailType())).findFirst();
-        Optional<ContactDetailDTO> emailContact = participant.getContactDetails().stream()
-                .filter(email -> "EMAIL".equals(email.getContact().getContactDetailType())).findFirst();
-        participantDao.setContactEmailDesc(
-                emailContact.map(contactDetailDTO -> contactDetailDTO.getContact().getAddress()).orElse(null));
-        participantDao.setPhoneId(
-                phoneContact.map(contactDetailDTO -> contactDetailDTO.getContact().getPhoneNumber()).orElse(null));
-
-        return participantDao;
-    }
 
     private IsrcContractParticipantDAO createBasicParticipantDao(String contractId, BigDecimal rol,
                                                                    BigDecimal partyOrderNumber, ParticipantDTO participant,

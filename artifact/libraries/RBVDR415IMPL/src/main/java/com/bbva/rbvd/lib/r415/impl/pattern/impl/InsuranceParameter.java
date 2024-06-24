@@ -7,19 +7,13 @@ import com.bbva.pisd.lib.r601.PISDR601;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 import com.bbva.rbvd.dto.preformalization.transfer.PayloadConfig;
-import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import com.bbva.rbvd.lib.r415.impl.pattern.PreInsuranceProduct;
 import com.bbva.rbvd.lib.r415.impl.service.dao.IQuotationDAO;
 import com.bbva.rbvd.lib.r415.impl.service.dao.impl.QuotationDAOImpl;
 import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
 
 public class InsuranceParameter implements PreInsuranceProduct {
 
@@ -42,8 +36,6 @@ public class InsuranceParameter implements PreInsuranceProduct {
         validateIfQuotationExistInContract(input.getQuotationNumber());
         LOGGER.info("InsuranceParameter - getConfig() - quotation not exist in contract");
 
-        evaluateIfPaymentIsRequired(input);
-
         QuotationDAO quotationDetail = getQuotationDetails(input.getQuotationNumber());
         LOGGER.info("InsuranceParameter - getConfig() - quotationDetail: {}",quotationDetail);
 
@@ -60,19 +52,6 @@ public class InsuranceParameter implements PreInsuranceProduct {
     private void validateIfQuotationExistInContract(String quotationId){
         boolean validateExist = this.pisdr226.executeFindQuotationIfExistInContract(quotationId);
         ValidationUtil.validateQuotationExistsInContract(validateExist);
-    }
-
-    private void evaluateIfPaymentIsRequired(PolicyDTO requestBody) {
-        DateTimeZone dateTimeZone = DateTimeZone.forID(ConstantsUtil.TimeZone.LIMA_TIME_ZONE);
-
-        DateTime currentLocalDate = new DateTime(new Date(), dateTimeZone);
-        Date currentDate = currentLocalDate.toDate();
-
-        dateTimeZone = DateTimeZone.forID(ConstantsUtil.TimeZone.GMT_TIME_ZONE);
-        LocalDate startLocalDate = new LocalDate(requestBody.getValidityPeriod().getStartDate(), dateTimeZone);
-        Date startDate = startLocalDate.toDateTimeAtStartOfDay().toDate();
-
-        requestBody.getFirstInstallment().setIsPaymentRequired(!startDate.after(currentDate));
     }
 
     private QuotationDAO getQuotationDetails(String quotationNumber){

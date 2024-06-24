@@ -1,6 +1,8 @@
 package com.bbva.rbvd.lib.r415.impl.transform.bean;
 
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICMRYS3;
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.FirstInstallmentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import com.bbva.rbvd.dto.preformalization.dao.ContractDAO;
@@ -42,35 +44,32 @@ public class ContractBean {
         contractDao.setDomicileContractId(getDomicileContractId(response.getRelatedContracts()));
         contractDao.setIssuedReceiptNumber(BigDecimal.ZERO);
         contractDao.setPaymentFrequencyId(payloadStore.getPaymentFrequencyId());
-        contractDao.setPremiumAmount(ConvertUtil.getBigDecimalValue(response.getFirstInstallment().getPaymentAmount().getAmount()));
+        contractDao.setPremiumAmount(ConvertUtil.getBigDecimalValue(response.getInstallmentPlan().getPaymentAmount().getAmount()));
         contractDao.setSettlePendingPremiumAmount(ConvertUtil.getBigDecimalValue(response.getTotalAmount().getAmount()));
         contractDao.setCurrencyId(response.getInstallmentPlan().getPaymentAmount().getCurrency());
         contractDao.setInstallmentPeriodFinalDate(currentDate);
         contractDao.setInsuredAmount(ConvertUtil.getBigDecimalValue(response.getInsuredAmount().getAmount()));
         contractDao.setCtrctDisputeStatusType(response.getSaleChannelId());
-        contractDao.setEndorsementPolicyIndType((payloadStore.getIsEndorsement()) ? ConstantsUtil.S_VALUE : ConstantsUtil.N_VALUE);
+        contractDao.setEndorsementPolicyIndType(ConstantsUtil.N_VALUE);
         contractDao.setInsrncCoContractStatusType(ConstantsUtil.StatusContract.PENDIENTE.getValue());
         contractDao.setContractStatusId(ConstantsUtil.StatusContract.PENDIENTE.getValue());
         contractDao.setCreationUserId(response.getCreationUser());
         contractDao.setUserAuditId(response.getUserAudit());
-        contractDao.setInsurPendingDebtIndType((response.getFirstInstallment().getIsPaymentRequired())
-                ? ConstantsUtil.N_VALUE : ConstantsUtil.S_VALUE);
         contractDao.setContractManagerBranchId(response.getBank().getBranch().getId());
         contractDao.setContractInceptionDate(currentDate);
         contractDao.setSettlementFixPremiumAmount(ConvertUtil.getBigDecimalValue(response.getTotalAmount().getAmount()));
         contractDao.setBiometryTransactionId(response.getIdentityVerificationCode());
         contractDao.setEndLinkageDate(ConvertUtil.generateCorrectDateFormat(
                 ConvertUtil.convertDateToLocalDate(response.getInstallmentPlan().getMaturityDate())));
-        contractDao.setInsuranceContractStartDate(ConvertUtil.generateCorrectDateFormat(
-                ConvertUtil.convertDateToLocalDate(response.getValidityPeriod().getStartDate())));
+        contractDao.setInsuranceContractStartDate(getContractStarDate(response.getValidityPeriod()));
         contractDao.setValidityMonthsNumber(quotationDAO.getContractDurationType().equals("A")
                 ? quotationDAO.getContractDurationNumber().multiply(BigDecimal.valueOf(12))
                 : quotationDAO.getContractDurationNumber());
-        contractDao.setTotalDebtAmount((response.getFirstInstallment().getIsPaymentRequired())
-                ? BigDecimal.ZERO : ConvertUtil.getBigDecimalValue(response.getFirstInstallment().getPaymentAmount().getAmount()));
+
         contractDao.setAutomaticDebitIndicatorType((response.getPaymentMethod().getPaymentType().equals(ConstantsUtil.PAYMENT_METHOD_VALUE))
                 ? ConstantsUtil.S_VALUE : ConstantsUtil.N_VALUE);
 
+        setFieldsFromFirstInstallment(response.getFirstInstallment(),contractDao);
 
         if (nonNull(response.getBusinessAgent())) {
             contractDao.setInsuranceManagerId(response.getBusinessAgent().getId());
@@ -80,25 +79,40 @@ public class ContractBean {
             contractDao.setInsurancePromoterId(response.getPromoter().getId());
         }
 
-        contractDao.setPrevPendBillRcptsNumber(getPrevPendBillRcptsNumber(response, quotationDAO));
+        contractDao.setPrevPendBillRcptsNumber(getPrevPendBillRcptsNumber(response));
 
         return contractDao;
     }
 
-    private static String getDomicileContractId(List<RelatedContractDTO> relatedContractList){
-        if(CollectionUtils.isEmpty(relatedContractList)) return null;
-        return relatedContractList.get(0).getContractDetails().getNumber();
+    private static void setFieldsFromFirstInstallment(FirstInstallmentDTO firstInstallment,ContractDAO contractDao){
+        if(firstInstallment != null){
+            contractDao.setInsurPendingDebtIndType((firstInstallment.getIsPaymentRequired()) ? ConstantsUtil.N_VALUE : ConstantsUtil.S_VALUE);
+            contractDao.setTotalDebtAmount((firstInstallment.getIsPaymentRequired()) ? BigDecimal.ZERO : ConvertUtil.getBigDecimalValue(firstInstallment.getPaymentAmount().getAmount()));
+        }else{
+            contractDao.setInsurPendingDebtIndType(null);
+            contractDao.setTotalDebtAmount(null);
+        }
     }
 
-    private static BigDecimal getPrevPendBillRcptsNumber(PolicyDTO preformalizationBody, QuotationDAO quotationDAO) {
+    private static String getContractStarDate(ValidityPeriodDTO validityPeriod){
+        if(validityPeriod != null){
+            return ConvertUtil.generateCorrectDateFormat(ConvertUtil.convertDateToLocalDate(validityPeriod.getStartDate()));
+        }
+        return null;
+    }
 
-        BigDecimal prevPendBillRcptsNumber;
-        boolean isPaymentRequired = preformalizationBody.getFirstInstallment().getIsPaymentRequired();
-        Long totalNumberInstallments = preformalizationBody.getInstallmentPlan().getTotalNumberInstallments();
+    private static String getDomicileContractId(List<RelatedContractDTO> relatedContractList){
+        if(CollectionUtils.isEmpty(relatedContractList)) return null;
+        RelatedContractDTO relatedContract = ConvertUtil.getRelatedContractByTye(relatedContractList, ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT);
+        return relatedContract != null ? relatedContract.getContractDetails().getContractId() : null;
+    }
 
-        if ("VIDA".equals(quotationDAO.getInsuranceBusinessName())) {
-            prevPendBillRcptsNumber = quotationDAO.getContractDurationNumber();
-        } else {
+    private static BigDecimal getPrevPendBillRcptsNumber(PolicyDTO requestBody) {
+        BigDecimal prevPendBillRcptsNumber = BigDecimal.ZERO;
+        Long totalNumberInstallments = requestBody.getInstallmentPlan().getTotalNumberInstallments();
+
+        if(requestBody.getFirstInstallment() != null && totalNumberInstallments != null){
+            boolean isPaymentRequired = requestBody.getFirstInstallment().getIsPaymentRequired();
             prevPendBillRcptsNumber = BigDecimal.valueOf(isPaymentRequired ? totalNumberInstallments - 1 : totalNumberInstallments);
         }
 

@@ -7,11 +7,10 @@ public class ConstantsUtil {
 
 
     public static class Participant {
-        public static final String ENDORSEE = "ENDORSEE";
         public static final String PAYMENT_MANAGER = "PAYMENT_MANAGER";
-        public static final String INSURED = "INSURED";
+
         public static final String LEGAL_REPRESENTATIVE = "LEGAL_REPRESENTATIVE";
-        public static final String BENEFICIARY = "BENEFICIARY";
+
     }
 
     public static final class DocumentType {
@@ -52,6 +51,8 @@ public class ConstantsUtil {
     public static final class RelatedContractType {
         public static final String INTERNAL_CONTRACT = "INTERNAL_CONTRACT";
         public static final String EXTERNAL_CONTRACT = "EXTERNAL_CONTRACT";
+        public static final String PRODUCT_TYPE_ID_ACCOUNT = "ACCOUNT";
+        public static final String PRODUCT_TYPE_ID_CARD = "CARD";
     }
 
     public static final class ApxConsole{
@@ -61,6 +62,11 @@ public class ConstantsUtil {
         public static final String KEY_AGENT_PROMOTER_CODE = "agent.and.promoter.code";
         public static final String CHANNEL_GLOMO = "pisd.channel.glomo.aap";
         public static final String CHANNEL_CONTACT_DETAIL = "pisd.channel.contact.detail.aap";
+        public static final String EVENT_CHANNEL = "event.channel.key";
+        public static final String FLAG_CALL_EVENT = "flag.callevent.createinsured.for.preemision";
+        public static final String FLAG_FILTER_CHANNEL = "flag.filter.channel.quotation.for.preemision";
+        public static final String LIST_PAYMENT_TYPE_ACCOUNT = "list.paymenttype.account";
+        public static final String LIST_PAYMENT_TYPE_CARD = "list.paymenttype.card";
     }
 
     public static final class ContactDetailsType{
@@ -72,6 +78,6 @@ public class ConstantsUtil {
     public static final String N_VALUE = "N";
     public static final String PAYMENT_METHOD_VALUE = "DIRECT_DEBIT";
     public static final String ID_PUT_EVENT_UPSILON_SERVICE = "createdInsurancePutEvent";
-    public static final String EVENT_CHANNEL = "event.channel.key";
+
 
 }

@@ -13,15 +13,12 @@ import com.bbva.pisd.lib.r601.PISDR601;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICMRYS3;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
 import com.bbva.rbvd.dto.cicsconnection.utils.HostAdvice;
-import com.bbva.rbvd.dto.insrncsale.commons.ContactDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.PolicyInspectionDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.PolicyInspectionDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.mock.MockData;
-import com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.ParticipantTypeDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
+import com.bbva.rbvd.dto.insrncsale.policy.*;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.dto.preformalization.util.RBVDMessageError;
 import com.bbva.rbvd.lib.r415.factory.ApiConnectorFactoryTest;
@@ -44,13 +41,7 @@ import org.springframework.web.client.RestClientException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Arrays;
-
+import java.util.*;
 
 import static com.bbva.pisd.dto.insurance.utils.PISDConstants.CHANNEL_GLOMO;
 import static org.junit.Assert.*;
@@ -75,7 +66,6 @@ public class RBVDR415Test {
 
 	private PISDR401 pisdR401;
 
-
 	private PISDR601 pisdr601;
 
 	private PISDR226 pisdR226;
@@ -89,7 +79,6 @@ public class RBVDR415Test {
 	private ApplicationConfigurationService applicationConfigurationService;
 	private APIConnector internalApiConnectorImpersonation;
 	private Map<String,Object> quotationInfo;
-
 
 	@Before
 	public void setUp() throws Exception {
@@ -119,6 +108,13 @@ public class RBVDR415Test {
 		mockData = MockData.getInstance();
 
 		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getInstallmentPlan().setStartDate(null);
+		requestBody.getInstallmentPlan().setTotalNumberInstallments(null);
+		requestBody.setFirstInstallment(null);
+		requestBody.setIdentityVerificationCode(null);
+		requestBody.setValidityPeriod(null);
+		requestBody.getRelatedContracts().get(0).getContractDetails().setContractType(ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT);
+		requestBody.getRelatedContracts().get(0).getContractDetails().setContractId("00110486000195020403");
 
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_TLMKT_CODE)).thenReturn("7794");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_PIC_CODE)).thenReturn("PC");
@@ -126,9 +122,13 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_CONTACT_CENTER_CODE)).thenReturn("CC");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.CHANNEL_CONTACT_DETAIL)).thenReturn("13000013");
 		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_AGENT_PROMOTER_CODE)).thenReturn("UCQGSPPP");
-		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("N");
+		when(applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_FILTER_CHANNEL,ConstantsUtil.S_VALUE)).thenReturn(ConstantsUtil.S_VALUE);
+		when(applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_CALL_EVENT,ConstantsUtil.N_VALUE)).thenReturn(ConstantsUtil.S_VALUE);
+		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.EVENT_CHANNEL)).thenReturn("DW");
 		when(applicationConfigurationService.getProperty("DNI")).thenReturn("L");
 		when(applicationConfigurationService.getProperty("PASSPORT")).thenReturn("P");
+		when(applicationConfigurationService.getProperty("list.paymenttype.card")).thenReturn("CREDIT_CARD,DEBIT_CARD,PREPAID_CARD");
+		when(applicationConfigurationService.getProperty("list.paymenttype.account")).thenReturn("SAVINGS_ACCOUNT,CURRENT_ACCOUNT,CTS_ACCOUNT");
 
 		when(pisdR226.executeFindQuotationIfExistInContract(Mockito.anyString())).thenReturn(false);
 
@@ -139,12 +139,13 @@ public class RBVDR415Test {
 
 		quotationInfo = new HashMap<>();
 		quotationInfo.put("INSURANCE_BUSINESS_NAME","VIDA");
-		quotationInfo.put("INSURANCE_PRODUCT_ID",13);
-		quotationInfo.put("INSURANCE_PRODUCT_DESC","Seguro Vida Ley");
+		quotationInfo.put("INSURANCE_PRODUCT_ID",new BigDecimal("13"));
+		quotationInfo.put("INSURANCE_PRODUCT_DESC","SEGURO VIDA LEY");
 		quotationInfo.put("CONTRACT_DURATION_TYPE","");
 		quotationInfo.put("CONTRACT_DURATION_NUMBER",999);
 		quotationInfo.put("INSURANCE_MODALITY_NAME","PLAN PLATA");
 		quotationInfo.put("INSURANCE_COMPANY_QUOTA_ID","ba3c7d41-65ce-4582-bde2-08f21311fbc9");
+		quotationInfo.put("SALE_CHANNEL_ID","PC");
 		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber()))
 				.thenReturn(quotationInfo);
 
@@ -161,11 +162,12 @@ public class RBVDR415Test {
 		when(pisdR226.executeInsertInsuranceContract(Mockito.anyMap())).thenReturn(1);
 	}
 
+
 	/*
 	CASO 1: PRODUCTO VIDA LEY CON UNA CUENTA, CLIENTE RUC 20, PLAN 01, 1 REPRESENTANTE LEGAL
 	 */
 	@Test
-	public void executeTestFlowLifeLawCase1(){
+	public void executeTestFlowLifeLawCase1() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
@@ -175,6 +177,8 @@ public class RBVDR415Test {
 		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
 		//Responsable de pago empresa ruc 20
+		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getPaymentMethod().setPaymentType("SAVINGS_ACCOUNT");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
 		requestBody.getParticipants().get(0).setCustomerId("97165552");
@@ -200,24 +204,6 @@ public class RBVDR415Test {
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 
-		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
-
-		inspection.setIsRequired(true);
-		inspection.setFullName("Cristian Alexis Segovia Farfan");
-
-		List<ContactDetailDTO> contactDetails = new ArrayList<>();
-		ContactDetailDTO phone = new ContactDetailDTO();
-		phone.setContact(new ContactDTO());
-		phone.getContact().setContactDetailType("PHONE");
-		phone.getContact().setPhoneNumber("98736442");
-		contactDetails.add(phone);
-		ContactDetailDTO email = new ContactDetailDTO();
-		email.setContact(new ContactDTO());
-		email.getContact().setContactDetailType("EMAIL");
-		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
-		contactDetails.add(email);
-		inspection.setContactDetails(contactDetails);
-		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
 		requestBody.setSaleChannelId("DW");
@@ -236,7 +222,7 @@ public class RBVDR415Test {
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
 		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
-		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+		verify(internalApiConnectorImpersonation, never()).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
 
 
@@ -244,7 +230,7 @@ public class RBVDR415Test {
 	CASO 2: PRODUCTO VIDA LEY CON UNA CUENTA, CLIENTE RUC 20, PLAN 02, 4 REPRESENTANTES LEGALES
 	 */
 	@Test
-	public void executeTestFlowLifeLawCase2(){
+	public void executeTestFlowLifeLawCase2() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
@@ -253,6 +239,8 @@ public class RBVDR415Test {
 				.thenReturn(result);
 
 		//Responsable de pago empresa ruc 20
+		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getPaymentMethod().setPaymentType("SAVINGS_ACCOUNT");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
 		requestBody.getParticipants().get(0).setCustomerId("97165552");
@@ -270,39 +258,28 @@ public class RBVDR415Test {
 		//producto vida ley
 		requestBody.getProduct().setId("842");
 
-		//plan 01
+		//plan 02
 		requestBody.getProduct().getPlan().setId("02");
 
 		//cuenta de cliente
 		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("ACCOUNT");
 		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("00110130260299972507");
 
+		requestBody.getInstallmentPlan().setTotalNumberInstallments(1L);
+
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1,1,1,1,1});
 
-		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
+		quotationInfo.put("SALE_CHANNEL_ID","DW");
+		when(pisdr601.executeFindQuotationDetailForPreEmision(requestBody.getQuotationNumber())).thenReturn(quotationInfo);
+
+		when(applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_FILTER_CHANNEL,ConstantsUtil.S_VALUE)).thenReturn(ConstantsUtil.S_VALUE);
+		when(applicationConfigurationService.getDefaultProperty(ConstantsUtil.ApxConsole.FLAG_CALL_EVENT,ConstantsUtil.N_VALUE)).thenReturn(ConstantsUtil.S_VALUE);
+		when(applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.EVENT_CHANNEL)).thenReturn("DW");
 		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
 				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
-		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
-
-		inspection.setIsRequired(true);
-		inspection.setFullName("Cristian Alexis Segovia Farfan");
-
-		List<ContactDetailDTO> contactDetails = new ArrayList<>();
-		ContactDetailDTO phone = new ContactDetailDTO();
-		phone.setContact(new ContactDTO());
-		phone.getContact().setContactDetailType("PHONE");
-		phone.getContact().setPhoneNumber("98736442");
-		contactDetails.add(phone);
-		ContactDetailDTO email = new ContactDetailDTO();
-		email.setContact(new ContactDTO());
-		email.getContact().setContactDetailType("EMAIL");
-		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
-		contactDetails.add(email);
-		inspection.setContactDetails(contactDetails);
-		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
 		requestBody.setSaleChannelId("DW");
@@ -330,15 +307,16 @@ public class RBVDR415Test {
 	 */
 
 	@Test
-	public void executeTestFlowLifeLawCase3(){
+	public void executeTestFlowLifeLawCase3() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
 
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString())).thenReturn(result);
 
 		//Responsable de pago empresa ruc 20
+		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getPaymentMethod().setPaymentType("CREDIT_CARD");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
 		requestBody.getParticipants().get(0).setCustomerId("97165552");
@@ -348,6 +326,8 @@ public class RBVDR415Test {
 		ParticipantDTO legal2 = mockCreateParticipant("DNI","76110922","89001171","LEGAL_REPRESENTATIVE");
 		requestBody.getParticipants().add(legal1);
 		requestBody.getParticipants().add(legal2);
+
+		requestBody.getRelatedContracts().get(0).getContractDetails().setContractId("4147918224830934");
 
 		//producto vida ley
 		requestBody.getProduct().setId("842");
@@ -362,32 +342,10 @@ public class RBVDR415Test {
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1,1,1});
 
-		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
-		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
-				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
-		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
 
-		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
-
-		inspection.setIsRequired(true);
-		inspection.setFullName("Cristian Alexis Segovia Farfan");
-
-		List<ContactDetailDTO> contactDetails = new ArrayList<>();
-		ContactDetailDTO phone = new ContactDetailDTO();
-		phone.setContact(new ContactDTO());
-		phone.getContact().setContactDetailType("PHONE");
-		phone.getContact().setPhoneNumber("98736442");
-		contactDetails.add(phone);
-		ContactDetailDTO email = new ContactDetailDTO();
-		email.setContact(new ContactDTO());
-		email.getContact().setContactDetailType("EMAIL");
-		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
-		contactDetails.add(email);
-		inspection.setContactDetails(contactDetails);
-		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
-		requestBody.setSaleChannelId("DW");
+		requestBody.setSaleChannelId("PC");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -403,7 +361,7 @@ public class RBVDR415Test {
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
 		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
-		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+		verify(internalApiConnectorImpersonation, never()).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
 
 
@@ -412,15 +370,16 @@ public class RBVDR415Test {
 	 */
 
 	@Test
-	public void executeTestFlowLifeLawCase4(){
+	public void executeTestFlowLifeLawCase4() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,3,7));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
 
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString())).thenReturn(result);
 
 		//Responsable de pago empresa ruc 20
+		requestBody = mockData.createRequestPreFormalizationTrx();
+		requestBody.getPaymentMethod().setPaymentType("CREDIT_CARD");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("RUC");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("20479438413");
 		requestBody.getParticipants().get(0).setCustomerId("97165552");
@@ -437,6 +396,8 @@ public class RBVDR415Test {
 		requestBody.getParticipants().add(legal4);
 		requestBody.getParticipants().add(legal5);
 
+		requestBody.getRelatedContracts().get(0).getContractDetails().setContractId("4147918224830934");
+
 		//producto vida ley
 		requestBody.getProduct().setId("842");
 
@@ -450,32 +411,9 @@ public class RBVDR415Test {
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1,1,1});
 
-		when(applicationConfigurationService.getDefaultProperty("flag.callevent.createinsured.for.preemision","N")).thenReturn("S");
-		when(this.internalApiConnectorImpersonation.exchange(anyString(), any(HttpMethod.class), anyObject(),
-				(Class<Integer>)any())).thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
-		when(applicationConfigurationService.getProperty("event.channel.key")).thenReturn("DW");
-
-		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
-
-		inspection.setIsRequired(true);
-		inspection.setFullName("Cristian Alexis Segovia Farfan");
-
-		List<ContactDetailDTO> contactDetails = new ArrayList<>();
-		ContactDetailDTO phone = new ContactDetailDTO();
-		phone.setContact(new ContactDTO());
-		phone.getContact().setContactDetailType("PHONE");
-		phone.getContact().setPhoneNumber("98736442");
-		contactDetails.add(phone);
-		ContactDetailDTO email = new ContactDetailDTO();
-		email.setContact(new ContactDTO());
-		email.getContact().setContactDetailType("EMAIL");
-		email.getContact().setAddress("cristian.segovia.contractor@bbva.com");
-		contactDetails.add(email);
-		inspection.setContactDetails(contactDetails);
-		requestBody.setInspection(inspection);
 		requestBody.setHeaderOperationDate("2024-05-21");
 		requestBody.setHeaderOperationTime("14:35:36");
-		requestBody.setSaleChannelId("DW");
+		requestBody.setSaleChannelId("PC");
 
 		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
 
@@ -491,7 +429,7 @@ public class RBVDR415Test {
 		verify(pisdR226, times(1)).executeFindPaymentPeriodByType(any());
 		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
-		verify(internalApiConnectorImpersonation, times(1)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
+		verify(internalApiConnectorImpersonation, never()).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
 	}
 
 
@@ -499,7 +437,7 @@ public class RBVDR415Test {
 	CASO 5: PRODUCTO VEHICULAR CON UNA CUENTA, CLIENTE DNI, PLAN 01, CON RESPONSABLE DE PAGO DNI
 	 */
 	@Test
-	public void executeTestFlowVehicularCase5(){
+	public void executeTestFlowVehicularCase5() throws IOException {
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
@@ -508,6 +446,7 @@ public class RBVDR415Test {
 				.thenReturn(result);
 
 		//producto vehicular
+		requestBody = mockData.createRequestPreFormalizationTrx();
 		requestBody.getProduct().setId("830");
 
 		quotationInfo.put("INSURANCE_BUSINESS_NAME","VEHICULAR");
@@ -523,16 +462,15 @@ public class RBVDR415Test {
 		//plan 01
 		requestBody.getProduct().getPlan().setId("01");
 
-		//cuenta de cliente
-		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("ACCOUNT");
-		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("00110130290299972582");
-
+		requestBody.setFirstInstallment(new FirstInstallmentDTO());
 		requestBody.getFirstInstallment().setIsPaymentRequired(true);
 		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
 		inspection.setIsRequired(true);
 		inspection.setFullName("Jose Artica");
 		inspection.setContactDetails(requestBody.getHolder().getContactDetails());
 		requestBody.setInspection(inspection);
+		requestBody.setValidityPeriod(new ValidityPeriodDTO());
+		requestBody.getValidityPeriod().setStartDate(new Date());
 
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,1});
@@ -559,19 +497,22 @@ public class RBVDR415Test {
 	CASO 6: PRODUCTO VEHICULAR CON UNA TARJETA, CLIENTE PASAPORTE, PLAN 02, CON RESPONSABLE DE PAGO PASAPORTE
 	 */
 	@Test
-	public void executeTestFlowVehicularCase6(){
+	public void executeTestFlowVehicularCase6() throws IOException{
 		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
 		Map<String, Object> result = new HashMap<>();
 		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
 
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
+		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString())).thenReturn(result);
 
 		//CLIENTE PASAPORTE
+		requestBody = mockData.createRequestPreFormalizationTrx();
 		requestBody.getHolder().getIdentityDocument().getDocumentType().setId("PASSPORT");
 		requestBody.getHolder().getIdentityDocument().setNumber("1000867709");
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("PASSPORT");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("1000867709");
+
+		requestBody.setValidityPeriod(new ValidityPeriodDTO());
+		requestBody.getValidityPeriod().setStartDate(new Date());
 
 		//producto vehicular
 		requestBody.getProduct().setId("830");
@@ -593,6 +534,7 @@ public class RBVDR415Test {
 		requestBody.getRelatedContracts().get(0).getContractDetails().getProductType().setId("CARD");
 		requestBody.getRelatedContracts().get(0).getContractDetails().setNumber("4919108221879326");
 
+		requestBody.setFirstInstallment(new FirstInstallmentDTO());
 		requestBody.getFirstInstallment().setIsPaymentRequired(true);
 		PolicyInspectionDTO inspection = new PolicyInspectionDTO();
 		inspection.setIsRequired(true);
@@ -618,96 +560,6 @@ public class RBVDR415Test {
 		verify(rbvdR602, times(1)).executePreFormalizationInsurance(any());
 		verify(pisdR012, times(1)).executeMultipleInsertionOrUpdate(any(),any());
 		verify(internalApiConnectorImpersonation, times(0)).exchange(anyString(), any(HttpMethod.class), anyObject(), (Class<Integer>)any());
-	}
-
-
-	/*
-	CASO 7: OTRO PRODUCTO QUE TIENE PARTICIPANTES BENEFICIARIOS
-	 */
-	@Test
-	public void executeTestCase7() throws IOException {
-		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,6,7));
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		//Se agrega beneficiarios de otro mock
-		PolicyDTO request2WithBeneficiaries = mockData.getCreateInsuranceRequestBody();
-		requestBody.setParticipants(request2WithBeneficiaries.getParticipants());
-
-		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
-				.thenReturn(new int[]{1,1,1,1});
-
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-		assertNotNull(validation.getProduct());
-		assertNotNull(validation.getParticipants());
-		assertEquals(3,validation.getParticipants().size());
-	}
-
-
-	/*
-	CASO 8: OTRO PRODUCTO QUE TIENE PARTICIPANTES ASEGURADOS
-	 */
-
-	@Test
-	public void executeTestCase8(){
-		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		icr3Response.getIcmrys3().setOFICON("7794");
-		when(rbvdR602.executePreFormalizationInsurance(Mockito.anyObject())).thenReturn(icr3Response);
-
-		//Se agrega asegurado
-		ParticipantDTO insured = mockCreateParticipant("FOREIGNERS","97793201","69503241210","INSURED");
-		requestBody.getParticipants().add(insured);
-
-		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
-				.thenReturn(new int[]{1,1,1});
-
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-		assertNotNull(validation.getProduct());
-		assertNotNull(validation.getParticipants());
-		assertEquals(2,validation.getParticipants().size());
-	}
-
-
-	/*
-	CASO 9: OTRO PRODUCTO QUE TIENE PARTICIPANTE ENDOSATARIO
-	 */
-
-	@Test
-	public void executeTestCase9(){
-		List<Map<String, Object>> rolesFromDB = mockGetRolesFromDB(Arrays.asList(1,2));
-		Map<String, Object> result = new HashMap<>();
-		result.put(PISDProperties.KEY_OF_INSRC_LIST_RESPONSES.getValue(), rolesFromDB);
-
-		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
-				.thenReturn(result);
-
-		//Se agrega endosatario
-		ParticipantDTO endorsee = mockCreateParticipant("RUC","20224043","20628447889","ENDORSEE");
-		endorsee.setBenefitPercentage(100D);
-		requestBody.getParticipants().add(endorsee);
-
-		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
-				.thenReturn(new int[]{1,1});
-
-		PolicyDTO validation = rbvdr415.executeLogicPreFormalization(requestBody);
-
-		assertNotNull(validation);
-		assertNotNull(validation.getProduct());
-		assertNotNull(validation.getParticipants());
-		assertEquals(2,validation.getParticipants().size());
 	}
 
 
@@ -837,6 +689,8 @@ public class RBVDR415Test {
 		when(pisdR012.executeMultipleInsertionOrUpdate(Mockito.anyString(),Mockito.any()))
 				.thenReturn(new int[]{1,0,1});
 
+		requestBody.getProduct().setId("842");
+
 		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
 
 		assertNull(response);
@@ -855,6 +709,8 @@ public class RBVDR415Test {
 
 		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
 				.thenReturn(result);
+
+		requestBody.getProduct().setId("842");
 
 		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
 

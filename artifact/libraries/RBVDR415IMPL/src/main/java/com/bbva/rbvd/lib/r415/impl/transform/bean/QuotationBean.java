@@ -22,6 +22,7 @@ public class QuotationBean {
         quotationDAO.setContractDurationType((String) responseQueryGetRequiredFields.get(RBVDProperties.FIELD_CONTRACT_DURATION_TYPE.getValue()));
         quotationDAO.setInsuranceCompanyQuotaId((String) responseQueryGetRequiredFields.get(RBVDProperties.FIELD_INSURANCE_COMPANY_QUOTA_ID.getValue()));
         quotationDAO.setInsuranceModalityName((String) responseQueryGetRequiredFields.get(PISDProperties.FIELD_INSURANCE_MODALITY_NAME.getValue()));
+        quotationDAO.setSaleChannelId((String) responseQueryGetRequiredFields.get("SALE_CHANNEL_ID"));
 
         return quotationDAO;
     }

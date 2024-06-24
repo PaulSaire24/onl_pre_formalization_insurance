@@ -1,15 +1,13 @@
 package com.bbva.rbvd.lib.r415.impl.business;
 
-
-import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.ContactDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
 import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
-import com.bbva.rbvd.dto.insrncsale.events.CreatedInsrcEventDTO;
+import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
 import com.bbva.rbvd.dto.insrncsale.events.CreatedInsuranceDTO;
+import com.bbva.rbvd.dto.insrncsale.events.CreatedInsrcEventDTO;
 import com.bbva.rbvd.dto.insrncsale.events.StatusDTO;
 import com.bbva.rbvd.dto.insrncsale.events.ProductCreatedInsrcEventDTO;
 import com.bbva.rbvd.dto.insrncsale.events.PlanCreatedInsrcEventDTO;
@@ -28,6 +26,7 @@ import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.TotalInstallmentDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PaymentPeriodDTO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
+import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -46,7 +45,7 @@ public class CreatedInsuranceEventBusiness {
         Calendar operationDate = Calendar.getInstance();
         operationDate.setTime(requestBody.getOperationDate());
         body.setOperationDate(operationDate);
-        body.setValidityPeriod(getValidityPeriodFromResponse(requestBody));
+        body.setValidityPeriod(requestBody.getValidityPeriod());
         body.setHolder(getHolderFromResponse(requestBody));
         body.setProduct(getProductFromResponse(requestBody));
         body.setPaymentMethod(getPaymentMethodFromResponse(requestBody));
@@ -102,10 +101,14 @@ public class CreatedInsuranceEventBusiness {
 
         paymentMethod.setPaymentType(requestBody.getPaymentMethod().getPaymentType());
 
-        RelatedContractDTO relatedContract = new RelatedContractDTO();
-        relatedContract.setContractId(requestBody.getRelatedContracts().get(0).getContractDetails().getContractId());
-        relatedContract.setNumber(requestBody.getRelatedContracts().get(0).getContractDetails().getNumber());
-        paymentMethod.setRelatedContracts(Collections.singletonList(relatedContract));
+        RelatedContractDTO relatedContractBody = ConvertUtil.getRelatedContractByTye(requestBody.getRelatedContracts(), ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT);
+
+        if(relatedContractBody != null){
+            RelatedContractDTO relatedContract = new RelatedContractDTO();
+            relatedContract.setContractId(relatedContractBody.getContractDetails().getContractId());
+            relatedContract.setNumber(relatedContractBody.getContractDetails().getContractId());
+            paymentMethod.setRelatedContracts(Collections.singletonList(relatedContract));
+        }
 
         return paymentMethod;
     }
@@ -132,7 +135,7 @@ public class CreatedInsuranceEventBusiness {
         plan.setTotalInstallment(totalInstallment);
 
         InstallmentPlansCreatedInsrcEvent installmentPlans = new InstallmentPlansCreatedInsrcEvent();
-        installmentPlans.setPaymentsTotalNumber(requestBody.getInstallmentPlan().getTotalNumberInstallments().intValue());
+        installmentPlans.setPaymentsTotalNumber(getPaymentsTotalNumber(requestBody.getInstallmentPlan().getTotalNumberInstallments()));
         installmentPlans.setPaymentAmount(new PaymentAmountDTO());
         installmentPlans.getPaymentAmount().setAmount(requestBody.getInstallmentPlan().getPaymentAmount().getAmount());
         installmentPlans.getPaymentAmount().setCurrency(requestBody.getInstallmentPlan().getPaymentAmount().getCurrency());
@@ -143,14 +146,11 @@ public class CreatedInsuranceEventBusiness {
         return plan;
     }
 
-    private static ValidityPeriodDTO getValidityPeriodFromResponse(PolicyDTO requestBody) {
-        if(requestBody.getValidityPeriod() != null){
-            ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
-            validityPeriodDTO.setStartDate(requestBody.getValidityPeriod().getStartDate());
-            validityPeriodDTO.setEndDate(requestBody.getValidityPeriod().getEndDate());
-            return validityPeriodDTO;
+    private static int getPaymentsTotalNumber(Long number){
+        if(number != null){
+            return number.intValue();
         }
-        return null;
+        return 1;
     }
 
     private static HolderDTO getHolderFromResponse(PolicyDTO requestBody){
@@ -169,6 +169,7 @@ public class CreatedInsuranceEventBusiness {
 
         return holderDTO;
     }
+
 
     private static ContactDetailDTO getContactDetailToHolder(ContactDetailDTO contactDetailDTO) {
         ContactDetailDTO contactDetailForHolderEvent = new ContactDetailDTO();
