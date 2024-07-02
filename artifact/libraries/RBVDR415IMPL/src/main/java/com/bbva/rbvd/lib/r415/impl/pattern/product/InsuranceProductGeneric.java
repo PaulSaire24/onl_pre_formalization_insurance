@@ -4,10 +4,10 @@ import com.bbva.elara.configuration.manager.application.ApplicationConfiguration
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICMRYS3;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Request;
 import com.bbva.rbvd.dto.cicsconnection.icr3.ICR3Response;
+import com.bbva.rbvd.dto.insrncsale.commons.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
 import com.bbva.rbvd.dto.preformalization.dao.QuotationDAO;
 import com.bbva.rbvd.dto.preformalization.transfer.PayloadConfig;
-import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.lib.r415.impl.business.ICR3Business;
 import com.bbva.rbvd.lib.r415.impl.pattern.PostInsuranceProduct;
 import com.bbva.rbvd.lib.r415.impl.pattern.PreInsuranceProduct;
@@ -18,6 +18,8 @@ import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
 import com.bbva.rbvd.lib.r602.RBVDR602;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 public class InsuranceProductGeneric extends PreFormalizationDecorator {
 
@@ -40,7 +42,6 @@ public class InsuranceProductGeneric extends PreFormalizationDecorator {
 
         String hostBranchId = icr3Response.getIcmrys3().getOFICON();
         input.getBank().getBranch().setId(hostBranchId);
-        setSaleChannelIdFromBranchId(input, hostBranchId,applicationConfigurationService);
 
         filltOutputTrx(input,icr3Response.getIcmrys3(),payloadConfig.getQuotation());
 
@@ -56,18 +57,25 @@ public class InsuranceProductGeneric extends PreFormalizationDecorator {
         return input;
     }
 
-    private void setSaleChannelIdFromBranchId(PolicyDTO requestBody, String branchId,ApplicationConfigurationService applicationConfigurationService) {
-        String tlmktValue = applicationConfigurationService.getProperty(ConstantsUtil.ApxConsole.KEY_TLMKT_CODE);
-        if (tlmktValue.equals(branchId)) {
-            LOGGER.info("***** InsuranceProductGeneric - setSaleChannelIdFromBranchId | It's TLMKT Channel *****");
-            requestBody.setSaleChannelId("TM");
-        }
-    }
     private void filltOutputTrx(PolicyDTO policyDTO, ICMRYS3 icmrys3, QuotationDAO quotationDAO){
         policyDTO.setId(getContractFrontIcr3Response(icmrys3));
         policyDTO.getProduct().setName(quotationDAO.getInsuranceProductDesc());
+        policyDTO.getProduct().getPlan().setDescription(quotationDAO.getInsuranceModalityName());
         policyDTO.setOperationDate(ConvertUtil.convertStringDateWithTimeFormatToDate(icmrys3.getFECCTR()));
-        policyDTO.getValidityPeriod().setEndDate(ConvertUtil.convertStringDateWithDateFormatToDate(icmrys3.getFECFIN()));
+        fillValidityPeriod(policyDTO,icmrys3);
+    }
+
+    private void fillValidityPeriod(PolicyDTO response,ICMRYS3 icmrys3){
+        if(response.getValidityPeriod() != null){
+            response.getValidityPeriod().setEndDate(icmrys3.getFECFIN() != null ? ConvertUtil.convertStringDateWithDateFormatToDate(icmrys3.getFECFIN()) : null);
+        }else{
+            if(ValidationUtil.allValuesNotNullOrEmpty(Arrays.asList(icmrys3.getFECINI(),icmrys3.getFECFIN()))){
+                ValidityPeriodDTO validityPeriodDTO = new ValidityPeriodDTO();
+                validityPeriodDTO.setStartDate(ConvertUtil.convertStringDateWithDateFormatToDate(icmrys3.getFECINI()));
+                validityPeriodDTO.setEndDate(ConvertUtil.convertStringDateWithDateFormatToDate(icmrys3.getFECFIN()));
+                response.setValidityPeriod(validityPeriodDTO);
+            }
+        }
     }
 
     private String getContractFrontIcr3Response(ICMRYS3 icmrys3) {

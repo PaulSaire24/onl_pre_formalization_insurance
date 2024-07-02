@@ -386,10 +386,15 @@ public class RBVDR415Test {
 
 		//Se agrega 4 representantes legales
 		ParticipantDTO legal1 = mockCreateParticipant("DNI","37850934","78122201","LEGAL_REPRESENTATIVE");
+		legal1.setFullName("Jose Artica");
 		ParticipantDTO legal2 = mockCreateParticipant("DNI","76110922","89001171","LEGAL_REPRESENTATIVE");
+		legal2.setFullName("Jose Daniel|Perea");
 		ParticipantDTO legal3 = mockCreateParticipant("DNI","80009125","67009815","LEGAL_REPRESENTATIVE");
+		legal3.setFullName("Pedro|Guller|Kvaratskhelia");
 		ParticipantDTO legal4 = mockCreateParticipant("DNI","10977833","72000822","LEGAL_REPRESENTATIVE");
+		legal4.setFullName("Renzo||");
 		ParticipantDTO legal5 = mockCreateParticipant("DNI","10998361","70009818","LEGAL_REPRESENTATIVE");
+		legal5.setFullName("Enzo|Fernandez|");
 		requestBody.getParticipants().add(legal1);
 		requestBody.getParticipants().add(legal2);
 		requestBody.getParticipants().add(legal3);
@@ -511,8 +516,6 @@ public class RBVDR415Test {
 		requestBody.getParticipants().get(0).getIdentityDocument().getDocumentType().setId("PASSPORT");
 		requestBody.getParticipants().get(0).getIdentityDocument().setNumber("1000867709");
 
-		requestBody.setValidityPeriod(new ValidityPeriodDTO());
-		requestBody.getValidityPeriod().setStartDate(new Date());
 
 		//producto vehicular
 		requestBody.getProduct().setId("830");
