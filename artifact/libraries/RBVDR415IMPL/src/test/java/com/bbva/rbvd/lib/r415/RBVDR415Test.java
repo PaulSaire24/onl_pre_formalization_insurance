@@ -713,7 +713,8 @@ public class RBVDR415Test {
 		when(pisdR012.executeGetRolesByProductAndModality(Mockito.any(),Mockito.anyString()))
 				.thenReturn(result);
 
-		requestBody.getProduct().setId("842");
+		requestBody.getProduct().setId("861");
+		requestBody.setValidityPeriod(null);
 
 		PolicyDTO response = rbvdr415.executeLogicPreFormalization(requestBody);
 
