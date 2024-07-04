@@ -96,7 +96,7 @@
 		</dto>
 		<list order="14" name="participants" mandatory="0">
 			<dto order="1" name="Type" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO" artifactId="RBVDC201">
-				<parameter order="1" name="fullName" mandatory="0" type="String" size="100"/>
+				<parameter order="1" name="fullName" mandatory="0" type="String" size="300"/>
 				<dto order="2" name="identityDocument" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO" artifactId="RBVDC201">
 					<dto order="1" name="documentType" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO" artifactId="RBVDC201">
 						<parameter order="1" name="id" mandatory="1" type="String" size="30"/>
@@ -169,7 +169,7 @@
 		</dto>
 		<list order="10" name="participants" mandatory="0">
 			<dto order="1" name="Type" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.policy.ParticipantDTO" artifactId="RBVDC201">
-				<parameter order="1" name="fullName" mandatory="0" type="String" size="100"/>
+				<parameter order="1" name="fullName" mandatory="0" type="String" size="300"/>
 				<dto order="2" name="identityDocument" mandatory="0" package="com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO" artifactId="RBVDC201">
 					<dto order="1" name="documentType" mandatory="1" package="com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO" artifactId="RBVDC201">
 						<parameter order="1" name="id" mandatory="1" type="String" size="30"/>

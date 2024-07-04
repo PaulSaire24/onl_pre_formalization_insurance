@@ -9,8 +9,10 @@ import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 import com.bbva.rbvd.lib.r415.impl.util.ValidationUtil;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,6 +78,17 @@ public class ParticipantBean {
         participantDao.setCustomerId(Objects.nonNull(participant.getCustomerId()) ? participant.getCustomerId() : null);
         participantDao.setCreationUserId(requestBody.getCreationUser());
         participantDao.setUserAuditId(requestBody.getUserAudit());
+
+        //si envian nombres completos (campo fullName) deben enviar en el formato: NOMBRES|APELLIDO PATERNO|APELLIDO MATERNO
+        if(!StringUtils.isEmpty(participant.getFullName())){
+            List<String> listNames = Arrays.asList(participant.getFullName().split("\\|"));
+            if(listNames.size() == 3){
+                participantDao.setInsuredCustomerName(listNames.get(0));
+                participantDao.setFirstLastName(listNames.get(1));
+                participantDao.setSecondLastName(listNames.get(2));
+            }
+        }
+
         return participantDao;
     }
 

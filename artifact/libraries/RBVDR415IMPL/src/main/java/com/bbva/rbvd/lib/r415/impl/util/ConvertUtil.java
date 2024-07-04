@@ -2,7 +2,6 @@
 package com.bbva.rbvd.lib.r415.impl.util;
 
 import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
-import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.springframework.util.CollectionUtils;
