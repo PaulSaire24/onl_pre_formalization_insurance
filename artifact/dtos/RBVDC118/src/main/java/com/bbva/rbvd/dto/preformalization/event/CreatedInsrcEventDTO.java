@@ -7,7 +7,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @JsonIgnoreProperties(value = {"type"})
 public class CreatedInsrcEventDTO extends AbstractDTO {
 
-    private InsurancePreFormalizedDTO insurancePreFormalized;
+    private transient InsurancePreFormalizedDTO insurancePreFormalized;
     private HeaderDTO header;
 
 
