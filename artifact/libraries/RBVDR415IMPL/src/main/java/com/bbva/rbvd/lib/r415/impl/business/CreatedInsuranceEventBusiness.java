@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 
 public class CreatedInsuranceEventBusiness {
 
-    private CreatedInsuranceEventBusiness(){}
-
     public static CreatedInsrcEventDTO createRequestCreatedInsuranceEvent(PolicyDTO requestBody){
         CreatedInsrcEventDTO createdInsrcEventDTO = new CreatedInsrcEventDTO();
 

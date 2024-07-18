@@ -254,6 +254,7 @@ public class RBVDR415Test {
 		requestBody.getParticipants().add(legal2);
 		requestBody.getParticipants().add(legal3);
 		requestBody.getParticipants().add(legal4);
+		requestBody.getRelatedContracts().get(0).getContractDetails().setContractType("INTERNAL_CONTRACT");
 
 		//producto vida ley
 		requestBody.getProduct().setId("842");
