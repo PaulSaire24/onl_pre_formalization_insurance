@@ -3,11 +3,12 @@ package com.bbva.rbvd.dto.preformalization.event;
 import com.bbva.apx.dto.AbstractDTO;
 import com.bbva.rbvd.dto.preformalization.header.HeaderDTO;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonIgnoreProperties(value = {"type"})
 public class CreatedInsrcEventDTO extends AbstractDTO {
-
-    private transient InsurancePreFormalizedDTO insurancePreFormalized;
+    @JsonIgnore
+    private InsurancePreFormalizedDTO insurancePreFormalized;
     private HeaderDTO header;
 
 
