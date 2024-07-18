@@ -1,35 +1,36 @@
 package com.bbva.rbvd.lib.r415.impl.business;
 
-import com.bbva.rbvd.dto.insrncsale.commons.PaymentAmountDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.ContactDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.DocumentTypeDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.HolderDTO;
-import com.bbva.rbvd.dto.insrncsale.commons.IdentityDocumentDTO;
-import com.bbva.rbvd.dto.insrncsale.events.CreatedInsuranceDTO;
-import com.bbva.rbvd.dto.insrncsale.events.CreatedInsrcEventDTO;
-import com.bbva.rbvd.dto.insrncsale.events.StatusDTO;
-import com.bbva.rbvd.dto.insrncsale.events.ProductCreatedInsrcEventDTO;
-import com.bbva.rbvd.dto.insrncsale.events.PlanCreatedInsrcEventDTO;
-import com.bbva.rbvd.dto.insrncsale.events.InstallmentPlansCreatedInsrcEvent;
-import com.bbva.rbvd.dto.insrncsale.events.header.EventDTO;
-import com.bbva.rbvd.dto.insrncsale.events.header.OriginDTO;
-import com.bbva.rbvd.dto.insrncsale.events.header.BranchEventDTO;
-import com.bbva.rbvd.dto.insrncsale.events.header.ResultDTO;
-import com.bbva.rbvd.dto.insrncsale.events.header.TraceDTO;
-import com.bbva.rbvd.dto.insrncsale.events.header.BankEventDTO;
-import com.bbva.rbvd.dto.insrncsale.events.header.FlagDTO;
-import com.bbva.rbvd.dto.insrncsale.events.header.HeaderDTO;
 import com.bbva.rbvd.dto.insrncsale.policy.PolicyDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PolicyPaymentMethodDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.TotalInstallmentDTO;
-import com.bbva.rbvd.dto.insrncsale.policy.PaymentPeriodDTO;
+import com.bbva.rbvd.dto.preformalization.event.RelatedContractDTO;
+import com.bbva.rbvd.dto.preformalization.event.CreatedInsrcEventDTO;
+import com.bbva.rbvd.dto.preformalization.event.InsurancePreFormalizedDTO;
+import com.bbva.rbvd.dto.preformalization.event.ProductCreatedInsrcEventDTO;
+import com.bbva.rbvd.dto.preformalization.event.PlanCreatedInsrcEventDTO;
+import com.bbva.rbvd.dto.preformalization.event.TotalInstallmentDTO;
+import com.bbva.rbvd.dto.preformalization.event.InstallmentPlansCreatedInsrcEvent;
+import com.bbva.rbvd.dto.preformalization.event.PaymentAmountDTO;
+import com.bbva.rbvd.dto.preformalization.event.PaymentPeriodDTO;
+import com.bbva.rbvd.dto.preformalization.event.HolderDTO;
+import com.bbva.rbvd.dto.preformalization.event.IdentityDocumentDTO;
+import com.bbva.rbvd.dto.preformalization.event.DocumentTypeDTO;
+import com.bbva.rbvd.dto.preformalization.event.ContactDetailDTO;
+import com.bbva.rbvd.dto.preformalization.event.ContactDTO;
+import com.bbva.rbvd.dto.preformalization.header.EventDTO;
+import com.bbva.rbvd.dto.preformalization.header.OriginDTO;
+import com.bbva.rbvd.dto.preformalization.header.BranchEventDTO;
+import com.bbva.rbvd.dto.preformalization.header.BankEventDTO;
+import com.bbva.rbvd.dto.preformalization.header.ResultDTO;
+import com.bbva.rbvd.dto.preformalization.header.TraceDTO;
+import com.bbva.rbvd.dto.preformalization.header.FlagDTO;
+import com.bbva.rbvd.dto.preformalization.header.HeaderDTO;
+import com.bbva.rbvd.dto.preformalization.event.StatusDTO;
+import com.bbva.rbvd.dto.preformalization.event.PolicyPaymentMethodDTO;
+import com.bbva.rbvd.dto.preformalization.event.ValidityPeriodDTO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
-import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CreatedInsuranceEventBusiness {
@@ -39,19 +40,22 @@ public class CreatedInsuranceEventBusiness {
     public static CreatedInsrcEventDTO createRequestCreatedInsuranceEvent(PolicyDTO requestBody){
         CreatedInsrcEventDTO createdInsrcEventDTO = new CreatedInsrcEventDTO();
 
-        CreatedInsuranceDTO body = new CreatedInsuranceDTO();
+        InsurancePreFormalizedDTO body = new InsurancePreFormalizedDTO();
         body.setQuotationId(requestBody.getQuotationNumber());
         body.setContractId(requestBody.getId());
         Calendar operationDate = Calendar.getInstance();
         operationDate.setTime(requestBody.getOperationDate());
         body.setOperationDate(operationDate);
-        body.setValidityPeriod(requestBody.getValidityPeriod());
+        ValidityPeriodDTO validityPeriod = new ValidityPeriodDTO();
+        validityPeriod.setStartDate(requestBody.getValidityPeriod().getStartDate());
+        validityPeriod.setEndDate(requestBody.getValidityPeriod().getEndDate());
+        body.setValidityPeriod(validityPeriod);
         body.setHolder(getHolderFromResponse(requestBody));
         body.setProduct(getProductFromResponse(requestBody));
         body.setPaymentMethod(getPaymentMethodFromResponse(requestBody));
         body.setStatus(getStatus());
 
-        createdInsrcEventDTO.setCreatedInsurance(body);
+        createdInsrcEventDTO.setInsurancePreFormalized(body);
 
         EventDTO event = new EventDTO("InsurancePreFormalized", "pe.rbvd.app-id-105529.prod");
         OriginDTO origin = new OriginDTO();
@@ -101,15 +105,18 @@ public class CreatedInsuranceEventBusiness {
 
         paymentMethod.setPaymentType(requestBody.getPaymentMethod().getPaymentType());
 
-        RelatedContractDTO relatedContractBody = ConvertUtil.getRelatedContractByTye(requestBody.getRelatedContracts(), ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT);
+        RelatedContractDTO relatedContracts = requestBody.getRelatedContracts().stream()
+                .filter(relatedContractDTO -> ConstantsUtil.RelatedContractType.INTERNAL_CONTRACT.equals(relatedContractDTO.getContractDetails().getContractType()))
+                .map(relatedContract ->{
+                RelatedContractDTO relatedContractDTO = new RelatedContractDTO();
+                relatedContractDTO.setContractId(relatedContract.getContractDetails().getContractId());
+                relatedContractDTO.setNumber(relatedContract.getContractDetails().getContractId());
+                return relatedContractDTO;
+                }).findFirst().orElse(null);
 
-        if(relatedContractBody != null){
-            RelatedContractDTO relatedContract = new RelatedContractDTO();
-            relatedContract.setContractId(relatedContractBody.getContractDetails().getContractId());
-            relatedContract.setNumber(relatedContractBody.getContractDetails().getContractId());
-            paymentMethod.setRelatedContracts(Collections.singletonList(relatedContract));
+        if(Objects.nonNull(relatedContracts)){
+            paymentMethod.setRelatedContracts(Collections.singletonList(relatedContracts));
         }
-
         return paymentMethod;
     }
 
@@ -171,7 +178,7 @@ public class CreatedInsuranceEventBusiness {
     }
 
 
-    private static ContactDetailDTO getContactDetailToHolder(ContactDetailDTO contactDetailDTO) {
+    private static com.bbva.rbvd.dto.preformalization.event.ContactDetailDTO getContactDetailToHolder(com.bbva.rbvd.dto.insrncsale.commons.ContactDetailDTO contactDetailDTO) {
         ContactDetailDTO contactDetailForHolderEvent = new ContactDetailDTO();
         ContactDTO contact = new ContactDTO();
         if(ConstantsUtil.ContactDetailsType.EMAIL.equals(contactDetailDTO.getContact().getContactDetailType())) {

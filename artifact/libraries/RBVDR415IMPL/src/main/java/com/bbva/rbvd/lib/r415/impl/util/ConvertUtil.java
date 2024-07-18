@@ -1,6 +1,7 @@
 
 package com.bbva.rbvd.lib.r415.impl.util;
 
+
 import com.bbva.rbvd.dto.insrncsale.policy.RelatedContractDTO;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;

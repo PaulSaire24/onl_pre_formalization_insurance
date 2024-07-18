@@ -1,7 +1,7 @@
 package com.bbva.rbvd.lib.r415.impl.service.api;
 
 import com.bbva.elara.utility.api.connector.APIConnector;
-import com.bbva.rbvd.dto.insrncsale.events.CreatedInsrcEventDTO;
+import com.bbva.rbvd.dto.preformalization.event.CreatedInsrcEventDTO;
 import com.bbva.rbvd.dto.preformalization.util.ConstantsUtil;
 import com.bbva.rbvd.lib.r415.impl.util.ConvertUtil;
 import org.slf4j.Logger;

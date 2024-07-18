@@ -23,7 +23,17 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.bbva.apx.dto</groupId>
+            <artifactId>apx-dto</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+        </dependency>
+    </dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>
 		<plugins>
