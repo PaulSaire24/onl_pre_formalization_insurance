@@ -53,7 +53,7 @@ public class CreatedInsuranceEventBusiness {
 
         createdInsrcEventDTO.setInsurancePreFormalized(body);
 
-        EventDTO event = new EventDTO("CreatedInsurance", "pe.rbvd.app-id-105529.prod");
+        EventDTO event = new EventDTO("InsurancePreFormalized", "pe.rbvd.app-id-105529.prod");
         OriginDTO origin = new OriginDTO();
         origin.setAap(requestBody.getAap());
 
@@ -65,10 +65,10 @@ public class CreatedInsuranceEventBusiness {
         origin.setChannelCode(requestBody.getSaleChannelId());
         origin.setEnvironCode(requestBody.getEnvironmentCode());
         origin.setIpv4(requestBody.getIpv4());
-        origin.setOperation("APX_RBVDT211_CreatedInsurance");
+        origin.setOperation("APX_RBVDT211_InsurancePreFormalized");
         origin.setProductCode(requestBody.getProductCode());
 
-        String timestamp = requestBody.getHeaderOperationDate().concat(" ").concat(requestBody.getHeaderOperationTime());
+        String timestamp = requestBody.getHeaderOperationDate();
         origin.setTimestamp(timestamp);
 
         origin.setUser(requestBody.getCreationUser());
