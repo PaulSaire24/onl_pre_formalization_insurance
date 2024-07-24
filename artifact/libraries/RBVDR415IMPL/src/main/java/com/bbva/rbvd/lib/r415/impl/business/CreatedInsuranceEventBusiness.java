@@ -51,7 +51,7 @@ public class CreatedInsuranceEventBusiness {
         body.setPaymentMethod(getPaymentMethodFromResponse(requestBody));
         body.setStatus(getStatus());
 
-        createdInsrcEventDTO.setInsurancePreFormalized(body);
+        createdInsrcEventDTO.setCreatedInsurance(body);
 
         EventDTO event = new EventDTO("InsurancePreFormalized", "pe.rbvd.app-id-105529.prod");
         OriginDTO origin = new OriginDTO();
