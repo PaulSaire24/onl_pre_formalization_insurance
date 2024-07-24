@@ -68,7 +68,7 @@ public class CreatedInsuranceEventBusiness {
         origin.setOperation("APX_RBVDT211_InsurancePreFormalized");
         origin.setProductCode(requestBody.getProductCode());
 
-        String timestamp = requestBody.getHeaderOperationDate();
+        String timestamp = requestBody.getHeaderOperationDate().concat(" ").concat(requestBody.getHeaderOperationTime());
         origin.setTimestamp(timestamp);
 
         origin.setUser(requestBody.getCreationUser());
